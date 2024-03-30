@@ -13,9 +13,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<ResourceSettings>().FromScriptableObjectResource("Settings/ResourceSettings").AsSingle();
 		Container.Bind<PlanetSettings>().FromScriptableObjectResource("Settings/PlanetSettings").AsSingle();
 		Container.Bind<CargoShipView>().FromComponentInNewPrefabResource("Game/CargoShip").AsSingle();
-		Container.Bind<IProductionService>().To<ProductionService>().AsSingle();
 		Container.Bind<IResourcesService>().To<ResourcesService>().AsSingle();
-		Container.Bind<IUnitFactory>().To<UnitFactory>().AsSingle();
 		Container.Bind<IPlayerModel>().To<PlayerModel>().AsSingle();
 		Container.Bind<ISpaceModel>().To<SpaceModel>().AsSingle();
 		Container.Bind<ISpaceController>().To<SpaceController>().AsSingle();

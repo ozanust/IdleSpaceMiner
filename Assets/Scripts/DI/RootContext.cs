@@ -8,5 +8,4 @@ public class RootContext : MonoBehaviour
 {
 	[Inject] IGameManager gameManager;
 	[Inject] IInputService inputService;
-	[Inject] IUnitPool unitPool;
 }
