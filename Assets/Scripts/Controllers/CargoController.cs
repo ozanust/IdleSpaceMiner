@@ -10,6 +10,8 @@ public class CargoController : ICargoController
 	private ISpaceModel spaceModel;
 	private CargoShipView cargoShipPrototype;
 
+	private Dictionary<int, CargoShipView> ships = new Dictionary<int, CargoShipView>();
+
     public CargoController(SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel)
 	{
 		this.signalBus = signalBus;
@@ -19,11 +21,27 @@ public class CargoController : ICargoController
 
 		this.cargoShipPrototype.gameObject.SetActive(false);
 		this.signalBus.Subscribe<PlanetTransformSignal>(OnPlanetUnlocked);
+		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
 	private void OnPlanetUnlocked(PlanetTransformSignal signal)
 	{
 		SpawnCargoShipAndAssign(signal.PlanetId);
+	}
+
+	private void OnPlanetUpdated(PlanetUpdatedSignal signal)
+	{
+		if (ships.ContainsKey(signal.PlanetId))
+		{
+			CargoShipView ship = ships[signal.PlanetId];
+
+			PlanetData planetData;
+			if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
+			{
+				ship.SetShipSpeed(planetData.CurrentShipSpeed);
+				ship.SetCargoSize(planetData.CurrentShipCargo);
+			}
+		}
 	}
 
 	private void SpawnCargoShipAndAssign(int planetId)
@@ -43,6 +61,11 @@ public class CargoController : ICargoController
 			ship.SetTargetPlanet(planetTransform, planetId);
 			ship.SetSignalBus(signalBus);
 			ship.gameObject.SetActive(true);
+
+			if (!ships.ContainsKey(planetId))
+			{
+				ships.Add(planetId, ship);
+			}
 		}
 		else
 		{

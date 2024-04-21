@@ -15,9 +15,11 @@ public class CargoShipView : MonoBehaviour
 	private Transform targetPlanet;
 	private Vector3 mothershipDefaultPosition = new Vector3(0, 0, 0);
 
+	// Don't happy with this "Set" methods, let's find a better way
 	public void SetSignalBus(SignalBus signalBus)
 	{
 		this.signalBus = signalBus;
+		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
 	public void SetTargetPlanet(Transform targetPlanet, int targetPlanetId)
@@ -54,5 +56,15 @@ public class CargoShipView : MonoBehaviour
 	private void Update()
 	{
 		this.transform.position += (currentTarget - transform.position).normalized * shipSpeed * Time.deltaTime * 5;
+	}
+
+	private void OnPlanetUpdated(PlanetUpdatedSignal signal)
+	{
+		if (signal.PlanetId != targetPlanetId)
+		{
+			return;
+		}
+
+
 	}
 }

@@ -44,6 +44,9 @@ public class PlanetInfoView : MonoBehaviour
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
+		miningRateUpdateButton.onClick.AddListener(OnMiningRateUpdateButtonClick);
+		shipSpeedUpdateButton.onClick.AddListener(OnShipSpeedUpdateButtonClick);
+		shipCargoUpdateButton.onClick.AddListener(OnShipCargoUpdateButtonClick);
 		signalBus.Subscribe<PlanetOpenSignal>(OnPlanetOpen);
 		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
@@ -79,16 +82,16 @@ public class PlanetInfoView : MonoBehaviour
 		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 		{
 			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", "Lv.", planetData.CurrentTotalMiningRate, "sec");
-			miningRateUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.TotalMiningRateUpdatePrice);
+			miningRateText.text = string.Format("{0} / {1}", planetData.CurrentTotalMiningRate, "sec");
+			miningRateUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.TotalMiningRateUpdatePrice);
 
 			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-			shipSpeedText.text = string.Format("{0} {1}", "Lv.", planetData.CurrentShipSpeed, "mkph");
-			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipSpeedUpdatePrice);
+			shipSpeedText.text = string.Format("{0} {1}", planetData.CurrentShipSpeed, "mkph");
+			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipSpeedUpdatePrice);
 
 			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
 			shipCargoText.text = planetData.CurrentShipCargo.ToString();
-			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipCargoUpdatePrice);
+			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipCargoUpdatePrice);
 		}
 
 		panel.SetActive(true);
@@ -113,6 +116,15 @@ public class PlanetInfoView : MonoBehaviour
 		}
 	}
 
+	private void UpdateMiningDataTypeViews(PlanetMineData[] mineDatas)
+	{
+		foreach (PlanetMineData pmd in mineDatas)
+		{
+			ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
+			infoItems[pmd.Type].UpdateMiningRate(data.TotalMineRate * pmd.Ratio);
+		}
+	}
+
 	private void OnPlanetUpdated(PlanetUpdatedSignal signal)
 	{
 		if (signal.PlanetId != openPlanetId)
@@ -124,17 +136,39 @@ public class PlanetInfoView : MonoBehaviour
 		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 		{
 			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", "Lv.", planetData.CurrentTotalMiningRate, "sec");
-			miningRateUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.TotalMiningRateUpdatePrice);
+			miningRateText.text = string.Format("{0} / {1}", planetData.CurrentTotalMiningRate, "sec");
+			miningRateUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.TotalMiningRateUpdatePrice);
 
 			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-			shipSpeedText.text = string.Format("{0} {1}", "Lv.", planetData.CurrentShipSpeed, "mkph");
-			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipSpeedUpdatePrice);
+			shipSpeedText.text = string.Format("{0} {1}", planetData.CurrentShipSpeed, "mkph");
+			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipSpeedUpdatePrice);
 
 			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
 			shipCargoText.text = planetData.CurrentShipCargo.ToString();
-			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipCargoUpdatePrice);
+			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipCargoUpdatePrice);
 		}
+
+		MiningData tempData;
+		if (miningController.TryGetMiningData(signal.PlanetId, out tempData))
+		{
+			data = tempData;
+			UpdateMiningDataTypeViews(data.MineDatas);
+		}
+	}
+
+	private void OnMiningRateUpdateButtonClick()
+	{
+		planetInfoController.UpdateMiningRate(openPlanetId);
+	}
+
+	private void OnShipSpeedUpdateButtonClick()
+	{
+		planetInfoController.UpdateShipSpeed(openPlanetId);
+	}
+
+	private void OnShipCargoUpdateButtonClick()
+	{
+		planetInfoController.UpdateCargoSize(openPlanetId);
 	}
 
 	private void CloseView()

@@ -7,19 +7,22 @@ public class MiningController : IMiningController, ITickable
 {
 	private PlanetSettings planetSettings;
 	private IPlayerModel playerModel;
+	private ISpaceModel spaceModel;
 	private SignalBus signalBus;
 	private Dictionary<int, MiningData> mineData = new Dictionary<int, MiningData>();
 	private Dictionary<int, TransferResourcesData[]> transferData = new Dictionary<int, TransferResourcesData[]>();
 
-	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, IPlayerModel playerModel)
+	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, IPlayerModel playerModel, ISpaceModel spaceModel)
 	{
 		this.signalBus = signalBus;
 		this.planetSettings = planetSettings;
 		this.playerModel = playerModel;
+		this.spaceModel = spaceModel;
 
 		this.signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
 		this.signalBus.Subscribe<CargoShipMothershipArrivalSignal>(OnCargoArrivedMothership);
+		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
 	public void Tick()
@@ -34,6 +37,15 @@ public class MiningController : IMiningController, ITickable
 		{
 			MiningData md = new MiningData(planetDataSettings.TotalStartingMiningRate, planetDataSettings.MiningYieldRatios);
 			mineData.Add(signal.PlanetId, md);
+		}
+	}
+
+	private void OnPlanetUpdated(PlanetUpdatedSignal signal)
+	{
+		PlanetData planetData;
+		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
+		{
+			mineData[signal.PlanetId].TotalMineRate = planetData.CurrentTotalMiningRate;
 		}
 	}
 

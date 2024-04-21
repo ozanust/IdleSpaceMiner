@@ -23,6 +23,7 @@ public class PlanetInfoController : IPlanetInfoController
 		{
 			if (playerModel.HasMoney(planetData.TotalMiningRateUpdatePrice))
 			{
+				playerModel.UseMoney(planetData.TotalMiningRateUpdatePrice);
 				spaceModel.UpdatePlanetMiningRate(planetId);
 			}
 		}
@@ -35,6 +36,7 @@ public class PlanetInfoController : IPlanetInfoController
 		{
 			if (playerModel.HasMoney(planetData.ShipSpeedUpdatePrice))
 			{
+				playerModel.UseMoney(planetData.ShipSpeedUpdatePrice);
 				spaceModel.UpdatePlanetShipSpeed(planetId);
 			}
 		}
@@ -47,6 +49,7 @@ public class PlanetInfoController : IPlanetInfoController
 		{
 			if (playerModel.HasMoney(planetData.ShipCargoUpdatePrice))
 			{
+				playerModel.UseMoney(planetData.ShipCargoUpdatePrice);
 				spaceModel.UpdatePlanetCargo(planetId);
 			}
 		}

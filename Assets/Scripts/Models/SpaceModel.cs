@@ -29,10 +29,26 @@ public class SpaceModel : ISpaceModel
 		signalBus.Fire(new SpaceModelInitializedSignal() { Data = planetData });
 	}
 
-	public void UnlockPlanet(int planetIndex)
+	public void UnlockPlanet(int planetId)
 	{
-		planetData[planetIndex].IsUnlocked = true;
-		signalBus.Fire(new PlanetUnlockedSignal() { PlanetId = planetIndex });
+		planetData[planetId].IsUnlocked = true;
+		PlanetData pd = planetData[planetId];
+		PlanetDataSetting pds;
+
+		if (planetSettings.TryGetPlanetSetting(planetId, out pds))
+		{
+			pd.MiningRateLevel += 1;
+			pd.CurrentTotalMiningRate = pds.TotalStartingMiningRate;
+			pd.TotalMiningRateUpdatePrice = pds.StartingMiningRatePrice;
+			pd.ShipSpeedLevel += 1;
+			pd.CurrentShipSpeed = pds.StartingShipSpeed;
+			pd.ShipSpeedUpdatePrice = pds.StartingShipSpeedPrice;
+			pd.ShipCargoLevel += 1;
+			pd.CurrentShipCargo = pds.StartingShipCargo;
+			pd.ShipCargoUpdatePrice = pds.StartingShipCargoPrice;
+		}
+
+		signalBus.Fire(new PlanetUnlockedSignal() { PlanetId = planetId });
 	}
 
 	public void UnravelPlanet(int planetIndex)
@@ -121,7 +137,7 @@ public class SpaceModel : ISpaceModel
 			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
 			{
 				pd.ShipCargoLevel += 1;
-				pd.CurrentShipCargo = pds.StartingShipCargo * Mathf.Pow(pds.CargoIncreaseMultiplier, pd.ShipCargoLevel);
+				pd.CurrentShipCargo = Mathf.RoundToInt(pds.StartingShipCargo * Mathf.Pow(pds.CargoIncreaseMultiplier, pd.ShipCargoLevel));
 				pd.ShipCargoUpdatePrice = Mathf.RoundToInt(pds.StartingShipCargoPrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.ShipCargoLevel));
 				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
 			}
