@@ -12,6 +12,7 @@ public class PlanetInfoView : MonoBehaviour
     [Inject] IPlanetInfoController planetInfoController;
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
+	[Inject] ISpaceModel spaceModel;
 
 	[SerializeField] private GameObject panel;
 	[SerializeField] private GameObject miningInfoPanel;
@@ -19,6 +20,21 @@ public class PlanetInfoView : MonoBehaviour
 	[SerializeField] private MiningInfoItem miningInfoItemPrototype;
 	[SerializeField] private TMP_Text planetNameText;
 	[SerializeField] private Button closeButton;
+
+	[SerializeField] private TMP_Text miningRateLevelText;
+	[SerializeField] private TMP_Text miningRateText;
+	[SerializeField] private TMP_Text miningRateUpdatePriceText;
+	[SerializeField] private Button miningRateUpdateButton;
+
+	[SerializeField] private TMP_Text shipSpeedLevelText;
+	[SerializeField] private TMP_Text shipSpeedText;
+	[SerializeField] private TMP_Text shipSpeedUpdatePriceText;
+	[SerializeField] private Button shipSpeedUpdateButton;
+
+	[SerializeField] private TMP_Text shipCargoLevelText;
+	[SerializeField] private TMP_Text shipCargoText;
+	[SerializeField] private TMP_Text shipCargoUpdatePriceText;
+	[SerializeField] private Button shipCargoUpdateButton;
 
 	private Dictionary<ResourceType, MiningInfoItem> infoItems = new Dictionary<ResourceType, MiningInfoItem>();
 
@@ -29,6 +45,7 @@ public class PlanetInfoView : MonoBehaviour
 	{
 		closeButton.onClick.AddListener(CloseView);
 		signalBus.Subscribe<PlanetOpenSignal>(OnPlanetOpen);
+		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
 	private void OnPlanetOpen(PlanetOpenSignal signal)
@@ -57,7 +74,23 @@ public class PlanetInfoView : MonoBehaviour
 		{
 			return;
 		}
-		
+
+		PlanetData planetData;
+		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
+		{
+			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
+			miningRateText.text = string.Format("{0} / {1}", "Lv.", planetData.CurrentTotalMiningRate, "sec");
+			miningRateUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.TotalMiningRateUpdatePrice);
+
+			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
+			shipSpeedText.text = string.Format("{0} {1}", "Lv.", planetData.CurrentShipSpeed, "mkph");
+			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipSpeedUpdatePrice);
+
+			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
+			shipCargoText.text = planetData.CurrentShipCargo.ToString();
+			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipCargoUpdatePrice);
+		}
+
 		panel.SetActive(true);
 	}
 
@@ -77,6 +110,30 @@ public class PlanetInfoView : MonoBehaviour
 				ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
 				infoItems[pmd.Type].Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * pmd.Ratio, pmd.MinedAmount);
 			}
+		}
+	}
+
+	private void OnPlanetUpdated(PlanetUpdatedSignal signal)
+	{
+		if (signal.PlanetId != openPlanetId)
+		{
+			return;
+		}
+
+		PlanetData planetData;
+		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
+		{
+			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
+			miningRateText.text = string.Format("{0} / {1}", "Lv.", planetData.CurrentTotalMiningRate, "sec");
+			miningRateUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.TotalMiningRateUpdatePrice);
+
+			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
+			shipSpeedText.text = string.Format("{0} {1}", "Lv.", planetData.CurrentShipSpeed, "mkph");
+			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipSpeedUpdatePrice);
+
+			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
+			shipCargoText.text = planetData.CurrentShipCargo.ToString();
+			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "Lv.", "$", planetData.ShipCargoUpdatePrice);
 		}
 	}
 

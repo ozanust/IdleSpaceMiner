@@ -7,4 +7,7 @@ public interface ISpaceModel
     void UnlockPlanet(int planetId);
     bool TryGetPlanetTransform(int planetId, out Transform transform);
     bool TryGetPlanetData(int planetId, out PlanetData data);
+    public void UpdatePlanetMiningRate(int planetId);
+    public void UpdatePlanetShipSpeed(int planetId);
+    public void UpdatePlanetCargo(int planetId);
 }

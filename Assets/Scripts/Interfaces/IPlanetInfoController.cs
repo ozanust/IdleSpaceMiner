@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IPlanetInfoController
 {
-	public void UpdateMiningRate();
-	public void UpdateShipSpeed();
-	public void UpdateCargoSize();
+	public void UpdateMiningRate(int planetId);
+	public void UpdateShipSpeed(int planetId);
+	public void UpdateCargoSize(int planetId);
 }

@@ -29,21 +29,27 @@ public class BindingsInstaller : MonoInstaller
 		SignalBusInstaller.Install(Container);
 		Container.DeclareSignal<BindingsDoneSignal>();
 		Container.DeclareSignal<SpaceModelInitializedSignal>();
-		Container.DeclareSignal<PlanetUnraveledSignal>();
-		Container.DeclareSignal<PlanetUnlockedSignal>();
+
 		Container.DeclareSignal<PlayerModelUpdatedSignal>();
 		Container.DeclareSignal<PlayerMoneyUpdatedSignal>();
 		Container.DeclareSignal<PlayerDarkMatterUpdatedSignal>();
+
+		Container.DeclareSignal<PlanetUnraveledSignal>();
+		Container.DeclareSignal<PlanetUnlockedSignal>();
 		Container.DeclareSignal<PlanetOpenSignal>();
+		Container.DeclareSignal<PlanetUpdatedSignal>();
 		Container.DeclareSignal<PlanetTransformSignal>();
+
 		Container.DeclareSignal<CargoShipPlanetArrivalSignal>();
 		Container.DeclareSignal<CargoShipMothershipArrivalSignal>();
+
 		Container.DeclareSignal<ResourcesViewInitializedSignal>();
 		Container.DeclareSignal<ResourcesViewUpdatedSignal>();
-		Container.DeclareSignal<MenuOpenSignal>();
 		Container.DeclareSignal<ResourcesSellSignal>();
 		Container.DeclareSignal<ResourceDeselectedToSellSignal>();
 		Container.DeclareSignal<ResourceSelectedToSellSignal>();
 		Container.DeclareSignal<ResourcesViewClosedSignal>();
+
+		Container.DeclareSignal<MenuOpenSignal>();
 	}
 }

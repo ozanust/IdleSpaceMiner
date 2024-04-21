@@ -8,10 +8,12 @@ public class SpaceModel : ISpaceModel
 	private PlanetData[] planetData;
 	private Dictionary<int, Transform> planetTransformDatas = new Dictionary<int, Transform>();
 	readonly SignalBus signalBus;
+	private PlanetSettings planetSettings;
 
-	public SpaceModel(SignalBus signalBus)
+	public SpaceModel(SignalBus signalBus, PlanetSettings planetSettings)
 	{
 		this.signalBus = signalBus;
+		this.planetSettings = planetSettings;
 
 		signalBus.Subscribe<PlanetTransformSignal>(OnSetPlanetTransform);
 	}
@@ -73,5 +75,56 @@ public class SpaceModel : ISpaceModel
 		}
 
 		return false;
+	}
+
+	public void UpdatePlanetMiningRate(int planetId)
+	{
+		if (planetData[planetId].IsUnlocked)
+		{
+			PlanetData pd = planetData[planetId];
+			PlanetDataSetting pds;
+
+			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
+			{
+				pd.MiningRateLevel += 1;
+				pd.CurrentTotalMiningRate = pds.TotalStartingMiningRate * Mathf.Pow(pds.MiningRateIncreaseMultiplier, pd.MiningRateLevel);
+				pd.TotalMiningRateUpdatePrice = Mathf.RoundToInt(pds.StartingMiningRatePrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.MiningRateLevel));
+				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
+			}
+		}
+	}
+
+	public void UpdatePlanetShipSpeed(int planetId)
+	{
+		if (planetData[planetId].IsUnlocked)
+		{
+			PlanetData pd = planetData[planetId];
+			PlanetDataSetting pds;
+
+			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
+			{
+				pd.ShipSpeedLevel += 1;
+				pd.CurrentShipSpeed = pds.StartingShipSpeed * Mathf.Pow(pds.ShipSpeedIncreaseMultiplier, pd.ShipSpeedLevel);
+				pd.ShipSpeedUpdatePrice = Mathf.RoundToInt(pds.StartingShipSpeedPrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.ShipSpeedLevel));
+				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
+			}
+		}
+	}
+
+	public void UpdatePlanetCargo(int planetId)
+	{
+		if (planetData[planetId].IsUnlocked)
+		{
+			PlanetData pd = planetData[planetId];
+			PlanetDataSetting pds;
+
+			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
+			{
+				pd.ShipCargoLevel += 1;
+				pd.CurrentShipCargo = pds.StartingShipCargo * Mathf.Pow(pds.CargoIncreaseMultiplier, pd.ShipCargoLevel);
+				pd.ShipCargoUpdatePrice = Mathf.RoundToInt(pds.StartingShipCargoPrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.ShipCargoLevel));
+				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
+			}
+		}
 	}
 }

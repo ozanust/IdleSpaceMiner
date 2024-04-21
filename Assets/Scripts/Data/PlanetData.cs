@@ -7,6 +7,12 @@ public class PlanetData
 	public int MiningRateLevel;
 	public int ShipSpeedLevel;
 	public int ShipCargoLevel;
+	public float CurrentTotalMiningRate;
+	public float CurrentShipSpeed;
+	public float CurrentShipCargo;
+	public int TotalMiningRateUpdatePrice;
+	public int ShipSpeedUpdatePrice;
+	public int ShipCargoUpdatePrice;
 	public PlanetMineData[] MinedAmounts;
 
 	public PlanetData()
