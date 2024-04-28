@@ -8,10 +8,12 @@ public class ResourceSettings : ScriptableObject
 	[SerializeField] private ResourceDataSetting[] resourceDataSettings;
 	[SerializeField] private ResourceValueSetting[] resourceValueSettings;
 	[SerializeField] private ResourceTypeSetting[] resourceTypeSettings;
+	[SerializeField] private AlloySmeltTimeSettings[] alloySmeltTimeSettings;
 
 	public ResourceDataSetting[] Settings => resourceDataSettings;
 	public ResourceValueSetting[] ValueSettings => resourceValueSettings;
 	public ResourceTypeSetting[] TypeSettings => resourceTypeSettings;
+	public AlloySmeltTimeSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
 
 	public int GetResourceValue(ResourceType type)
 	{
@@ -89,4 +91,12 @@ public class ResourceTypeSetting
 {
 	public MainResourceType Type;
 	public ResourceType[] SubTypes;
+}
+
+[System.Serializable]
+public class AlloySmeltTimeSettings
+{
+	public AlloyType Type;
+	public float TimeToSmelt;
+	public int PriceToUnlock;
 }

@@ -44,3 +44,19 @@ MonoBehaviour:
     SubTypes: 0000000001000000020000000300000004000000
   - Type: 2
     SubTypes: 0500000006000000070000000800000009000000
+  alloySmeltTimeSettings:
+  - Type: 0
+    TimeToSmelt: 20
+    PriceToUnlock: 5000
+  - Type: 1
+    TimeToSmelt: 30
+    PriceToUnlock: 10000
+  - Type: 2
+    TimeToSmelt: 40
+    PriceToUnlock: 15000
+  - Type: 3
+    TimeToSmelt: 60
+    PriceToUnlock: 25000
+  - Type: 4
+    TimeToSmelt: 80
+    PriceToUnlock: 75000
