@@ -5,12 +5,11 @@ public class SmelterAlloyData
 {
 	public AlloyType Type;
 	public float SmeltTime;
-	public float SmeltedAmount;
+	public float SmeltedTime;
 
-	public SmelterAlloyData(AlloyType type, float smeltedAmount, float smeltTime)
+	public SmelterAlloyData(AlloyType type, float smeltTime)
 	{
 		Type = type;
-		SmeltedAmount = smeltedAmount;
 		SmeltTime = smeltTime;
 	}
 }

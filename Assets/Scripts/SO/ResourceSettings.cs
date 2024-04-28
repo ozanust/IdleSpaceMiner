@@ -69,6 +69,19 @@ public class ResourceSettings : ScriptableObject
 
 		return MainResourceType.None;
 	}
+
+	public AlloySmeltTimeSettings GetSmeltSetting(AlloyType type)
+	{
+		for (int i = 0; i < alloySmeltTimeSettings.Length; i++)
+		{
+			if (type == alloySmeltTimeSettings[i].Type)
+			{
+				return alloySmeltTimeSettings[i];
+			}
+		}
+
+		return null;
+	}
 }
 
 [System.Serializable]
@@ -97,6 +110,7 @@ public class ResourceTypeSetting
 public class AlloySmeltTimeSettings
 {
 	public AlloyType Type;
+	public int ResourceNeeded;
 	public float TimeToSmelt;
 	public int PriceToUnlock;
 }
