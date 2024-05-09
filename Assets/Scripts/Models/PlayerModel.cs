@@ -9,6 +9,7 @@ public class PlayerModel : IPlayerModel
 	private PlanetData[] planetData;
 	private Dictionary<ResourceType, int> resources;
 	private Dictionary<CurrencyType, int> currencies;
+	private List<AlloyType> unlockedAlloys;
 
 	readonly SignalBus signalBus;
 
@@ -205,5 +206,16 @@ public class PlayerModel : IPlayerModel
 	public int GetMoney()
 	{
 		return money;
+	}
+
+	public void UnlockAlloy(AlloyType type)
+	{
+		unlockedAlloys.Add(type);
+		signalBus.Fire<PlayerMoneyUpdatedSignal>();
+	}
+
+	public AlloyType[] GetUnlockedAlloys()
+	{
+		return unlockedAlloys.ToArray();
 	}
 }

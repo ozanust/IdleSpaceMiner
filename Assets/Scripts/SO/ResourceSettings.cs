@@ -6,11 +6,13 @@ using UnityEngine;
 public class ResourceSettings : ScriptableObject
 {
 	[SerializeField] private ResourceDataSetting[] resourceDataSettings;
+	[SerializeField] private AlloyDataSetting[] alloyDataSettings;
 	[SerializeField] private ResourceValueSetting[] resourceValueSettings;
 	[SerializeField] private ResourceTypeSetting[] resourceTypeSettings;
 	[SerializeField] private AlloySmeltTimeSettings[] alloySmeltTimeSettings;
 
-	public ResourceDataSetting[] Settings => resourceDataSettings;
+	public ResourceDataSetting[] ResourceDataSettings => resourceDataSettings;
+	public AlloyDataSetting[] AlloySettings => alloyDataSettings;
 	public ResourceValueSetting[] ValueSettings => resourceValueSettings;
 	public ResourceTypeSetting[] TypeSettings => resourceTypeSettings;
 	public AlloySmeltTimeSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
@@ -35,6 +37,19 @@ public class ResourceSettings : ScriptableObject
 			if (type == resourceDataSettings[i].Type)
 			{
 				return resourceDataSettings[i];
+			}
+		}
+
+		return null;
+	}
+
+	public AlloyDataSetting GetAlloyData(AlloyType type)
+	{
+		for (int i = 0; i < alloyDataSettings.Length; i++)
+		{
+			if (type == alloyDataSettings[i].Type)
+			{
+				return alloyDataSettings[i];
 			}
 		}
 
@@ -88,6 +103,14 @@ public class ResourceSettings : ScriptableObject
 public class ResourceDataSetting
 {
 	public ResourceType Type;
+	public string Name;
+	public Sprite Icon;
+}
+
+[System.Serializable]
+public class AlloyDataSetting
+{
+	public AlloyType Type;
 	public string Name;
 	public Sprite Icon;
 }

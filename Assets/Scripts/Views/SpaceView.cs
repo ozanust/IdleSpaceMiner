@@ -23,6 +23,8 @@ public class SpaceView : MonoBehaviour
 
 	private void Start()
 	{
+		Application.targetFrameRate = 60;
+
 		if (!isViewInitialized)
 		{
 			InitializePlanets(planetSettings);

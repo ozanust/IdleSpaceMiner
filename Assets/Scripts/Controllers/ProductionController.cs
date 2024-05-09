@@ -58,4 +58,14 @@ public class ProductionController : IProductionController, ITickable
 			}
 		}
 	}
+
+	public SmelterAlloyData GetAlloyData(int smelterId)
+	{
+		if (smeltingData.ContainsKey(smelterId))
+		{
+			return smeltingData[smelterId];
+		}
+
+		return null;
+	}
 }

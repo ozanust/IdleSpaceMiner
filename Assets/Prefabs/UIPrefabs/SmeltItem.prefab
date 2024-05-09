@@ -343,7 +343,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1779071126930472652}
   m_Layer: 5
-  m_Name: Images
+  m_Name: SelectedRecipeImages
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -733,6 +733,7 @@ GameObject:
   - component: {fileID: 1779071127253163350}
   - component: {fileID: 1779071127253163348}
   - component: {fileID: 1779071127253163351}
+  - component: {fileID: 605038877585832320}
   m_Layer: 5
   m_Name: SmeltItem
   m_TagString: Untagged
@@ -800,6 +801,29 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &605038877585832320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779071127253163337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649511aeff4e1ea4bb47c1cf3b76d35a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smelterLockedPanel: {fileID: 2731939180814995221}
+  smelterUnlockedPanel: {fileID: 6164159692294554769}
+  smelterUnlockPriceText: {fileID: 4346256867491745046}
+  noRecipeSelectedText: {fileID: 1779071127915718901}
+  selectedRecipeImagesParent: {fileID: 1779071126930472655}
+  sourceResourceImage: {fileID: 1779071128267337245}
+  targetResourceImage: {fileID: 1779071126598004129}
+  setRecipeButton: {fileID: 1779071126592586656}
+  cancelRecipeButton: {fileID: 1779071127069687002}
+  recipeProgressSlider: {fileID: 1779071126944642361}
+  recipeRemainingTimeText: {fileID: 1779071126736760486}
 --- !u!1 &1779071127320432168
 GameObject:
   m_ObjectHideFlags: 0
