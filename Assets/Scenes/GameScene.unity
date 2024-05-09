@@ -14088,6 +14088,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 839211113}
     m_Modifications:
+    - target: {fileID: 1779071126930472655, guid: c73cdc25bca240845bd583805263c579, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1779071127253163337, guid: c73cdc25bca240845bd583805263c579, type: 3}
       propertyPath: m_Name
       value: SmeltItem
@@ -14176,6 +14180,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1779071127915718901, guid: c73cdc25bca240845bd583805263c579, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1779071128154071515, guid: c73cdc25bca240845bd583805263c579, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -14183,6 +14191,14 @@ PrefabInstance:
     - target: {fileID: 1779071128598751316, guid: c73cdc25bca240845bd583805263c579, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2731939180814995221, guid: c73cdc25bca240845bd583805263c579, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6164159692294554769, guid: c73cdc25bca240845bd583805263c579, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c73cdc25bca240845bd583805263c579, type: 3}
