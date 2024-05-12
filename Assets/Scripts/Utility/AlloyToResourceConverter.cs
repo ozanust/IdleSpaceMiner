@@ -9,7 +9,7 @@ public static class AlloyToResourceConverter
 		switch (alloyType)
 		{
 			case AlloyType.CopperBar:
-				return ResourceType.CooperBar;
+				return ResourceType.CopperBar;
 			case AlloyType.IronBar:
 				return ResourceType.IronBar;
 			case AlloyType.LeadBar:
@@ -19,7 +19,26 @@ public static class AlloyToResourceConverter
 			case AlloyType.AluminumBar:
 				return ResourceType.AluminumBar;
 			default:
-				return ResourceType.CooperBar;
+				return ResourceType.CopperBar;
+		}
+	}
+
+	public static ResourceType ConvertToRaw(AlloyType alloyType)
+	{
+		switch (alloyType)
+		{
+			case AlloyType.CopperBar:
+				return ResourceType.Copper;
+			case AlloyType.IronBar:
+				return ResourceType.Iron;
+			case AlloyType.LeadBar:
+				return ResourceType.Lead;
+			case AlloyType.SilicaBar:
+				return ResourceType.Silica;
+			case AlloyType.AluminumBar:
+				return ResourceType.Aluminum;
+			default:
+				return ResourceType.Copper;
 		}
 	}
 }

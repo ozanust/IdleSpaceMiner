@@ -21,6 +21,7 @@ public class SmelterItem : MonoBehaviour
     [SerializeField] private Image targetResourceImage;
     [SerializeField] private Button setRecipeButton;
     [SerializeField] private Button cancelRecipeButton;
+    [SerializeField] private Button unlockButton;
     [SerializeField] private Slider recipeProgressSlider;
     [SerializeField] private TMP_Text recipeRemainingTimeText;
 
@@ -32,8 +33,10 @@ public class SmelterItem : MonoBehaviour
 	{
         setRecipeButton.onClick.AddListener(OnClickSetRecipe);
         cancelRecipeButton.onClick.AddListener(OnClickRemoveRecipe);
+        unlockButton.onClick.AddListener(OnClickUnlockButton);
         signalBus.Subscribe<SmeltRecipeAddSignal>(OnSmeltRecipeAdded);
         signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnSmeltRecipeRemoved);
+        signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
     }
 
 	private void Update()
@@ -43,19 +46,40 @@ public class SmelterItem : MonoBehaviour
             recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString();
             recipeProgressSlider.value = data.SmeltedTime;
         }
+
+        // Debug purpose
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+            signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = AlloyType.CopperBar, SmelterId = 0 });
+		}
 	}
 
-	public void UnlockSmelter(int id)
+    public void SetSmelterUnlockPrice(int price)
+    {
+        smelterUnlockPriceText.text = price.ToString();
+    }
+
+    private void OnClickUnlockButton()
+	{
+        productionController.TryUnlockSmelter();
+	}
+
+    private void UnlockSmelter(int id)
 	{
         smelterUnlockedPanel.SetActive(true);
         smelterLockedPanel.SetActive(false);
+        unlockButton.enabled = false;
         isUnlocked = true;
         smelterId = id;
 	}
 
-    public void SetSmelterUnlockPrice(int price)
+    private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-        smelterUnlockPriceText.text = price.ToString();
+        Debug.Log("unlocked");
+		if (!isUnlocked)
+		{
+            UnlockSmelter(signal.SmelterId);
+		}
 	}
 
     private void OnClickSetRecipe()

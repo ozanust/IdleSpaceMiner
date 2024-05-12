@@ -11,13 +11,33 @@ public class ProductionView : MonoBehaviour
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
 
+	[SerializeField] private GameObject panel;
+	[SerializeField] private Button closeButton;
+	[SerializeField] private TMP_Text panelTitle;
+
+	private MenuType type = MenuType.Production;
+
 	private void Awake()
 	{
-		
+		closeButton.onClick.AddListener(CloseView);
 	}
 
 	private void Start()
 	{
-		// subscribe to signals
+		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
+	}
+
+	private void OnMenuOpen(MenuOpenSignal signal)
+	{
+		if (signal.Type == type)
+		{
+			panel.SetActive(true);
+		}
+	}
+
+	private void CloseView()
+	{
+		panel.SetActive(false);
+		signalBus.Fire<ResourcesViewClosedSignal>();
 	}
 }

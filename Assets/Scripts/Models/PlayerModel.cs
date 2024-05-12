@@ -9,13 +9,17 @@ public class PlayerModel : IPlayerModel
 	private PlanetData[] planetData;
 	private Dictionary<ResourceType, int> resources;
 	private Dictionary<CurrencyType, int> currencies;
-	private List<AlloyType> unlockedAlloys;
+	private List<AlloyType> unlockedAlloys = new List<AlloyType>();
+	private int lastUnlockedSmelterId = -1;
 
 	readonly SignalBus signalBus;
 
 	public PlayerModel(SignalBus signalBus)
 	{
 		this.signalBus = signalBus;
+
+		//UnlockAlloy(AlloyType.CopperBar);
+		//UnlockSmelter(0);
 	}
 
 	public void AddResource(ResourceType type, int amount)
@@ -211,11 +215,23 @@ public class PlayerModel : IPlayerModel
 	public void UnlockAlloy(AlloyType type)
 	{
 		unlockedAlloys.Add(type);
-		signalBus.Fire<PlayerMoneyUpdatedSignal>();
+		signalBus.Fire<PlayerModelUpdatedSignal>();
 	}
 
 	public AlloyType[] GetUnlockedAlloys()
 	{
 		return unlockedAlloys.ToArray();
+	}
+
+	public void UnlockSmelter(int smelterId)
+	{
+		lastUnlockedSmelterId = smelterId;
+		signalBus.Fire<PlayerModelUpdatedSignal>();
+		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedSmelterId });
+	}
+
+	public int GetLastUnlockedSmelterId()
+	{
+		return lastUnlockedSmelterId;
 	}
 }

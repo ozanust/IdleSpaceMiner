@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   economySettings:
-    StartingMoney: 180
+    StartingMoney: 1000000
     StartingDarkMatter: 0

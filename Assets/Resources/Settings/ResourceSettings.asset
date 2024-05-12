@@ -15,19 +15,22 @@ MonoBehaviour:
   resourceDataSettings:
   - Type: 0
     Name: Copper
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
   - Type: 1
     Name: Iron
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300000, guid: 492b9988436bd45049a9a6bc52ac8fb0, type: 3}
   - Type: 2
     Name: Lead
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300000, guid: d11d28313eb99944683c309595c47ab6, type: 3}
   - Type: 3
     Name: Silica
     Icon: {fileID: 0}
   - Type: 4
     Name: Aluminum
     Icon: {fileID: 0}
+  - Type: 5
+    Name: Copper Bar
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
   alloyDataSettings:
   - Type: 0
     Name: Copper Bar
@@ -62,13 +65,13 @@ MonoBehaviour:
     SubTypes: 0500000006000000070000000800000009000000
   alloySmeltTimeSettings:
   - Type: 0
-    ResourceNeeded: 1000
+    ResourceNeeded: 100
     TimeToSmelt: 20
-    PriceToUnlock: 5000
+    PriceToUnlock: 0
   - Type: 1
     ResourceNeeded: 1000
     TimeToSmelt: 30
-    PriceToUnlock: 10000
+    PriceToUnlock: 3000
   - Type: 2
     ResourceNeeded: 1000
     TimeToSmelt: 40
@@ -81,3 +84,12 @@ MonoBehaviour:
     ResourceNeeded: 1000
     TimeToSmelt: 80
     PriceToUnlock: 75000
+  smelterSettings:
+  - SmelterId: 0
+    Price: 0
+  - SmelterId: 1
+    Price: 50000
+  - SmelterId: 2
+    Price: 500000
+  - SmelterId: 3
+    Price: 1000000

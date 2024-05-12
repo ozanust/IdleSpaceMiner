@@ -22,6 +22,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<IResourcesViewController>().To<ResourcesViewController>().AsSingle().NonLazy();
 		Container.Bind<IResourcesSellViewController>().To<ResourcesSellViewController>().AsSingle().NonLazy();
 		Container.Bind<IPlanetInfoController>().To<PlanetInfoController>().AsSingle();
+		Container.Bind(typeof(IProductionController), typeof(ITickable)).To<ProductionController>().AsSingle().NonLazy();
 	}
 
 	void InstallSignals()
@@ -49,6 +50,10 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<ResourceDeselectedToSellSignal>();
 		Container.DeclareSignal<ResourceSelectedToSellSignal>();
 		Container.DeclareSignal<ResourcesViewClosedSignal>();
+
+		Container.DeclareSignal<SmeltRecipeAddSignal>();
+		Container.DeclareSignal<SmeltRecipeRemoveSignal>();
+		Container.DeclareSignal<SmelterUnlockedSignal>();
 
 		Container.DeclareSignal<MenuOpenSignal>();
 	}

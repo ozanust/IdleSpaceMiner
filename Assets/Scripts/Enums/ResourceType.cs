@@ -7,7 +7,7 @@ public enum ResourceType : int
 	Lead = 2,
 	Silica = 3,
 	Aluminum = 4,
-	CooperBar = 5,
+	CopperBar = 5,
 	IronBar = 6,
 	LeadBar = 7,
 	SilicaBar = 8,

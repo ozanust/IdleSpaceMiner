@@ -17,4 +17,6 @@ public interface IPlayerModel
     bool HasMoney(int amount);
     int GetMoney();
     Dictionary<ResourceType, int> GetResources();
+    void UnlockSmelter(int smelterId);
+    int GetLastUnlockedSmelterId();
 }

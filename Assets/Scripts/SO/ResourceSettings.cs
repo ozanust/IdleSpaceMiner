@@ -10,12 +10,14 @@ public class ResourceSettings : ScriptableObject
 	[SerializeField] private ResourceValueSetting[] resourceValueSettings;
 	[SerializeField] private ResourceTypeSetting[] resourceTypeSettings;
 	[SerializeField] private AlloySmeltTimeSettings[] alloySmeltTimeSettings;
+	[SerializeField] private SmelterSetting[] smelterSettings;
 
 	public ResourceDataSetting[] ResourceDataSettings => resourceDataSettings;
 	public AlloyDataSetting[] AlloySettings => alloyDataSettings;
 	public ResourceValueSetting[] ValueSettings => resourceValueSettings;
 	public ResourceTypeSetting[] TypeSettings => resourceTypeSettings;
 	public AlloySmeltTimeSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
+	public SmelterSetting[] SmelterSettings => smelterSettings;
 
 	public int GetResourceValue(ResourceType type)
 	{
@@ -97,6 +99,19 @@ public class ResourceSettings : ScriptableObject
 
 		return null;
 	}
+
+	public SmelterSetting GetSmelterSetting(int smelterId)
+	{
+		for (int i = 0; i < smelterSettings.Length; i++)
+		{
+			if (smelterId == smelterSettings[i].SmelterId)
+			{
+				return smelterSettings[i];
+			}
+		}
+
+		return null;
+	}
 }
 
 [System.Serializable]
@@ -136,4 +151,11 @@ public class AlloySmeltTimeSettings
 	public int ResourceNeeded;
 	public float TimeToSmelt;
 	public int PriceToUnlock;
+}
+
+[System.Serializable]
+public class SmelterSetting
+{
+	public int SmelterId;
+	public int Price;
 }
