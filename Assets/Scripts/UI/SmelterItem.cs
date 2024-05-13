@@ -75,7 +75,6 @@ public class SmelterItem : MonoBehaviour
 
     private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-        Debug.Log("unlocked");
 		if (!isUnlocked)
 		{
             UnlockSmelter(signal.SmelterId);

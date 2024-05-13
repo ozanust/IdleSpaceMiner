@@ -6,6 +6,7 @@ public class SmelterAlloyData
 	public AlloyType Type;
 	public float SmeltTime;
 	public float SmeltedTime;
+	public bool IsSmelting;
 
 	public SmelterAlloyData(AlloyType type, float smeltTime)
 	{
