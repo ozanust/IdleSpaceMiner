@@ -31,6 +31,12 @@ public class ProductionController : IProductionController, ITickable
 
 	private void OnRecipeAdded(SmeltRecipeAddSignal signal)
 	{
+		// Smelter already has the same recipe
+		if (smeltingData.ContainsKey(signal.SmelterId))
+		{
+			return;
+		}
+
 		AlloySmeltTimeSettings settings = resourceSettings.GetSmeltSetting(signal.RecipeType);
 		SmelterAlloyData newData = new SmelterAlloyData(signal.RecipeType, settings.TimeToSmelt);
 		smeltingData.Add(signal.SmelterId, newData);
@@ -115,10 +121,10 @@ public class ProductionController : IProductionController, ITickable
 	{
 		int nextSmelterId = playerModel.GetLastUnlockedSmelterId() + 1;
 		int nextSmelterPrice = resourceSettings.GetSmelterSetting(nextSmelterId).Price;
-
 		if (playerModel.HasMoney(nextSmelterPrice))
 		{
 			playerModel.UnlockSmelter(nextSmelterId);
+			playerModel.UseMoney(nextSmelterPrice);
 		}
 	}
 }

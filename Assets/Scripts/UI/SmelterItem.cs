@@ -10,6 +10,7 @@ public class SmelterItem : MonoBehaviour
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
     [Inject] IProductionController productionController;
+    [Inject] IPlayerModel playerModel;
 
     [SerializeField] private GameObject smelterLockedPanel;
     [SerializeField] private GameObject smelterUnlockedPanel;
@@ -25,8 +26,8 @@ public class SmelterItem : MonoBehaviour
     [SerializeField] private Slider recipeProgressSlider;
     [SerializeField] private TMP_Text recipeRemainingTimeText;
 
-    private bool isUnlocked = false;
-    private int smelterId;
+    [SerializeField] private bool isUnlocked = false;
+    [SerializeField] private int smelterId;
     private SmelterAlloyData data;
 
 	private void Awake()
@@ -34,6 +35,10 @@ public class SmelterItem : MonoBehaviour
         setRecipeButton.onClick.AddListener(OnClickSetRecipe);
         cancelRecipeButton.onClick.AddListener(OnClickRemoveRecipe);
         unlockButton.onClick.AddListener(OnClickUnlockButton);
+    }
+
+	private void Start()
+	{
         signalBus.Subscribe<SmeltRecipeAddSignal>(OnSmeltRecipeAdded);
         signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnSmeltRecipeRemoved);
         signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
@@ -46,17 +51,11 @@ public class SmelterItem : MonoBehaviour
             recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString();
             recipeProgressSlider.value = data.SmeltedTime;
         }
-
-        // Debug purpose
-		if (Input.GetKeyDown(KeyCode.Space))
-		{
-            signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = AlloyType.CopperBar, SmelterId = 0 });
-		}
 	}
 
     public void SetSmelterUnlockPrice(int price)
     {
-        smelterUnlockPriceText.text = price.ToString();
+        smelterUnlockPriceText.text = price.ToString() + "$";
     }
 
     private void OnClickUnlockButton()
@@ -75,7 +74,7 @@ public class SmelterItem : MonoBehaviour
 
     private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-		if (!isUnlocked)
+        if (!isUnlocked)
 		{
             UnlockSmelter(signal.SmelterId);
 		}
@@ -83,6 +82,7 @@ public class SmelterItem : MonoBehaviour
 
     private void OnClickSetRecipe()
 	{
+        playerModel.SetTargetSmelter(smelterId);
         signalBus.Fire(new MenuOpenSignal() { Type = MenuType.SmeltRecipes });
     }
 
@@ -91,15 +91,18 @@ public class SmelterItem : MonoBehaviour
         signalBus.Fire(new SmeltRecipeRemoveSignal() { SmelterId = smelterId });
     }
 
-    private void OnSmeltRecipeRemoved()
+    private void OnSmeltRecipeRemoved(SmeltRecipeRemoveSignal signal)
 	{
-        recipeProgressSlider.value = 0;
-        recipeRemainingTimeText.text = "OFF";
-        noRecipeSelectedText.gameObject.SetActive(true);
-        selectedRecipeImagesParent.SetActive(false);
-        data = null;
-        recipeProgressSlider.maxValue = 0;
-        recipeProgressSlider.minValue = 0;
+        if (signal.SmelterId == smelterId)
+        {
+            recipeProgressSlider.value = 0;
+            recipeRemainingTimeText.text = "OFF";
+            noRecipeSelectedText.gameObject.SetActive(true);
+            selectedRecipeImagesParent.SetActive(false);
+            data = null;
+            recipeProgressSlider.maxValue = 0;
+            recipeProgressSlider.minValue = 0;
+        }
     }
 
     private void OnSmeltRecipeAdded(SmeltRecipeAddSignal signal)
@@ -117,5 +120,13 @@ public class SmelterItem : MonoBehaviour
             recipeProgressSlider.maxValue = data.SmeltTime;
             recipeProgressSlider.minValue = 0;
         }
+	}
+
+    public void SetInjections(SignalBus signalBus, ResourceSettings resourceSettings, IProductionController productionController, IPlayerModel playerModel)
+	{
+        this.signalBus = signalBus;
+        this.resourceSettings = resourceSettings;
+        this.productionController = productionController;
+        this.playerModel = playerModel;
 	}
 }

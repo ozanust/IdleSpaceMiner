@@ -826,6 +826,7 @@ MonoBehaviour:
   unlockButton: {fileID: 3644707492974313834}
   recipeProgressSlider: {fileID: 1779071126944642361}
   recipeRemainingTimeText: {fileID: 1779071126736760486}
+  smelterId: 0
 --- !u!114 &3644707492974313834
 MonoBehaviour:
   m_ObjectHideFlags: 0

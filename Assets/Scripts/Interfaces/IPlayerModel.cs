@@ -19,4 +19,7 @@ public interface IPlayerModel
     Dictionary<ResourceType, int> GetResources();
     void UnlockSmelter(int smelterId);
     int GetLastUnlockedSmelterId();
+    AlloyType[] GetUnlockedAlloys();
+    void SetTargetSmelter(int smelterId);
+    int GetTargetSmelter();
 }
