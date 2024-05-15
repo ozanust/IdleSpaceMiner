@@ -21,7 +21,7 @@ public class NavBarView : MonoBehaviour
     {
         resourcesButton.onClick.AddListener(OnClickResources);
         productionButton.onClick.AddListener(OnClickProduction);
-        projectsButton.onClick.AddListener(OnClickProjects);
+        projectsButton.onClick.AddListener(OnClickResearch);
         managersButton.onClick.AddListener(OnClickManagers);
         boostsButton.onClick.AddListener(OnClickBoosts);
         mothershipButton.onClick.AddListener(OnClickMothership);
@@ -37,9 +37,9 @@ public class NavBarView : MonoBehaviour
         signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Production });
     }
 
-    private void OnClickProjects()
+    private void OnClickResearch()
     {
-        signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Projects });
+        signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Research });
     }
 
     private void OnClickManagers()

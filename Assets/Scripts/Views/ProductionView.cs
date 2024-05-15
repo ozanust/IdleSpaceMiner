@@ -51,7 +51,6 @@ public class ProductionView : MonoBehaviour
 	private void CloseView()
 	{
 		panel.SetActive(false);
-		signalBus.Fire<ResourcesViewClosedSignal>();
 	}
 
 	private void OnSmelterUnlocked(SmelterUnlockedSignal signal)

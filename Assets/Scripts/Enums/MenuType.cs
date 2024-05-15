@@ -4,7 +4,7 @@ public enum MenuType
 	Resources,
 	Production,
 	SmeltRecipes,
-	Projects,
+	Research,
 	Managers,
 	Boosts,
 	Mothership
