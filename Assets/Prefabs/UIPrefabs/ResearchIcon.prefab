@@ -214,6 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iconImage: {fileID: 2551523130491134607}
   borderImage: {fileID: 2551523129436781590}
+  button: {fileID: 2551523130491134606}
   type: 0
 --- !u!1 &2551523130544738703
 GameObject:
