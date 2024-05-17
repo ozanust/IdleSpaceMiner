@@ -93,3 +93,56 @@ MonoBehaviour:
     Price: 500000
   - SmelterId: 3
     Price: 1000000
+  researchSettings:
+  - Name: Telescope 1
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+    Description: Extends vision to 3 more planets
+    Type: 8
+    NeededResources:
+    - Type: 0
+      Amount: 250
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []
+  - Name: 
+    Icon: {fileID: 0}
+    Description: 
+    Type: 0
+    NeededResources: []

@@ -33,6 +33,7 @@ public class ResearchItem : MonoBehaviour
 
 	private void OnClickButton()
 	{
+		signalBus.Fire(new MenuOpenSignal() { Type = MenuType.ResarchInfo });
 		signalBus.Fire(new ResearchInfoOpenSignal() { Type = type });
 	}
 }
