@@ -31,6 +31,33 @@ MonoBehaviour:
   - Type: 5
     Name: Copper Bar
     Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 6
+    Name: Iron Bar
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 7
+    Name: Lead Bar
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 8
+    Name: Silica Bar
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 9
+    Name: Aluminum Bar
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 10
+    Name: Cooper Wire
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 11
+    Name: Iron Nail
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 12
+    Name: Battery
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 13
+    Name: Hammer
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+  - Type: 14
+    Name: Glass
+    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
   alloyDataSettings:
   - Type: 0
     Name: Copper Bar
@@ -63,6 +90,8 @@ MonoBehaviour:
     SubTypes: 0000000001000000020000000300000004000000
   - Type: 2
     SubTypes: 0500000006000000070000000800000009000000
+  - Type: 3
+    SubTypes: 0a0000000b0000000c0000000d0000000e000000
   alloySmeltTimeSettings:
   - Type: 0
     ResourceNeeded: 100
@@ -75,7 +104,7 @@ MonoBehaviour:
   - Type: 2
     ResourceNeeded: 1000
     TimeToSmelt: 40
-    PriceToUnlock: 15000
+    PriceToUnlock: 9000
   - Type: 3
     ResourceNeeded: 1000
     TimeToSmelt: 60
@@ -90,59 +119,115 @@ MonoBehaviour:
   - SmelterId: 1
     Price: 50000
   - SmelterId: 2
-    Price: 500000
+    Price: 474746
   - SmelterId: 3
     Price: 1000000
   researchSettings:
   - Name: Telescope 1
-    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+    Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}
     Description: Extends vision to 3 more planets
     Type: 8
+    RequiredResearch: 1
+    NeededResources:
+    - Type: 1
+      Amount: 1500
+    - Type: 5
+      Amount: 3
+  - Name: Telescope 2
+    Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}
+    Description: Extends vision to 3 more planets
+    Type: 9
+    RequiredResearch: 8
+    NeededResources:
+    - Type: 7
+      Amount: 5
+    - Type: 3
+      Amount: 500
+  - Name: Telescope 3
+    Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}
+    Description: Extends vision to 3 more planets
+    Type: 10
+    RequiredResearch: 9
+    NeededResources:
+    - Type: 11
+      Amount: 10
+    - Type: 8
+      Amount: 15
+  - Name: Telescope 4
+    Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}
+    Description: Extends vision to 3 more planets
+    Type: 11
+    RequiredResearch: 10
+    NeededResources:
+    - Type: 13
+      Amount: 5
+    - Type: 9
+      Amount: 20
+  - Name: Asteroid Miner
+    Icon: {fileID: 21300000, guid: 0a0c3bbb3d055ed469b77a816a1bc225, type: 3}
+    Description: Ability to mine asteroids for ore
+    Type: 0
+    RequiredResearch: 0
     NeededResources:
     - Type: 0
+      Amount: 400
+    - Type: 1
+      Amount: 100
+  - Name: Management
+    Icon: {fileID: 21300000, guid: c3fc458d9b3d37147b589d0912682e39, type: 3}
+    Description: Hire and assign managers to planets
+    Type: 1
+    RequiredResearch: 1
+    NeededResources:
+    - Type: 0
+      Amount: 400
+    - Type: 1
+      Amount: 50
+  - Name: Smelter
+    Icon: {fileID: 21300000, guid: daff6177ca9108844a18e5d507ce4a2d, type: 3}
+    Description: Refines ores into more valuable materials
+    Type: 2
+    RequiredResearch: 0
+    NeededResources:
+    - Type: 0
+      Amount: 600
+    - Type: 1
       Amount: 250
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
-  - Name: 
-    Icon: {fileID: 0}
-    Description: 
-    Type: 0
-    NeededResources: []
+  - Name: Crafter
+    Icon: {fileID: 21300000, guid: 5f540c6fa1ac07146ab9239eb6652ff0, type: 3}
+    Description: Crafts items from raw materials
+    Type: 3
+    RequiredResearch: 2
+    NeededResources:
+    - Type: 2
+      Amount: 5000
+    - Type: 6
+      Amount: 5
+  - Name: Advanced Crafter
+    Icon: {fileID: 21300000, guid: e75e05a970c783d4cacbd42c6bec61d8, type: 3}
+    Description: All crafters speed x1.20
+    Type: 4
+    RequiredResearch: 3
+    NeededResources:
+    - Type: 13
+      Amount: 10
+    - Type: 9
+      Amount: 50
+  - Name: Advanced Furnace
+    Icon: {fileID: 21300000, guid: cb02883e4c0f302439667234b26ab5b5, type: 3}
+    Description: All smelters speed x1.20
+    Type: 5
+    RequiredResearch: 2
+    NeededResources:
+    - Type: 14
+      Amount: 3
+    - Type: 9
+      Amount: 10
+  - Name: Smelting Efficiency
+    Icon: {fileID: 21300000, guid: daff6177ca9108844a18e5d507ce4a2d, type: 3}
+    Description: Decreases ingredients required by 20% for all smelters
+    Type: 7
+    RequiredResearch: 5
+    NeededResources:
+    - Type: 5
+      Amount: 200

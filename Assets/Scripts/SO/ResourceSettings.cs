@@ -182,6 +182,7 @@ public class ResearchSettings
 	public Sprite Icon;
 	public string Description;
 	public ResearchType Type;
+	public ResearchType RequiredResearch;
 	public ResearchNeededResource[] NeededResources;
 }
 

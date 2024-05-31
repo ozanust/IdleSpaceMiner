@@ -23,6 +23,8 @@ public class ResearchInfoView : MonoBehaviour
 
 	private MenuType type = MenuType.ResarchInfo;
 
+	private List<ResearchRequirementInfoItem> infoItemPool = new List<ResearchRequirementInfoItem>();
+
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
@@ -49,15 +51,34 @@ public class ResearchInfoView : MonoBehaviour
 		researchIcon.sprite = settings.Icon;
 		researchDescription.text = settings.Description;
 
-		foreach (ResearchNeededResource resource in settings.NeededResources)
+		int itemCountToReuse = settings.NeededResources.Length < infoItemPool.Count ? settings.NeededResources.Length : infoItemPool.Count;
+
+		for (int i = 0; i < itemCountToReuse; i++)
+		{
+			ResearchRequirementInfoItem item = infoItemPool[i];
+			item.Initialize(resourceSettings.GetResourceData(settings.NeededResources[i].Type).Icon, playerModel.GetResource(settings.NeededResources[i].Type).ToString(), settings.NeededResources[i].Amount.ToString());
+			item.gameObject.SetActive(true);
+		}
+
+		for (int i = infoItemPool.Count; i < settings.NeededResources.Length; i++)
 		{
 			ResearchRequirementInfoItem item = Instantiate(itemPrototype, requirementsInfoContainer.transform);
-			item.Initialize(resourceSettings.GetResourceData(resource.Type).Icon, playerModel.GetResource(resource.Type).ToString(), resource.Amount.ToString());
+			item.Initialize(resourceSettings.GetResourceData(settings.NeededResources[i].Type).Icon, playerModel.GetResource(settings.NeededResources[i].Type).ToString(), settings.NeededResources[i].Amount.ToString());
+			infoItemPool.Add(item);
 		}
 	}
 
 	private void CloseView()
 	{
 		panel.SetActive(false);
+		DeactivateAllItems();
+	}
+
+	private void DeactivateAllItems()
+	{
+		for (int i = 0; i < infoItemPool.Count; i++)
+		{
+			infoItemPool[i].gameObject.SetActive(false);
+		}
 	}
 }

@@ -21,6 +21,7 @@ public class ResearchView : MonoBehaviour
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
+		// go through all research items and set their researchable or researched state
 	}
 
 	private void Start()

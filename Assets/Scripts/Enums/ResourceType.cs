@@ -11,5 +11,10 @@ public enum ResourceType : int
 	IronBar = 6,
 	LeadBar = 7,
 	SilicaBar = 8,
-	AluminumBar = 9
+	AluminumBar = 9,
+	CopperWire = 10,
+	IronNail = 11,
+	Battery = 12,
+	Hammer = 13,
+	Glass = 14
 }
