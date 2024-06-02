@@ -10,6 +10,7 @@ public class PlayerModel : IPlayerModel
 	private Dictionary<ResourceType, int> resources;
 	private Dictionary<CurrencyType, int> currencies;
 	private List<AlloyType> unlockedAlloys = new List<AlloyType>();
+	private List<ResearchType> unlockedResearchs = new List<ResearchType>();
 	private int lastUnlockedSmelterId = 0;
 	private int recipeSelectionTargetSmelter = -1;
 
@@ -63,7 +64,7 @@ public class PlayerModel : IPlayerModel
 
 	public bool HasResource(ResourceType type, int amount)
 	{
-		if(resources == null)
+		if (resources == null)
 		{
 			return false;
 		}
@@ -74,6 +75,19 @@ public class PlayerModel : IPlayerModel
 		}
 
 		return resources[type] >= amount;
+	}
+
+	public bool HasResources(ResearchNeededResource[] data)
+	{
+		for (int i = 0; i < data.Length; i++)
+		{
+			if (!HasResource(data[i].Type, data[i].Amount))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public bool TryUseResource(ResourceType type, int amount)
@@ -221,6 +235,23 @@ public class PlayerModel : IPlayerModel
 	public AlloyType[] GetUnlockedAlloys()
 	{
 		return unlockedAlloys.ToArray();
+	}
+
+	public void UnlockResearch(ResearchType type)
+	{
+		unlockedResearchs.Add(type);
+		signalBus.Fire<PlayerModelUpdatedSignal>();
+		signalBus.Fire(new ResearchCompletedSignal() { ResearchType = type });
+	}
+
+	public ResearchType[] GetUnlockedResearchs()
+	{
+		return unlockedResearchs.ToArray();
+	}
+
+	public bool IsResearchUnlocked(ResearchType type)
+	{
+		return unlockedResearchs.Contains(type);
 	}
 
 	public void UnlockSmelter(int smelterId)

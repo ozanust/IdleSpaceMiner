@@ -10,6 +10,7 @@ public interface IPlayerModel
     int GetCurrency(CurrencyType type);
     bool TryUseResource(ResourceType type, int amount);
     bool HasResource(ResourceType type, int amount);
+    bool HasResources(ResearchNeededResource[] data);
     int GetResource(ResourceType type);
     void AddResource(ResourceType type, int amount);
     void AddMoney(int amount);
@@ -19,7 +20,11 @@ public interface IPlayerModel
     Dictionary<ResourceType, int> GetResources();
     void UnlockSmelter(int smelterId);
     int GetLastUnlockedSmelterId();
+    void UnlockAlloy(AlloyType type);
     AlloyType[] GetUnlockedAlloys();
+    void UnlockResearch(ResearchType type);
+    ResearchType[] GetUnlockedResearchs();
+    bool IsResearchUnlocked(ResearchType type);
     void SetTargetSmelter(int smelterId);
     int GetTargetSmelter();
 }

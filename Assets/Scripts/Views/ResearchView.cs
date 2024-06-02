@@ -27,6 +27,7 @@ public class ResearchView : MonoBehaviour
 	private void Start()
 	{
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
+		// listen on project research signal to set highlighted items
 	}
 
 	private void OnMenuOpen(MenuOpenSignal signal)
