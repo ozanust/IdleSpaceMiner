@@ -21,13 +21,11 @@ public class ResearchView : MonoBehaviour
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
-		// go through all research items and set their researchable or researched state
 	}
 
 	private void Start()
 	{
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
-		// listen on project research signal to set highlighted items
 	}
 
 	private void OnMenuOpen(MenuOpenSignal signal)

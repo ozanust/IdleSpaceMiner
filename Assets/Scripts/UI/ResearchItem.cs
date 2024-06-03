@@ -36,7 +36,7 @@ public class ResearchItem : MonoBehaviour
 
 		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 		signalBus.Subscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
-		// check player model to initialize status of the item
+		Init();
 	}
 
 	private void OnResearchCompleted(ResearchCompletedSignal signal)
@@ -69,6 +69,20 @@ public class ResearchItem : MonoBehaviour
 			{
 				borderImage.color = Color.cyan;
 			}
+		}
+	}
+
+	private void Init()
+	{
+		if (playerModel.IsResearchUnlocked(type))
+		{
+			borderImage.color = Color.green;
+			iconImage.color = Color.white;
+		}
+		else if (playerModel.IsResearchUnlocked(resourceSettings.GetResearchSetting(type).RequiredResearch))
+		{
+			borderImage.color = Color.white;
+			iconImage.color = Color.white;
 		}
 	}
 

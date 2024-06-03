@@ -45,19 +45,19 @@ MonoBehaviour:
     Icon: {fileID: 21300000, guid: 39dd0244f54aebf4e85882397bd5d7b2, type: 3}
   - Type: 10
     Name: Cooper Wire
-    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+    Icon: {fileID: 21300000, guid: 6349abdfd485b084e82ccfc8bb9a6700, type: 3}
   - Type: 11
     Name: Iron Nail
-    Icon: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+    Icon: {fileID: 21300000, guid: c7689cd76ae8bc143968695d0d6d2b2c, type: 3}
   - Type: 12
     Name: Battery
-    Icon: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+    Icon: {fileID: 21300000, guid: 870dbef7cef8bdf428358aecc97dc0e1, type: 3}
   - Type: 13
     Name: Hammer
-    Icon: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+    Icon: {fileID: 21300000, guid: 1cb24d0a2e686df4588a6299a2d24900, type: 3}
   - Type: 14
     Name: Glass
-    Icon: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+    Icon: {fileID: 21300000, guid: 6886c9646d11a8c448f17414ec985b1b, type: 3}
   alloyDataSettings:
   - Type: 0
     Name: Copper Bar
