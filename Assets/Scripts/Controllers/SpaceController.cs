@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-public class SpaceController : ISpaceController
+public class SpaceController : ISpaceController, ITickable
 {
 	PlanetSettings planetSettings;
 	ISpaceModel spaceModel;
@@ -12,6 +12,9 @@ public class SpaceController : ISpaceController
 	SignalBus signalBus;
 
 	bool isNew;
+	bool isAsteroidMinerUnlocked;
+	int nextAsteroidSpawnTime;
+	float asteroidSpawnTimer;
 
 	public SpaceController(PlanetSettings planetSettings, ISpaceModel spaceModel, IPlayerModel playerModel, GameSettings gameSettings, SignalBus signalBus)
 	{
@@ -38,6 +41,8 @@ public class SpaceController : ISpaceController
 		{
 			// read planet data from save file
 		}
+
+		signalBus.Subscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
 	}
 
 	private PlanetData[] GetSampleData()
@@ -59,6 +64,14 @@ public class SpaceController : ISpaceController
 		data2.ShipSpeedLevel = 0;
 
 		return new PlanetData[] { data, data2 };
+	}
+
+	private void OnAsteroidResearchUnlocked(ResearchCompletedSignal signal)
+	{
+		if (signal.ResearchType == ResearchType.AsteroidMiner)
+		{
+			isAsteroidMinerUnlocked = true;
+		}
 	}
 
 	public void OpenPlanet(int planetIndex)
@@ -103,8 +116,18 @@ public class SpaceController : ISpaceController
 		}
 	}
 
-	public Transform GetPlanetTransform(int planetIndex)
+	public void Tick()
 	{
-		return null;
+		if (isAsteroidMinerUnlocked)
+		{
+			asteroidSpawnTimer += Time.deltaTime;
+
+			if (asteroidSpawnTimer >= nextAsteroidSpawnTime)
+			{
+				// spawn asteroid
+				nextAsteroidSpawnTime = Random.Range(gameSettings.GlobalSettings.AsteroidSpawnTimes[0], gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
+				asteroidSpawnTimer = 0;
+			}
+		}
 	}
 }

@@ -44,7 +44,7 @@ public class ProductionView : MonoBehaviour
 	{
 		if (signal.Type == type)
 		{
-			panel.SetActive(true);
+			panel.SetActive(!panel.activeInHierarchy);
 		}
 	}
 

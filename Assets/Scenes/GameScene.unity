@@ -16016,6 +16016,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 2060161625}
   closeButton: {fileID: 1501622321}
+  type: 4
   panelTitle: {fileID: 1764208674}
 --- !u!1 &1740145217
 GameObject:

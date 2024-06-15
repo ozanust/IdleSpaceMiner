@@ -59,5 +59,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<ResearchInfoOpenSignal>();
 
 		Container.DeclareSignal<MenuOpenSignal>();
+
+		Container.DeclareSignal<AsteroidDestroyedSignal>();
 	}
 }
