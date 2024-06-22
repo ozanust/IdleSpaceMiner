@@ -16,4 +16,4 @@ MonoBehaviour:
     StartingMoney: 1000000
     StartingDarkMatter: 0
   globalSettings:
-    AsteroidSpawnTimes: b40000002c010000
+    AsteroidSpawnTimes: 000000000a000000

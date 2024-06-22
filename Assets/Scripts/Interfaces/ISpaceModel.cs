@@ -10,4 +10,7 @@ public interface ISpaceModel
     public void UpdatePlanetMiningRate(int planetId);
     public void UpdatePlanetShipSpeed(int planetId);
     public void UpdatePlanetCargo(int planetId);
+    void AddAsteroidData(AsteroidData data, int id);
+    void RemoveAsteroidData(int id);
+    AsteroidData GetAsteroidRewards(int id);
 }

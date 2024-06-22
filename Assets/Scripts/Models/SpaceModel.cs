@@ -7,6 +7,7 @@ public class SpaceModel : ISpaceModel
 {
 	private PlanetData[] planetData;
 	private Dictionary<int, Transform> planetTransformDatas = new Dictionary<int, Transform>();
+	private Dictionary<int, AsteroidData> asteroidRewardsData = new Dictionary<int, AsteroidData>();
 	readonly SignalBus signalBus;
 	private PlanetSettings planetSettings;
 
@@ -141,6 +142,31 @@ public class SpaceModel : ISpaceModel
 				pd.ShipCargoUpdatePrice = Mathf.RoundToInt(pds.StartingShipCargoPrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.ShipCargoLevel));
 				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
 			}
+		}
+	}
+
+	public void AddAsteroidData(AsteroidData data, int id)
+	{
+		if (!asteroidRewardsData.ContainsKey(id))
+		{
+			asteroidRewardsData.Add(id, data);
+		}
+		else
+		{
+			asteroidRewardsData[id] = data;
+		}
+	}
+
+	public AsteroidData GetAsteroidRewards(int id)
+	{
+		return asteroidRewardsData[id];
+	}
+
+	public void RemoveAsteroidData(int id)
+	{
+		if (asteroidRewardsData.ContainsKey(id))
+		{
+			asteroidRewardsData.Remove(id);
 		}
 	}
 }

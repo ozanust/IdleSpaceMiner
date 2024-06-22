@@ -10,19 +10,27 @@ public class SpaceController : ISpaceController, ITickable
 	IPlayerModel playerModel;
 	GameSettings gameSettings;
 	SignalBus signalBus;
+	AsteroidView asteroidPrototype;
+	MissileView missilePrototype;
 
 	bool isNew;
 	bool isAsteroidMinerUnlocked;
 	int nextAsteroidSpawnTime;
 	float asteroidSpawnTimer;
+	int asteroidNumber = -1;
 
-	public SpaceController(PlanetSettings planetSettings, ISpaceModel spaceModel, IPlayerModel playerModel, GameSettings gameSettings, SignalBus signalBus)
+	public SpaceController(PlanetSettings planetSettings, ISpaceModel spaceModel, IPlayerModel playerModel, GameSettings gameSettings, SignalBus signalBus, AsteroidView asteroidView, MissileView missileView)
 	{
 		this.planetSettings = planetSettings;
 		this.spaceModel = spaceModel;
 		this.playerModel = playerModel;
 		this.gameSettings = gameSettings;
 		this.signalBus = signalBus;
+		asteroidPrototype = asteroidView;
+		missilePrototype = missileView;
+
+		asteroidPrototype.gameObject.SetActive(false);
+		missilePrototype.gameObject.SetActive(false);
 		isNew = true;
 
 		OnRegister();
@@ -43,6 +51,7 @@ public class SpaceController : ISpaceController, ITickable
 		}
 
 		signalBus.Subscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
+		signalBus.Subscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 	}
 
 	private PlanetData[] GetSampleData()
@@ -70,8 +79,20 @@ public class SpaceController : ISpaceController, ITickable
 	{
 		if (signal.ResearchType == ResearchType.AsteroidMiner)
 		{
+			nextAsteroidSpawnTime = Random.Range(gameSettings.GlobalSettings.AsteroidSpawnTimes[0], gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
 			isAsteroidMinerUnlocked = true;
 		}
+	}
+
+	private void OnAsteroidDestroyed(AsteroidDestroyedSignal signal)
+	{
+		ResourceData[] rewards = spaceModel.GetAsteroidRewards(signal.AsteroidId).Rewards;
+		foreach (ResourceData rd in rewards)
+		{
+			playerModel.AddResource(rd.Type, rd.Amount);
+		}
+
+		spaceModel.RemoveAsteroidData(signal.AsteroidId);
 	}
 
 	public void OpenPlanet(int planetIndex)
@@ -121,13 +142,33 @@ public class SpaceController : ISpaceController, ITickable
 		if (isAsteroidMinerUnlocked)
 		{
 			asteroidSpawnTimer += Time.deltaTime;
-
 			if (asteroidSpawnTimer >= nextAsteroidSpawnTime)
 			{
-				// spawn asteroid
+				float angle = Random.Range(0f, Mathf.PI * 2);
+				float x = Mathf.Cos(angle) * 10;
+				float y = Mathf.Sin(angle) * 10;
+				Vector3 position = new Vector3(x, y, 0f);
+
+				AsteroidView asteroid = Object.Instantiate(asteroidPrototype, position, Quaternion.identity);
+				asteroidNumber += 1;
+				int id = asteroidNumber;
+				asteroid.Init(signalBus, id);
+				asteroid.OnClick.AddListener(OnClickAsteroid);
+				asteroid.gameObject.SetActive(true);
+
+				AsteroidData data = new AsteroidData(new ResourceData[] { new ResourceData(ResourceType.Copper, Mathf.RoundToInt(playerModel.GetResource(ResourceType.Copper) * 0.2f)), new ResourceData(ResourceType.Iron, Mathf.RoundToInt(playerModel.GetResource(ResourceType.Iron) * 0.2f)) });
+				spaceModel.AddAsteroidData(data, id);
+				
 				nextAsteroidSpawnTime = Random.Range(gameSettings.GlobalSettings.AsteroidSpawnTimes[0], gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
 				asteroidSpawnTimer = 0;
 			}
 		}
+	}
+
+	private void OnClickAsteroid(Vector3 asteroidPosition)
+	{
+		MissileView missile = Object.Instantiate(missilePrototype, new Vector3(0, 0, 0), Quaternion.identity);
+		missile.Init(asteroidPosition);
+		missile.gameObject.SetActive(true);
 	}
 }
