@@ -25,6 +25,8 @@ public class NavBarView : MonoBehaviour
         managersButton.onClick.AddListener(OnClickManagers);
         boostsButton.onClick.AddListener(OnClickBoosts);
         mothershipButton.onClick.AddListener(OnClickMothership);
+
+        signalBus.Subscribe<ResearchCompletedSignal>(OnResearchUnlocked);
     }
 
     private void OnClickResources()
@@ -56,4 +58,17 @@ public class NavBarView : MonoBehaviour
     {
         signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Mothership });
     }
+
+    private void OnResearchUnlocked(ResearchCompletedSignal signal)
+	{
+        if(signal.ResearchType == ResearchType.Smelter)
+		{
+            productionButton.gameObject.SetActive(true);
+		}
+
+        if(signal.ResearchType == ResearchType.Management)
+		{
+            managersButton.gameObject.SetActive(true);
+		}
+	}
 }

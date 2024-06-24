@@ -38,6 +38,7 @@ public class ProductionView : MonoBehaviour
 	{
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
 	private void OnMenuOpen(MenuOpenSignal signal)
@@ -58,6 +59,14 @@ public class ProductionView : MonoBehaviour
 		SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
 		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
 		item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+	}
+
+	private void OnResearchCompleted(ResearchCompletedSignal signal)
+	{
+		if (signal.ResearchType == ResearchType.Crafter)
+		{
+			craftButton.gameObject.SetActive(true);
+		}
 	}
 
 	private void OnSmeltSelected()
