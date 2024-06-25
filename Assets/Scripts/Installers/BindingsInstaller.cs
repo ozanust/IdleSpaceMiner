@@ -56,6 +56,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<SmeltRecipeAddSignal>();
 		Container.DeclareSignal<SmeltRecipeRemoveSignal>();
 		Container.DeclareSignal<SmelterUnlockedSignal>();
+		Container.DeclareSignal<RecipeUnlockedSignal>();
 		
 		Container.DeclareSignal<ResearchCompletedSignal>();
 		Container.DeclareSignal<ResearchInfoOpenSignal>();

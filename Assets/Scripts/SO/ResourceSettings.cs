@@ -7,17 +7,21 @@ public class ResourceSettings : ScriptableObject
 {
 	[SerializeField] private ResourceDataSetting[] resourceDataSettings;
 	[SerializeField] private AlloyDataSetting[] alloyDataSettings;
+	[SerializeField] private ItemDataSetting[] itemDataSettings;
 	[SerializeField] private ResourceValueSetting[] resourceValueSettings;
 	[SerializeField] private ResourceTypeSetting[] resourceTypeSettings;
 	[SerializeField] private AlloySmeltTimeSettings[] alloySmeltTimeSettings;
+	[SerializeField] private ItemSmeltTimeSettings[] itemSmeltTimeSettings;
 	[SerializeField] private SmelterSetting[] smelterSettings;
 	[SerializeField] private ResearchSettings[] researchSettings;
 
 	public ResourceDataSetting[] ResourceDataSettings => resourceDataSettings;
 	public AlloyDataSetting[] AlloySettings => alloyDataSettings;
+	public ItemDataSetting[] ItemDataSettings => itemDataSettings;
 	public ResourceValueSetting[] ValueSettings => resourceValueSettings;
 	public ResourceTypeSetting[] TypeSettings => resourceTypeSettings;
 	public AlloySmeltTimeSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
+	public ItemSmeltTimeSettings[] ItemSmeltTimeSettings => itemSmeltTimeSettings;
 	public SmelterSetting[] SmelterSettings => smelterSettings;
 	public ResearchSettings[] ResearchSettings => researchSettings;
 
@@ -60,6 +64,19 @@ public class ResourceSettings : ScriptableObject
 		return null;
 	}
 
+	public ItemDataSetting GetItemData(ResourceType type)
+	{
+		for (int i = 0; i < itemDataSettings.Length; i++)
+		{
+			if (type == itemDataSettings[i].Type)
+			{
+				return itemDataSettings[i];
+			}
+		}
+
+		return null;
+	}
+
 	public ResourceType[] GetMainResourceSubType(MainResourceType type)
 	{
 		for (int i = 0; i < resourceTypeSettings.Length; i++)
@@ -96,6 +113,19 @@ public class ResourceSettings : ScriptableObject
 			if (type == alloySmeltTimeSettings[i].Type)
 			{
 				return alloySmeltTimeSettings[i];
+			}
+		}
+
+		return null;
+	}
+
+	public ItemSmeltTimeSettings GetItemSmeltSetting(ResourceType type)
+	{
+		for (int i = 0; i < itemSmeltTimeSettings.Length; i++)
+		{
+			if (type == itemSmeltTimeSettings[i].Type)
+			{
+				return itemSmeltTimeSettings[i];
 			}
 		}
 
@@ -146,6 +176,14 @@ public class AlloyDataSetting
 }
 
 [System.Serializable]
+public class ItemDataSetting
+{
+	public ResourceType Type;
+	public string Name;
+	public Sprite Icon;
+}
+
+[System.Serializable]
 public class ResourceValueSetting
 {
 	public ResourceType Type;
@@ -164,6 +202,15 @@ public class AlloySmeltTimeSettings
 {
 	public AlloyType Type;
 	public int ResourceNeeded;
+	public float TimeToSmelt;
+	public int PriceToUnlock;
+}
+
+[System.Serializable]
+public class ItemSmeltTimeSettings
+{
+	public ResourceType Type;
+	public ResearchNeededResource[] NeededResources;
 	public float TimeToSmelt;
 	public int PriceToUnlock;
 }

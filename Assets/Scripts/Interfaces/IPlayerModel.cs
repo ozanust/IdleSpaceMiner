@@ -21,6 +21,8 @@ public interface IPlayerModel
     void UnlockSmelter(int smelterId);
     int GetLastUnlockedSmelterId();
     void UnlockAlloy(AlloyType type);
+    void UnlockItemRecipe(ResourceType type);
+    ResourceType[] GetUnlockedItemRecipes();
     AlloyType[] GetUnlockedAlloys();
     void UnlockResearch(ResearchType type);
     ResearchType[] GetUnlockedResearchs();

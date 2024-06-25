@@ -60,15 +60,15 @@ public class NavBarView : MonoBehaviour
     }
 
     private void OnResearchUnlocked(ResearchCompletedSignal signal)
-	{
-        if(signal.ResearchType == ResearchType.Smelter)
-		{
-            productionButton.gameObject.SetActive(true);
-		}
+    {
+        if (signal.ResearchType == ResearchType.Smelter)
+        {
+            productionButton.interactable = true;
+        }
 
-        if(signal.ResearchType == ResearchType.Management)
-		{
-            managersButton.gameObject.SetActive(true);
-		}
-	}
+        if (signal.ResearchType == ResearchType.Management)
+        {
+            managersButton.interactable = true;
+        }
+    }
 }

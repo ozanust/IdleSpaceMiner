@@ -13,6 +13,8 @@ public class ProductionController : IProductionController, ITickable
 	private Dictionary<int, SmelterAlloyData> smeltingData = new Dictionary<int, SmelterAlloyData>();
 	private List<SmelterAlloyData> smeltData = new List<SmelterAlloyData>();
 
+	float smeltSpeed = 1;
+
 	public ProductionController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings)
 	{
 		this.signalBus = signalBus;
@@ -22,6 +24,7 @@ public class ProductionController : IProductionController, ITickable
 		this.signalBus.Subscribe<SmeltRecipeAddSignal>(OnRecipeAdded);
 		this.signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnRecipeRemoved);
 		this.signalBus.Subscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
+		this.signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
 	public void Tick()
@@ -73,7 +76,7 @@ public class ProductionController : IProductionController, ITickable
 		for (int i = 0; i < smeltData.Count; i++)
 		{
 			SmelterAlloyData sad = smeltData[i];
-			sad.SmeltedTime += Time.deltaTime;
+			sad.SmeltedTime += Time.deltaTime * smeltSpeed;
 			if (sad.SmeltedTime >= sad.SmeltTime)
 			{
 				sad.SmeltedTime = 0;
@@ -98,6 +101,14 @@ public class ProductionController : IProductionController, ITickable
 				playerModel.TryUseResource(AlloyToResourceConverter.ConvertToRaw(sad.Type), resourceSettings.GetSmeltSetting(sad.Type).ResourceNeeded);
 				AddSmelt(sad);
 			}
+		}
+	}
+
+	private void OnResearchCompleted(ResearchCompletedSignal signal)
+	{
+		if (signal.ResearchType == ResearchType.AdvancedFurnace)
+		{
+			smeltSpeed = 1.2f;
 		}
 	}
 

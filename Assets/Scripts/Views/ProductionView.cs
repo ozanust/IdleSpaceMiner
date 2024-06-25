@@ -65,7 +65,7 @@ public class ProductionView : MonoBehaviour
 	{
 		if (signal.ResearchType == ResearchType.Crafter)
 		{
-			craftButton.gameObject.SetActive(true);
+			craftButton.interactable = true;
 		}
 	}
 
