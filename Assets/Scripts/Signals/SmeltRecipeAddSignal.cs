@@ -2,4 +2,5 @@ public class SmeltRecipeAddSignal
 {
 	public int SmelterId;
 	public AlloyType RecipeType;
+	public ResourceType ItemRecipeType;
 }

@@ -4,6 +4,7 @@ public enum MenuType
 	Resources,
 	Production,
 	SmeltRecipes,
+	CraftRecipes,
 	Research,
 	ResarchInfo,
 	Managers,

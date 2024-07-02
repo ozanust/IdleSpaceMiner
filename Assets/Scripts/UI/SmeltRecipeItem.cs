@@ -21,6 +21,7 @@ public class SmeltRecipeItem : MonoBehaviour
 	AlloyType alloyType;
 	ResourceType resourceType = ResourceType.IronNail;
 	public Action<AlloyType> OnClick;
+	public Action<ResourceType> OnClickItemRecipe;
 
 	int price;
 
@@ -51,6 +52,11 @@ public class SmeltRecipeItem : MonoBehaviour
 		this.alloyType = alloyType;
 	}
 
+	public void SetResourceType(ResourceType resourceType)
+	{
+		this.resourceType = resourceType;
+	}
+
 	public void SetUnlockItemType(ResourceType resourceType)
 	{
 		this.resourceType = resourceType;
@@ -77,6 +83,7 @@ public class SmeltRecipeItem : MonoBehaviour
 		if (!isUnlock)
 		{
 			OnClick?.Invoke(alloyType);
+			OnClickItemRecipe?.Invoke(resourceType);
 		}
 		else
 		{

@@ -13,9 +13,12 @@ public class SmeltRecipesView : MonoBehaviour
 	[SerializeField] private SmeltRecipeItem smeltRecipeItemPrototype;
 	[SerializeField] private GameObject panel;
 	[SerializeField] private GameObject smeltRecipeItemsContainer;
+	[SerializeField] private GameObject craftRecipeItemsContainer;
 
 	private MenuType type = MenuType.SmeltRecipes;
+	private MenuType typeCraft = MenuType.CraftRecipes;
 	private List<AlloyType> alloyTypes = new List<AlloyType>();
+	private List<ResourceType> craftTypes = new List<ResourceType>();
 
 	private void Start()
 	{
@@ -27,9 +30,11 @@ public class SmeltRecipesView : MonoBehaviour
 		if (signal.Type == type)
 		{
 			panel.SetActive(true);
+			craftRecipeItemsContainer.gameObject.SetActive(false);
+			smeltRecipeItemsContainer.gameObject.SetActive(true);
 
 			AlloyType[] types = playerModel.GetUnlockedAlloys();
-			foreach(AlloyType type in types)
+			foreach (AlloyType type in types)
 			{
 				if (!alloyTypes.Contains(type))
 				{
@@ -42,11 +47,37 @@ public class SmeltRecipesView : MonoBehaviour
 				}
 			}
 		}
+		else if (signal.Type == typeCraft)
+		{
+			panel.SetActive(true);
+			craftRecipeItemsContainer.gameObject.SetActive(true);
+			smeltRecipeItemsContainer.gameObject.SetActive(false);
+
+			ResourceType[] types = playerModel.GetUnlockedItemRecipes();
+			foreach (ResourceType type in types)
+			{
+				if (!craftTypes.Contains(type))
+				{
+					SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
+					item.SetResourceType(type);
+					item.SetTitle(type.ToString());
+					item.SetDuration(Mathf.RoundToInt(resourceSettings.GetItemSmeltSetting(type).TimeToSmelt));
+					item.OnClickItemRecipe += OnClickItemRecipe;
+					craftTypes.Add(type);
+				}
+			}
+		}
 	}
 
 	private void OnClickRecipe(AlloyType alloyType)
 	{
 		signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = alloyType, SmelterId = playerModel.GetTargetSmelter() });
+		panel.SetActive(false);
+	}
+
+	private void OnClickItemRecipe(ResourceType resourceType)
+	{
+		signalBus.Fire(new SmeltRecipeAddSignal() { ItemRecipeType = resourceType, SmelterId = playerModel.GetTargetSmelter() });
 		panel.SetActive(false);
 	}
 }

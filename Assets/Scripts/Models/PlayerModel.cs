@@ -13,6 +13,7 @@ public class PlayerModel : IPlayerModel
 	private List<ResourceType> unlockedItemRecipes = new List<ResourceType>();
 	private List<ResearchType> unlockedResearchs = new List<ResearchType>();
 	private int lastUnlockedSmelterId = 0;
+	private int lastUnlockedCrafterId = 50;
 	private int recipeSelectionTargetSmelter = -1;
 
 	readonly SignalBus signalBus;
@@ -278,6 +279,18 @@ public class PlayerModel : IPlayerModel
 	public int GetLastUnlockedSmelterId()
 	{
 		return lastUnlockedSmelterId;
+	}
+
+	public void UnlockCrafter(int smelterId)
+	{
+		lastUnlockedCrafterId = smelterId;
+		signalBus.Fire<PlayerModelUpdatedSignal>();
+		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedCrafterId });
+	}
+
+	public int GetLastUnlockedCrafterId()
+	{
+		return lastUnlockedCrafterId;
 	}
 
 	public void SetTargetSmelter(int smelterId)

@@ -60,7 +60,14 @@ public class SmelterItem : MonoBehaviour
 
     private void OnClickUnlockButton()
 	{
-        productionController.TryUnlockSmelter();
+        if (smelterId <= 49)
+        {
+            productionController.TryUnlockSmelter();
+		}
+		else
+		{
+            productionController.TryUnlockCrafter();
+		}
 	}
 
     private void UnlockSmelter(int id)
@@ -81,9 +88,17 @@ public class SmelterItem : MonoBehaviour
 	}
 
     private void OnClickSetRecipe()
-	{
+    {
         playerModel.SetTargetSmelter(smelterId);
-        signalBus.Fire(new MenuOpenSignal() { Type = MenuType.SmeltRecipes });
+
+        if (smelterId <= 49)
+        {
+            signalBus.Fire(new MenuOpenSignal() { Type = MenuType.SmeltRecipes });
+        }
+        else
+        {
+            signalBus.Fire(new MenuOpenSignal() { Type = MenuType.CraftRecipes });
+        }
     }
 
     private void OnClickRemoveRecipe()

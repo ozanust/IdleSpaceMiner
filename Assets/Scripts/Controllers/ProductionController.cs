@@ -138,4 +138,15 @@ public class ProductionController : IProductionController, ITickable
 			playerModel.UseMoney(nextSmelterPrice);
 		}
 	}
+
+	public void TryUnlockCrafter()
+	{
+		int nextSmelterId = playerModel.GetLastUnlockedCrafterId() + 1;
+		int nextSmelterPrice = resourceSettings.GetSmelterSetting(nextSmelterId).Price;
+		if (playerModel.HasMoney(nextSmelterPrice))
+		{
+			playerModel.UnlockCrafter(nextSmelterId);
+			playerModel.UseMoney(nextSmelterPrice);
+		}
+	}
 }

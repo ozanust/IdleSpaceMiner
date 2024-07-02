@@ -18,6 +18,7 @@ public class ProductionView : MonoBehaviour
 
 	[SerializeField] private SmelterItem smelterItemPrototype;
 	[SerializeField] private GameObject smelterItemContainer;
+	[SerializeField] private GameObject crafterItemContainer;
 
 	[SerializeField] private Button smeltButton;
 	[SerializeField] private Button craftButton;
@@ -56,9 +57,18 @@ public class ProductionView : MonoBehaviour
 
 	private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-		SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
-		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-		item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+		if (signal.SmelterId <= 49)
+		{
+			SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
+			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
+			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+		}
+		else
+		{
+			SmelterItem item = Instantiate(smelterItemPrototype, crafterItemContainer.transform);
+			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
+			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+		}
 	}
 
 	private void OnResearchCompleted(ResearchCompletedSignal signal)
