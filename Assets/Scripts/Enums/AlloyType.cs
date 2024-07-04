@@ -6,5 +6,5 @@ public enum AlloyType : int
 	IronBar = 1,
 	LeadBar = 2,
 	SilicaBar = 3,
-	AluminumBar = 4,
+	AluminumBar = 4
 }

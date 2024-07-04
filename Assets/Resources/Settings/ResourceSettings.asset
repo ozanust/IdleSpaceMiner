@@ -90,6 +90,21 @@ MonoBehaviour:
   - Type: 14
     Name: Glass
     Icon: {fileID: 21300000, guid: 6886c9646d11a8c448f17414ec985b1b, type: 3}
+  - Type: 5
+    Name: Copper Bar
+    Icon: {fileID: 21300000, guid: 4bc48287f2cdc17439bb0b571b702810, type: 3}
+  - Type: 6
+    Name: Iron Bar
+    Icon: {fileID: 21300000, guid: 4dafeaef4e4b22540ac81a1fd990b0a5, type: 3}
+  - Type: 7
+    Name: Lead Bar
+    Icon: {fileID: 21300000, guid: 611a3e74ea89d0048ad9af8e377fe41e, type: 3}
+  - Type: 8
+    Name: Silica Bar
+    Icon: {fileID: 21300000, guid: f4883192140fa7f41a048c053421205f, type: 3}
+  - Type: 9
+    Name: Aluminum Bar
+    Icon: {fileID: 21300000, guid: 39dd0244f54aebf4e85882397bd5d7b2, type: 3}
   resourceValueSettings:
   - Type: 0
     Value: 1
@@ -173,6 +188,12 @@ MonoBehaviour:
     Price: 474746
   - SmelterId: 3
     Price: 1000000
+  - SmelterId: 50
+    Price: 500000
+  - SmelterId: 51
+    Price: 1000000
+  - SmelterId: 52
+    Price: 2000000
   researchSettings:
   - Name: Telescope 1
     Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}

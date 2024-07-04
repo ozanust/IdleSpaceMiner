@@ -40,7 +40,7 @@ public class ProductionController : IProductionController, ITickable
 			return;
 		}
 
-		AlloySmeltTimeSettings settings = resourceSettings.GetSmeltSetting(signal.RecipeType);
+		AlloySmeltSettings settings = resourceSettings.GetSmeltSetting(signal.RecipeType);
 		SmelterAlloyData newData = new SmelterAlloyData(signal.RecipeType, settings.TimeToSmelt);
 		smeltingData.Add(signal.SmelterId, newData);
 

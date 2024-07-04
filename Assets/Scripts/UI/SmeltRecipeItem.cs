@@ -15,26 +15,28 @@ public class SmeltRecipeItem : MonoBehaviour
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text durationText;
     [SerializeField] private TMP_Text priceText;
+    [SerializeField] private TMP_Text unlockText;
+    [SerializeField] private TMP_Text sourceNeededAmountText;
+    [SerializeField] private TMP_Text secondSourceNeededAmountText;
     [SerializeField] private Image iconImage;
-	[SerializeField] private bool isUnlock;
+    [SerializeField] private Image sourceImage;
+    [SerializeField] private Image secondSourceImage;
+    [SerializeField] private Image targetImage;
+	[SerializeField] private bool isLocked;
+	[SerializeField] private GameObject unlockedRecipeImages;
+	[SerializeField] private SmelterType type;
 
-	AlloyType alloyType;
+	AlloyType targetAlloyType;
 	ResourceType resourceType = ResourceType.IronNail;
 	public Action<AlloyType> OnClick;
 	public Action<ResourceType> OnClickItemRecipe;
 
 	int price;
 
-	private void Awake()
+	public void Init()
 	{
 		button.onClick.AddListener(OnClickButton);
 		signalBus.Subscribe<RecipeUnlockedSignal>(OnRecipeUnlocked);
-	}
-
-	private void Start()
-	{
-		ResourceType[] unlockedRecipes = playerModel.GetUnlockedItemRecipes();
-		SetUnlockItemType(unlockedRecipes[unlockedRecipes.Length - 1] + 1);
 	}
 
 	public void SetTitle(string title)
@@ -49,47 +51,114 @@ public class SmeltRecipeItem : MonoBehaviour
 
 	public void SetAlloyType(AlloyType alloyType)
 	{
-		this.alloyType = alloyType;
+		this.targetAlloyType = alloyType;
 	}
 
 	public void SetResourceType(ResourceType resourceType)
 	{
 		this.resourceType = resourceType;
 	}
-
-	public void SetUnlockItemType(ResourceType resourceType)
+	public void SetType(SmelterType type)
 	{
-		this.resourceType = resourceType;
-		price = resourceSettings.GetItemSmeltSetting(resourceType).PriceToUnlock;
-		priceText.text = price.ToString();
+		this.type = type;
+	}
 
-		iconImage.sprite = resourceSettings.GetItemData(resourceType).Icon;
-		titleText.text = resourceSettings.GetItemData(resourceType).Name;
+	public void SetInjections(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings)
+	{
+		this.signalBus = signalBus;
+		this.playerModel = playerModel;
+		this.resourceSettings = resourceSettings;
+	}
+
+	public void SetLockedItemType(ResourceType targetResourceType)
+	{
+		this.resourceType = targetResourceType;
+		if (targetResourceType <= ResourceType.AluminumBar)
+		{
+			targetAlloyType = ResourceToAlloyConverter.Convert(targetResourceType);
+			AlloySmeltSettings settings = resourceSettings.GetSmeltSetting(targetAlloyType);
+			price = settings.PriceToUnlock;
+			durationText.text = settings.TimeToSmelt.ToString();
+			sourceNeededAmountText.text = settings.ResourceNeeded.ToString();
+			sourceImage.sprite = resourceSettings.GetResourceData(AlloyToResourceConverter.ConvertToRaw(targetAlloyType)).Icon;
+			targetImage.sprite = resourceSettings.GetAlloyData(targetAlloyType).Icon;
+			priceText.text = price.ToString();
+			iconImage.sprite = resourceSettings.GetAlloyData(targetAlloyType).Icon;
+			titleText.text = resourceSettings.GetAlloyData(targetAlloyType).Name;
+		}
+		else
+		{
+			ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(targetResourceType);
+			price = settings.PriceToUnlock;
+			durationText.text = settings.TimeToSmelt.ToString();
+			priceText.text = price.ToString();
+
+			ResearchNeededResource[] resources = settings.NeededResources;
+			if (resources.Length > 1)
+			{
+				sourceNeededAmountText.text = resources[0].Amount.ToString();
+				sourceImage.sprite = resourceSettings.GetItemData(resources[0].Type).Icon;
+
+				secondSourceNeededAmountText.text = resources[1].Amount.ToString();
+				secondSourceImage.sprite = resourceSettings.GetItemData(resources[1].Type).Icon;
+
+				secondSourceImage.gameObject.SetActive(true);
+			}
+			else
+			{
+				sourceNeededAmountText.text = resources[0].Amount.ToString();
+				sourceImage.sprite = resourceSettings.GetItemData(resources[0].Type).Icon;
+			}
+
+			targetImage.sprite = resourceSettings.GetResourceData(resourceType).Icon;
+			iconImage.sprite = resourceSettings.GetItemData(targetResourceType).Icon;
+			titleText.text = resourceSettings.GetItemData(targetResourceType).Name;
+		}
+
+		isLocked = true;
 	}
 
 	private void OnRecipeUnlocked(RecipeUnlockedSignal signal)
 	{
-		if (isUnlock)
+		if (signal.Type == resourceType)
 		{
-			if (signal.Type > ResourceType.CopperWire && signal.Type > resourceType)
-			{
-				SetUnlockItemType(signal.Type + 1);
-			}
+			Unlock();
 		}
+		else if (ResourceToAlloyConverter.Convert(signal.Type) == targetAlloyType)
+		{
+			Unlock();
+		}
+	}
+
+	public void Unlock()
+	{
+		priceText.gameObject.SetActive(false);
+		iconImage.gameObject.SetActive(false);
+		unlockText.gameObject.SetActive(false);
+		durationText.gameObject.SetActive(true);
+		unlockedRecipeImages.gameObject.SetActive(true);
+		isLocked = false;
 	}
 
 	private void OnClickButton()
 	{
-		if (!isUnlock)
+		if (!isLocked)
 		{
-			OnClick?.Invoke(alloyType);
+			OnClick?.Invoke(targetAlloyType);
 			OnClickItemRecipe?.Invoke(resourceType);
 		}
 		else
 		{
 			if (playerModel.HasMoney(price))
 			{
-				playerModel.UnlockItemRecipe(resourceType);
+				if (type == SmelterType.Crafter)
+				{
+					playerModel.UnlockItemRecipe(resourceType);
+				}
+				else
+				{
+					playerModel.UnlockAlloy(targetAlloyType);
+				}
 			}
 		}
 	}

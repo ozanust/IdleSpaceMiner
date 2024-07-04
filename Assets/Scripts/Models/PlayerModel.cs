@@ -13,7 +13,7 @@ public class PlayerModel : IPlayerModel
 	private List<ResourceType> unlockedItemRecipes = new List<ResourceType>();
 	private List<ResearchType> unlockedResearchs = new List<ResearchType>();
 	private int lastUnlockedSmelterId = 0;
-	private int lastUnlockedCrafterId = 50;
+	private int lastUnlockedCrafterId = 49;
 	private int recipeSelectionTargetSmelter = -1;
 
 	readonly SignalBus signalBus;
@@ -233,6 +233,7 @@ public class PlayerModel : IPlayerModel
 	{
 		unlockedAlloys.Add(type);
 		signalBus.Fire<PlayerModelUpdatedSignal>();
+		signalBus.Fire(new RecipeUnlockedSignal() { Type = AlloyToResourceConverter.Convert(type) });
 	}
 
 	public AlloyType[] GetUnlockedAlloys()

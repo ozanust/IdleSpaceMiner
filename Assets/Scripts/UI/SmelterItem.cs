@@ -28,6 +28,7 @@ public class SmelterItem : MonoBehaviour
 
     [SerializeField] private bool isUnlocked = false;
     [SerializeField] private int smelterId;
+    [SerializeField] private SmelterType type;
     private SmelterAlloyData data;
 
 	private void Awake()
@@ -58,9 +59,14 @@ public class SmelterItem : MonoBehaviour
         smelterUnlockPriceText.text = price.ToString() + "$";
     }
 
+    public void SetType(SmelterType type)
+	{
+        this.type = type;
+	}
+
     private void OnClickUnlockButton()
 	{
-        if (smelterId <= 49)
+        if (type == SmelterType.Smelter)
         {
             productionController.TryUnlockSmelter();
 		}
@@ -83,7 +89,13 @@ public class SmelterItem : MonoBehaviour
 	{
         if (!isUnlocked)
 		{
-            UnlockSmelter(signal.SmelterId);
+            if (signal.SmelterId <= 49 && type == SmelterType.Smelter)
+            {
+                UnlockSmelter(signal.SmelterId);
+            }else if(signal.SmelterId > 49 && type == SmelterType.Crafter)
+			{
+                UnlockSmelter(signal.SmelterId);
+			}
 		}
 	}
 
@@ -125,7 +137,7 @@ public class SmelterItem : MonoBehaviour
         if (isUnlocked && smelterId == signal.SmelterId)
         {
             AlloyDataSetting settings = resourceSettings.GetAlloyData(signal.RecipeType);
-            ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(AlloyToResourceConverter.Convert(signal.RecipeType));
+            ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.ItemRecipeType);
 
             noRecipeSelectedText.gameObject.SetActive(false);
             selectedRecipeImagesParent.SetActive(true);

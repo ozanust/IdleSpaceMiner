@@ -10,8 +10,8 @@ public class ResourceSettings : ScriptableObject
 	[SerializeField] private ItemDataSetting[] itemDataSettings;
 	[SerializeField] private ResourceValueSetting[] resourceValueSettings;
 	[SerializeField] private ResourceTypeSetting[] resourceTypeSettings;
-	[SerializeField] private AlloySmeltTimeSettings[] alloySmeltTimeSettings;
-	[SerializeField] private ItemSmeltTimeSettings[] itemSmeltTimeSettings;
+	[SerializeField] private AlloySmeltSettings[] alloySmeltTimeSettings;
+	[SerializeField] private ItemSmeltSettings[] itemSmeltTimeSettings;
 	[SerializeField] private SmelterSetting[] smelterSettings;
 	[SerializeField] private ResearchSettings[] researchSettings;
 
@@ -20,8 +20,8 @@ public class ResourceSettings : ScriptableObject
 	public ItemDataSetting[] ItemDataSettings => itemDataSettings;
 	public ResourceValueSetting[] ValueSettings => resourceValueSettings;
 	public ResourceTypeSetting[] TypeSettings => resourceTypeSettings;
-	public AlloySmeltTimeSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
-	public ItemSmeltTimeSettings[] ItemSmeltTimeSettings => itemSmeltTimeSettings;
+	public AlloySmeltSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
+	public ItemSmeltSettings[] ItemSmeltTimeSettings => itemSmeltTimeSettings;
 	public SmelterSetting[] SmelterSettings => smelterSettings;
 	public ResearchSettings[] ResearchSettings => researchSettings;
 
@@ -106,7 +106,7 @@ public class ResourceSettings : ScriptableObject
 		return MainResourceType.None;
 	}
 
-	public AlloySmeltTimeSettings GetSmeltSetting(AlloyType type)
+	public AlloySmeltSettings GetSmeltSetting(AlloyType type)
 	{
 		for (int i = 0; i < alloySmeltTimeSettings.Length; i++)
 		{
@@ -119,7 +119,7 @@ public class ResourceSettings : ScriptableObject
 		return null;
 	}
 
-	public ItemSmeltTimeSettings GetItemSmeltSetting(ResourceType type)
+	public ItemSmeltSettings GetItemSmeltSetting(ResourceType type)
 	{
 		for (int i = 0; i < itemSmeltTimeSettings.Length; i++)
 		{
@@ -198,7 +198,7 @@ public class ResourceTypeSetting
 }
 
 [System.Serializable]
-public class AlloySmeltTimeSettings
+public class AlloySmeltSettings
 {
 	public AlloyType Type;
 	public int ResourceNeeded;
@@ -207,7 +207,7 @@ public class AlloySmeltTimeSettings
 }
 
 [System.Serializable]
-public class ItemSmeltTimeSettings
+public class ItemSmeltSettings
 {
 	public ResourceType Type;
 	public ResearchNeededResource[] NeededResources;

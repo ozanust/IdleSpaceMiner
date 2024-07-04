@@ -62,12 +62,14 @@ public class ProductionView : MonoBehaviour
 			SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
 			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
 			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+			item.SetType(SmelterType.Smelter);
 		}
 		else
 		{
 			SmelterItem item = Instantiate(smelterItemPrototype, crafterItemContainer.transform);
 			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
 			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+			item.SetType(SmelterType.Crafter);
 		}
 	}
 
