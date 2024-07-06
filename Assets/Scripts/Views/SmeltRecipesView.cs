@@ -35,50 +35,12 @@ public class SmeltRecipesView : MonoBehaviour
 			panel.SetActive(true);
 			craftRecipeItemsContainer.gameObject.SetActive(false);
 			smeltRecipeItemsContainer.gameObject.SetActive(true);
-
-			/*AlloyType[] types = playerModel.GetUnlockedAlloys();
-			foreach (AlloyType type in types)
-			{
-				if (!alloyTypes.Contains(type))
-				{
-					SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-					item.SetLockedItemType(AlloyToResourceConverter.Convert(type));
-					item.SetSignalBus(signalBus);
-					item.SetAlloyType(type);
-					item.SetType(SmelterType.Smelter);
-					item.SetTitle(type.ToString());
-					item.SetDuration(Mathf.RoundToInt(resourceSettings.GetSmeltSetting(type).TimeToSmelt));
-					item.OnClick += OnClickRecipe;
-					item.Unlock();
-					item.Init();
-					alloyTypes.Add(type);
-				}
-			}*/
 		}
 		else if (signal.Type == typeCraft)
 		{
 			panel.SetActive(true);
 			craftRecipeItemsContainer.gameObject.SetActive(true);
 			smeltRecipeItemsContainer.gameObject.SetActive(false);
-
-			/*ResourceType[] types = playerModel.GetUnlockedItemRecipes();
-			foreach (ResourceType type in types)
-			{
-				if (!craftTypes.Contains(type))
-				{
-					SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-					item.SetLockedItemType(type);
-					item.SetSignalBus(signalBus);
-					item.SetResourceType(type);
-					item.SetType(SmelterType.Crafter);
-					item.SetTitle(type.ToString());
-					item.SetDuration(Mathf.RoundToInt(resourceSettings.GetItemSmeltSetting(type).TimeToSmelt));
-					item.OnClickItemRecipe += OnClickItemRecipe;
-					item.Unlock();
-					item.Init();
-					craftTypes.Add(type);
-				}
-			}*/
 		}
 	}
 
