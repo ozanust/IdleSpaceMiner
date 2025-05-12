@@ -1,17 +1,17 @@
-public class SmeltingData
+public class CraftingData
 {
-	public SmelterAlloyData[] SmelterDatas;
+	public CrafterAlloyData[] SmelterDatas;
 
-	public SmeltingData(SmelterAlloyData[] smelterDatas)
+	public CraftingData(CrafterAlloyData[] smelterDatas)
 	{
 		SmelterDatas = smelterDatas;
 		Sort(SmelterDatas);
 	}
 
-	private void Sort(SmelterAlloyData[] arr)
+	private void Sort(CrafterAlloyData[] arr)
 	{
 		int n = arr.Length;
-		AlloyType temp;
+		ResourceType temp;
 
 		for (int i = 0; i < n - 1; i++)
 		{

@@ -71,8 +71,24 @@ public class SpaceController : ISpaceController, ITickable
 		data2.MiningRateLevel = 0;
 		data2.ShipCargoLevel = 0;
 		data2.ShipSpeedLevel = 0;
+		
+		PlanetData data3 = new PlanetData();
 
-		return new PlanetData[] { data, data2 };
+		data2.IsUnraveled = true;
+		data2.PlanetIndex = 2;
+		data2.MiningRateLevel = 0;
+		data2.ShipCargoLevel = 0;
+		data2.ShipSpeedLevel = 0;
+		
+		PlanetData data4 = new PlanetData();
+
+		data2.IsUnraveled = true;
+		data2.PlanetIndex = 3;
+		data2.MiningRateLevel = 0;
+		data2.ShipCargoLevel = 0;
+		data2.ShipSpeedLevel = 0;
+
+		return new PlanetData[] { data, data2, data3, data4 };
 	}
 
 	private void OnAsteroidResearchUnlocked(ResearchCompletedSignal signal)
