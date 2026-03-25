@@ -15,6 +15,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<CargoShipView>().FromComponentInNewPrefabResource("Game/CargoShip").AsSingle();
 		Container.Bind<AsteroidView>().FromComponentInNewPrefabResource("Game/Asteroid").AsSingle();
 		Container.Bind<MissileView>().FromComponentInNewPrefabResource("Game/Missile").AsSingle();
+		Container.Bind<ISaveService>().To<SaveService>().AsSingle();
 		Container.Bind<IResourcesService>().To<ResourcesService>().AsSingle();
 		Container.Bind<IPlayerModel>().To<PlayerModel>().AsSingle();
 		Container.Bind<ISpaceModel>().To<SpaceModel>().AsSingle();
@@ -25,6 +26,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<IResourcesSellViewController>().To<ResourcesSellViewController>().AsSingle().NonLazy();
 		Container.Bind<IPlanetInfoController>().To<PlanetInfoController>().AsSingle();
 		Container.Bind(typeof(IProductionController), typeof(ITickable)).To<ProductionController>().AsSingle().NonLazy();
+		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
 	}
 
 	void InstallSignals()

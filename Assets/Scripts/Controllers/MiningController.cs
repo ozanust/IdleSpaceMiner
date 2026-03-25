@@ -19,10 +19,26 @@ public class MiningController : IMiningController, ITickable
 		this.playerModel = playerModel;
 		this.spaceModel = spaceModel;
 
+		this.signalBus.Subscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		this.signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
 		this.signalBus.Subscribe<CargoShipMothershipArrivalSignal>(OnCargoArrivedMothership);
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+	}
+
+	/// <summary>
+	/// Pre-populates mining data for planets that are already unlocked when
+	/// loading from a save, so the cargo loop and planet info UI work immediately.
+	/// </summary>
+	private void OnSpaceModelInitialized(SpaceModelInitializedSignal signal)
+	{
+		foreach (PlanetData planet in signal.Data)
+		{
+			if (planet.IsUnlocked && !mineData.ContainsKey(planet.PlanetIndex))
+			{
+				RegisterMiningData(planet.PlanetIndex, planet.CurrentTotalMiningRate);
+			}
+		}
 	}
 
 	public void Tick()
@@ -35,8 +51,23 @@ public class MiningController : IMiningController, ITickable
 		PlanetDataSetting planetDataSettings;
 		if (planetSettings.TryGetPlanetSetting(signal.PlanetId, out planetDataSettings))
 		{
-			MiningData md = new MiningData(planetDataSettings.TotalStartingMiningRate, planetDataSettings.MiningYieldRatios);
-			mineData.Add(signal.PlanetId, md);
+			RegisterMiningData(signal.PlanetId, planetDataSettings.TotalStartingMiningRate);
+		}
+	}
+
+	/// <summary>Adds a new MiningData entry for the given planet if one does not already exist.</summary>
+	private void RegisterMiningData(int planetId, float totalMineRate)
+	{
+		if (mineData.ContainsKey(planetId))
+		{
+			return;
+		}
+
+		PlanetDataSetting planetDataSettings;
+		if (planetSettings.TryGetPlanetSetting(planetId, out planetDataSettings))
+		{
+			MiningData md = new MiningData(totalMineRate, planetDataSettings.MiningYieldRatios);
+			mineData.Add(planetId, md);
 		}
 	}
 

@@ -10,36 +10,51 @@ public class SpaceController : ISpaceController, ITickable
 	IPlayerModel playerModel;
 	GameSettings gameSettings;
 	SignalBus signalBus;
+	ISaveService saveService;
+	IMiningController miningController;
+	SaveController saveController;
 	AsteroidView asteroidPrototype;
 	MissileView missilePrototype;
 
-	bool isNew;
 	bool isAsteroidMinerUnlocked;
 	int nextAsteroidSpawnTime;
 	float asteroidSpawnTimer;
 	int asteroidNumber = -1;
 
-	public SpaceController(PlanetSettings planetSettings, ISpaceModel spaceModel, IPlayerModel playerModel, GameSettings gameSettings, SignalBus signalBus, AsteroidView asteroidView, MissileView missileView)
+	public SpaceController(
+		PlanetSettings planetSettings,
+		ISpaceModel spaceModel,
+		IPlayerModel playerModel,
+		GameSettings gameSettings,
+		SignalBus signalBus,
+		ISaveService saveService,
+		IMiningController miningController,
+		SaveController saveController,
+		AsteroidView asteroidView,
+		MissileView missileView)
 	{
 		this.planetSettings = planetSettings;
 		this.spaceModel = spaceModel;
 		this.playerModel = playerModel;
 		this.gameSettings = gameSettings;
 		this.signalBus = signalBus;
+		this.saveService = saveService;
+		this.miningController = miningController;
+		this.saveController = saveController;
 		asteroidPrototype = asteroidView;
 		missilePrototype = missileView;
 
 		asteroidPrototype.gameObject.SetActive(false);
 		missilePrototype.gameObject.SetActive(false);
-		isNew = true;
 
 		OnRegister();
 	}
 
 	private void OnRegister()
 	{
-		// read from save file
-		// true for now
+		SaveData save = saveService.Load();
+		bool isNew = save == null;
+
 		if (isNew)
 		{
 			spaceModel.InitializePlanetData(GetSampleData());
@@ -47,11 +62,114 @@ public class SpaceController : ISpaceController, ITickable
 		}
 		else
 		{
-			// read planet data from save file
+			saveController.BeginRestore();
+			RestoreFromSave(save);
+			saveController.EndRestore();
 		}
 
 		signalBus.Subscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
 		signalBus.Subscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
+	}
+
+	private void RestoreFromSave(SaveData save)
+	{
+		// --- Space state ---
+		spaceModel.InitializePlanetData(save.Space.Planets);
+
+		// --- Player money ---
+		playerModel.AddMoney(save.Player.Money);
+
+		// --- Resources ---
+		foreach (ResourceSaveEntry entry in save.Player.Resources)
+		{
+			playerModel.AddResource(entry.Type, entry.Amount);
+		}
+
+		// --- Currencies ---
+		foreach (CurrencySaveEntry entry in save.Player.Currencies)
+		{
+			playerModel.AddCurrency(entry.Type, entry.Amount);
+		}
+
+		// --- Unlocked alloys (skip defaults already added in PlayerModel ctor) ---
+		AlloyType[] defaultAlloys = playerModel.GetUnlockedAlloys();
+		foreach (AlloyType alloy in save.Player.UnlockedAlloys)
+		{
+			bool alreadyUnlocked = System.Array.IndexOf(defaultAlloys, alloy) >= 0;
+			if (!alreadyUnlocked)
+			{
+				playerModel.UnlockAlloy(alloy);
+			}
+		}
+
+		// --- Unlocked item recipes (skip defaults already added in PlayerModel ctor) ---
+		ResourceType[] defaultRecipes = playerModel.GetUnlockedItemRecipes();
+		foreach (ResourceType recipe in save.Player.UnlockedItemRecipes)
+		{
+			bool alreadyUnlocked = System.Array.IndexOf(defaultRecipes, recipe) >= 0;
+			if (!alreadyUnlocked)
+			{
+				playerModel.UnlockItemRecipe(recipe);
+			}
+		}
+
+		// --- Research ---
+		foreach (ResearchType research in save.Player.UnlockedResearches)
+		{
+			playerModel.UnlockResearch(research);
+		}
+
+		// --- Smelter / crafter slot progression ---
+		int savedSmelterId = save.Player.LastUnlockedSmelterId;
+		int currentSmelterId = playerModel.GetLastUnlockedSmelterId();
+		for (int i = currentSmelterId + 1; i <= savedSmelterId; i++)
+		{
+			playerModel.UnlockSmelter(i);
+		}
+
+		int savedCrafterId = save.Player.LastUnlockedCrafterId;
+		int currentCrafterId = playerModel.GetLastUnlockedCrafterId();
+		// CrafterId starts at 49 by default; only restore if higher values were saved
+		for (int i = currentCrafterId + 1; i <= savedCrafterId; i++)
+		{
+			playerModel.UnlockCrafter(i);
+		}
+
+		// --- Mining accumulated amounts ---
+		RestoreMinedAmounts(save.Mining);
+
+		// --- Asteroid miner active state ---
+		if (playerModel.IsResearchUnlocked(ResearchType.AsteroidMiner))
+		{
+			nextAsteroidSpawnTime = Random.Range(
+				gameSettings.GlobalSettings.AsteroidSpawnTimes[0],
+				gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
+			isAsteroidMinerUnlocked = true;
+		}
+	}
+
+	private void RestoreMinedAmounts(MiningSaveData miningData)
+	{
+		foreach (PlanetMineSaveEntry entry in miningData.PlanetMineEntries)
+		{
+			MiningData md;
+			if (!miningController.TryGetMiningData(entry.PlanetId, out md))
+			{
+				continue;
+			}
+
+			foreach (MineAmountEntry amountEntry in entry.MinedAmounts)
+			{
+				foreach (PlanetMineData pmd in md.MineDatas)
+				{
+					if (pmd.Type == amountEntry.Type)
+					{
+						pmd.MinedAmount = amountEntry.Amount;
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	private PlanetData[] GetSampleData()
