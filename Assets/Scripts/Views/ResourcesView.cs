@@ -44,6 +44,13 @@ public class ResourcesView : MonoBehaviour
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<ResourcesViewUpdatedSignal>(OnResourcesUpdated);
+		signalBus.Unsubscribe<ResourcesViewInitializedSignal>(OnResourcesInitialized);
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+	}
+
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
 		if (signal.Type == type)

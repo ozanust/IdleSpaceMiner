@@ -21,6 +21,12 @@ public class SpaceView : MonoBehaviour
 		signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
+		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+	}
+
 	private void Start()
 	{
 		Application.targetFrameRate = 60;

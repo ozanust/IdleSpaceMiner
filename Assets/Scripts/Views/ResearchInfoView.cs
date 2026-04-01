@@ -47,6 +47,14 @@ public class ResearchInfoView : MonoBehaviour
 		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+		signalBus.Unsubscribe<ResearchInfoOpenSignal>(OnResearchInfoOpen);
+		signalBus.Unsubscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
+	}
+
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
 		if (signal.Type == type)

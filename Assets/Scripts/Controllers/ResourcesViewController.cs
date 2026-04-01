@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-public class ResourcesViewController : IResourcesViewController
+public class ResourcesViewController : IResourcesViewController, IDisposable
 {
 	private IPlayerModel playerModel;
 	private SignalBus signalBus;
@@ -15,6 +16,12 @@ public class ResourcesViewController : IResourcesViewController
 
 		this.signalBus.Subscribe<PlayerModelUpdatedSignal>(OnResourcesUpdated);
 		InitializeResources();
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<PlayerModelUpdatedSignal>(OnResourcesUpdated);
 	}
 
 	private void OnResourcesUpdated(PlayerModelUpdatedSignal signal)

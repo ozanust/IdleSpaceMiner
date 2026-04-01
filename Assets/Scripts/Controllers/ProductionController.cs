@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using System.Linq;
+using System;
 
-public class ProductionController : IProductionController, ITickable
+public class ProductionController : IProductionController, ITickable, IDisposable
 {
 	private IPlayerModel playerModel;
 	private SignalBus signalBus;
@@ -30,6 +31,17 @@ public class ProductionController : IProductionController, ITickable
 		this.signalBus.Subscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
 		this.signalBus.Subscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
 		this.signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<SmeltRecipeAddSignal>(OnRecipeAdded);
+		signalBus.Unsubscribe<SmeltRecipeRemoveSignal>(OnRecipeRemoved);
+		signalBus.Unsubscribe<CraftRecipeAddSignal>(OnCraftRecipeAdded);
+		signalBus.Unsubscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
+		signalBus.Unsubscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
 	public void Tick()

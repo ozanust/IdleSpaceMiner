@@ -29,6 +29,11 @@ public class NavBarView : MonoBehaviour
         signalBus.Subscribe<ResearchCompletedSignal>(OnResearchUnlocked);
     }
 
+    private void OnDestroy()
+    {
+        signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchUnlocked);
+    }
+
     private void OnClickResources()
 	{
         signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Resources });

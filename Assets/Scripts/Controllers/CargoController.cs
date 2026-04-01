@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 
-public class CargoController : ICargoController
+public class CargoController : ICargoController, IDisposable
 {
 	private SignalBus signalBus;
 	private PlanetSettings planetSettings;
@@ -22,6 +24,13 @@ public class CargoController : ICargoController
 		this.cargoShipPrototype.gameObject.SetActive(false);
 		this.signalBus.Subscribe<PlanetTransformSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<PlanetTransformSignal>(OnPlanetUnlocked);
+		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
 	private void OnPlanetUnlocked(PlanetTransformSignal signal)

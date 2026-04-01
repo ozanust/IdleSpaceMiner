@@ -35,6 +35,10 @@ public class ResourcesSellView : MonoBehaviour
 
 	private void OnDestroy()
 	{
+        signalBus.Unsubscribe<ResourceSelectedToSellSignal>(OnResourceSelected);
+        signalBus.Unsubscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
+        signalBus.Unsubscribe<ResourcesViewClosedSignal>(OnResourcesViewClosed);
+        signalBus.Unsubscribe<ResourceDeselectedToSellSignal>(OnResourceDeselectedToSell);
         sellResourceSlider.onValueChanged.RemoveListener(OnSellingSliderMoved);
         sellButton.onClick.RemoveListener(OnSellButtonClicked);
     }

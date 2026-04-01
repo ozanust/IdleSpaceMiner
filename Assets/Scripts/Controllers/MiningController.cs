@@ -1,9 +1,10 @@
 using Zenject;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MiningController : IMiningController, ITickable
+public class MiningController : IMiningController, ITickable, IDisposable
 {
 	private PlanetSettings planetSettings;
 	private IPlayerModel playerModel;
@@ -24,6 +25,16 @@ public class MiningController : IMiningController, ITickable
 		this.signalBus.Subscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
 		this.signalBus.Subscribe<CargoShipMothershipArrivalSignal>(OnCargoArrivedMothership);
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
+		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+		signalBus.Unsubscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
+		signalBus.Unsubscribe<CargoShipMothershipArrivalSignal>(OnCargoArrivedMothership);
+		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
 	/// <summary>

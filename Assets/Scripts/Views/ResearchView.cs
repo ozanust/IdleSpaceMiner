@@ -28,6 +28,11 @@ public class ResearchView : MonoBehaviour
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+	}
+
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
 		if (signal.Type == type)

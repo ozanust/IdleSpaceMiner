@@ -28,6 +28,12 @@ public class SmeltRecipesView : MonoBehaviour
 		Init();
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+		signalBus.Unsubscribe<RecipeUnlockedSignal>(OnRecipeUnlocked);
+	}
+
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
 		if (signal.Type == type)

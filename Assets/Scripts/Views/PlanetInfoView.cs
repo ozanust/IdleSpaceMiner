@@ -51,6 +51,12 @@ public class PlanetInfoView : MonoBehaviour
 		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<PlanetOpenSignal>(OnPlanetOpen);
+		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+	}
+
 	private void OnPlanetOpen(PlanetOpenSignal signal)
 	{
 		if (openPlanetId == signal.PlanetId) 

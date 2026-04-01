@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
+using Object = UnityEngine.Object;
 
-public class SpaceController : ISpaceController, ITickable
+public class SpaceController : ISpaceController, ITickable, IDisposable
 {
 	PlanetSettings planetSettings;
 	ISpaceModel spaceModel;
@@ -227,6 +230,13 @@ public class SpaceController : ISpaceController, ITickable
 		}
 
 		spaceModel.RemoveAsteroidData(signal.AsteroidId);
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
+		signalBus.Unsubscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 	}
 
 	public void OpenPlanet(int planetIndex)

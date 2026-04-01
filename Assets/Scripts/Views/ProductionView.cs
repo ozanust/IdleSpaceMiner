@@ -42,6 +42,13 @@ public class ProductionView : MonoBehaviour
 		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+		signalBus.Unsubscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
+	}
+
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
 		if (signal.Type == type)

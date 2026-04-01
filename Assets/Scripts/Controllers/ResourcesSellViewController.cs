@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-public class ResourcesSellViewController : IResourcesSellViewController
+public class ResourcesSellViewController : IResourcesSellViewController, IDisposable
 {
 	private SignalBus signalBus;
 	private IPlayerModel playerModel;
@@ -16,6 +17,12 @@ public class ResourcesSellViewController : IResourcesSellViewController
 		this.resourceSettings = resourceSettings;
 
 		this.signalBus.Subscribe<ResourcesSellSignal>(OnSellResourceSignal);
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<ResourcesSellSignal>(OnSellResourceSignal);
 	}
 
 	private void OnSellResourceSignal(ResourcesSellSignal signal)

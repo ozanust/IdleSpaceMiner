@@ -21,6 +21,12 @@ public class GameCurrencyView : MonoBehaviour
 		signalBus.Subscribe<PlayerDarkMatterUpdatedSignal>(OnCurrencyUpdated);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<PlayerMoneyUpdatedSignal>(OnCurrencyUpdated);
+		signalBus.Unsubscribe<PlayerDarkMatterUpdatedSignal>(OnCurrencyUpdated);
+	}
+
 	private void Start()
 	{
 		InitializeResourceView();
