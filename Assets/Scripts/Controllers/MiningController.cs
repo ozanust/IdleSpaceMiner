@@ -162,4 +162,30 @@ public class MiningController : IMiningController, ITickable
 
 		return false;
 	}
+
+	/// <summary>
+	/// Aggregates all resources currently in transit across all cargo ships into a single dictionary.
+	/// Called during save to fold in-transit cargo into the centralized mothership snapshot.
+	/// </summary>
+	public Dictionary<ResourceType, int> GetTransferData()
+	{
+		Dictionary<ResourceType, int> result = new Dictionary<ResourceType, int>();
+
+		foreach (TransferResourcesData[] entries in transferData.Values)
+		{
+			foreach (TransferResourcesData entry in entries)
+			{
+				if (result.ContainsKey(entry.Type))
+				{
+					result[entry.Type] += entry.Amount;
+				}
+				else
+				{
+					result[entry.Type] = entry.Amount;
+				}
+			}
+		}
+
+		return result;
+	}
 }

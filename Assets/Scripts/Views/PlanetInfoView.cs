@@ -97,9 +97,9 @@ public class PlanetInfoView : MonoBehaviour
 		panel.SetActive(true);
 	}
 
-	private void ActivateMiningDataTypeViews(PlanetMineData[] mineDatas)
+	private void ActivateMiningDataTypeViews(ResourceMiningData[] mineDatas)
 	{
-		foreach (PlanetMineData pmd in mineDatas)
+		foreach (ResourceMiningData pmd in mineDatas)
 		{
 			if (!infoItems.ContainsKey(pmd.Type))
 			{
@@ -116,9 +116,9 @@ public class PlanetInfoView : MonoBehaviour
 		}
 	}
 
-	private void UpdateMiningDataTypeViews(PlanetMineData[] mineDatas)
+	private void UpdateMiningDataTypeViews(ResourceMiningData[] mineDatas)
 	{
-		foreach (PlanetMineData pmd in mineDatas)
+		foreach (ResourceMiningData pmd in mineDatas)
 		{
 			ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
 			infoItems[pmd.Type].UpdateMiningRate(data.TotalMineRate * pmd.Ratio);

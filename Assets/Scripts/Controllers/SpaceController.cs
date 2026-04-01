@@ -160,7 +160,7 @@ public class SpaceController : ISpaceController, ITickable
 
 			foreach (MineAmountEntry amountEntry in entry.MinedAmounts)
 			{
-				foreach (PlanetMineData pmd in md.MineDatas)
+				foreach (ResourceMiningData pmd in md.MineDatas)
 				{
 					if (pmd.Type == amountEntry.Type)
 					{

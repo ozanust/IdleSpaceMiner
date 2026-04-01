@@ -5,9 +5,9 @@ using UnityEngine;
 public class MiningData
 {
 	public float TotalMineRate;
-	public PlanetMineData[] MineDatas;
+	public ResourceMiningData[] MineDatas;
 
-	public MiningData(float mineRate, PlanetMineData[] planetMineDatas)
+	public MiningData(float mineRate, ResourceMiningData[] planetMineDatas)
 	{
 		TotalMineRate = mineRate;
 		MineDatas = planetMineDatas;
@@ -19,10 +19,10 @@ public class MiningData
 	{
 		TotalMineRate = mineRate;
 
-		PlanetMineData[] planetMineDatas = new PlanetMineData[planetMineYieldData.Length];
+		ResourceMiningData[] planetMineDatas = new ResourceMiningData[planetMineYieldData.Length];
 		for (int i = 0; i < planetMineYieldData.Length; i++)
 		{
-			planetMineDatas[i] = new PlanetMineData(planetMineYieldData[i].Type, 0, planetMineYieldData[i].YieldRatio);
+			planetMineDatas[i] = new ResourceMiningData(planetMineYieldData[i].Type, 0, planetMineYieldData[i].YieldRatio);
 		}
 
 		MineDatas = planetMineDatas;
@@ -30,7 +30,7 @@ public class MiningData
 		Sort(MineDatas);
 	}
 
-	private void Sort(PlanetMineData[] arr)
+	private void Sort(ResourceMiningData[] arr)
 	{
 		int n = arr.Length;
 		ResourceType temp;

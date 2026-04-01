@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Zenject;
 
 public class BindingsInstaller : MonoInstaller
@@ -64,6 +61,9 @@ public class BindingsInstaller : MonoInstaller
 		
 		Container.DeclareSignal<ResearchCompletedSignal>();
 		Container.DeclareSignal<ResearchInfoOpenSignal>();
+		
+		Container.DeclareSignal<OnApplicationFocusSignal>();
+		Container.DeclareSignal<OnApplicationQuitSignal>();
 
 		Container.DeclareSignal<MenuOpenSignal>();
 

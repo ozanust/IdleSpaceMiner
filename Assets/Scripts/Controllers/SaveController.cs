@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -6,7 +7,7 @@ using Zenject;
 /// Orchestrates periodic auto-saving and exposes an explicit Save method.
 /// Subscribes to relevant signals to trigger saves on meaningful state changes.
 /// </summary>
-public class SaveController : ITickable
+public class SaveController : ITickable, IDisposable
 {
     private const float AutoSaveInterval = 60f;
 
@@ -43,6 +44,19 @@ public class SaveController : ITickable
         signalBus.Subscribe<SmelterUnlockedSignal>(OnSaveTrigger);
         signalBus.Subscribe<ResourcesSellSignal>(OnSaveTrigger);
         signalBus.Subscribe<RecipeUnlockedSignal>(OnSaveTrigger);
+        signalBus.Subscribe<OnApplicationQuitSignal>(OnApplicationQuit);
+    }
+    
+    public void Dispose()
+    {
+        Debug.Log("SaveController::Dispose");
+        signalBus.Unsubscribe<PlanetUpdatedSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<PlanetUnlockedSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<ResearchCompletedSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<SmelterUnlockedSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<ResourcesSellSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<RecipeUnlockedSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<OnApplicationQuitSignal>(OnApplicationQuit);
     }
 
     /// <summary>Suppresses all saves until EndRestore is called.</summary>
@@ -58,6 +72,11 @@ public class SaveController : ITickable
         Save();
     }
 
+    private void OnApplicationQuit()
+    {
+        Save();
+    }
+
     /// <summary>Builds and writes the full save snapshot to disk.</summary>
     public void Save()
     {
@@ -65,7 +84,7 @@ public class SaveController : ITickable
         {
             return;
         }
-
+        
         SaveData data = BuildSaveData();
         saveService.Save(data);
     }
@@ -109,13 +128,35 @@ public class SaveController : ITickable
         playerData.LastUnlockedSmelterId = playerModel.GetLastUnlockedSmelterId();
         playerData.LastUnlockedCrafterId = playerModel.GetLastUnlockedCrafterId();
 
-        Dictionary<ResourceType, int> resources = playerModel.GetResources();
-        if (resources != null)
+        // Aggregate delivered player resources and in-transit cargo into a single
+        // centralized mothership snapshot, keyed by ResourceType to avoid duplicates.
+        Dictionary<ResourceType, int> mothershipResources = new Dictionary<ResourceType, int>();
+
+        Dictionary<ResourceType, int> deliveredResources = playerModel.GetResources();
+        if (deliveredResources != null)
         {
-            foreach (KeyValuePair<ResourceType, int> pair in resources)
+            foreach (KeyValuePair<ResourceType, int> pair in deliveredResources)
             {
-                playerData.Resources.Add(new ResourceSaveEntry { Type = pair.Key, Amount = pair.Value });
+                mothershipResources[pair.Key] = pair.Value;
             }
+        }
+
+        Dictionary<ResourceType, int> inTransitResources = miningController.GetTransferData();
+        foreach (KeyValuePair<ResourceType, int> pair in inTransitResources)
+        {
+            if (mothershipResources.ContainsKey(pair.Key))
+            {
+                mothershipResources[pair.Key] += pair.Value;
+            }
+            else
+            {
+                mothershipResources[pair.Key] = pair.Value;
+            }
+        }
+
+        foreach (KeyValuePair<ResourceType, int> pair in mothershipResources)
+        {
+            playerData.Resources.Add(new ResourceSaveEntry { Type = pair.Key, Amount = pair.Value });
         }
 
         foreach (CurrencyType currencyType in System.Enum.GetValues(typeof(CurrencyType)))
@@ -162,6 +203,8 @@ public class SaveController : ITickable
             return miningData;
         }
 
+        // Only save resources still accumulating at each planet (not yet picked up by a ship).
+        // In-transit resources are already folded into PlayerSaveData.Resources above.
         foreach (PlanetData planet in planets)
         {
             if (!planet.IsUnlocked)
@@ -173,7 +216,7 @@ public class SaveController : ITickable
             if (miningController.TryGetMiningData(planet.PlanetIndex, out md))
             {
                 PlanetMineSaveEntry entry = new PlanetMineSaveEntry { PlanetId = planet.PlanetIndex };
-                foreach (PlanetMineData pmd in md.MineDatas)
+                foreach (ResourceMiningData pmd in md.MineDatas)
                 {
                     entry.MinedAmounts.Add(new MineAmountEntry { Type = pmd.Type, Amount = pmd.MinedAmount });
                 }
@@ -182,5 +225,10 @@ public class SaveController : ITickable
         }
 
         return miningData;
+    }
+
+    public void LateDispose()
+    {
+        throw new System.NotImplementedException();
     }
 }

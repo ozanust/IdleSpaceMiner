@@ -13,7 +13,7 @@ public class PlanetData
 	public int TotalMiningRateUpdatePrice;
 	public int ShipSpeedUpdatePrice;
 	public int ShipCargoUpdatePrice;
-	public PlanetMineData[] MinedAmounts;
+	public ResourceMiningData[] MinedAmounts;
 
 	public PlanetData()
 	{

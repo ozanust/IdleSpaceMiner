@@ -12,14 +12,14 @@ public class MiningInfoItem : MonoBehaviour
     [SerializeField] private TMP_Text miningRateText;
     [SerializeField] private TMP_Text minedAmountText;
 
-    private PlanetMineData data;
+    private ResourceMiningData data;
 
 	private void Update()
 	{
         UpdateMinedAmount(data.MinedAmount);
 	}
 
-	public void Initialize(PlanetMineData data, Sprite planetIcon, string planetName, float yieldPercentage, float miningRate, float minedAmount)
+	public void Initialize(ResourceMiningData data, Sprite planetIcon, string planetName, float yieldPercentage, float miningRate, float minedAmount)
 	{
         this.data = data;
         planetImage.sprite = planetIcon;
