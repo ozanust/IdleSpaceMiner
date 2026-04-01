@@ -49,7 +49,6 @@ public class SaveController : ITickable, IDisposable
     
     public void Dispose()
     {
-        Debug.Log("SaveController::Dispose");
         signalBus.Unsubscribe<PlanetUpdatedSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<PlanetUnlockedSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<ResearchCompletedSignal>(OnSaveTrigger);
@@ -225,10 +224,5 @@ public class SaveController : ITickable, IDisposable
         }
 
         return miningData;
-    }
-
-    public void LateDispose()
-    {
-        throw new System.NotImplementedException();
     }
 }
