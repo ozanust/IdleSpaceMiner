@@ -94,10 +94,13 @@ public class MiningController : IMiningController, ITickable
 
 	private void OnCargoArrivedMothership(CargoShipMothershipArrivalSignal signal)
 	{
-		TransferResourcesData[] resourcesData = transferData[signal.PlanetId];
-		for (int i = 0; i < resourcesData.Length; i++)
+		if (transferData.ContainsKey(signal.PlanetId))
 		{
-			playerModel.AddResource(resourcesData[i].Type, resourcesData[i].Amount);
+			TransferResourcesData[] resourcesData = transferData[signal.PlanetId];
+			for (int i = 0; i < resourcesData.Length; i++)
+			{
+				playerModel.AddResource(resourcesData[i].Type, resourcesData[i].Amount);
+			}
 		}
 	}
 

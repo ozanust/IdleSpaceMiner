@@ -1,22 +1,16 @@
 using System.IO;
 using UnityEngine;
-
-/// <summary>
-/// Persists and retrieves SaveData as JSON using Application.persistentDataPath.
-/// </summary>
 public class SaveService : ISaveService
 {
     private const string SaveFileName = "save.json";
 
     private string SaveFilePath => Path.Combine(Application.persistentDataPath, SaveFileName);
 
-    /// <inheritdoc/>
     public bool HasSave()
     {
         return File.Exists(SaveFilePath);
     }
 
-    /// <inheritdoc/>
     public void Save(SaveData data)
     {
         try
@@ -30,7 +24,6 @@ public class SaveService : ISaveService
         }
     }
 
-    /// <inheritdoc/>
     public SaveData Load()
     {
         if (!HasSave())
@@ -50,7 +43,6 @@ public class SaveService : ISaveService
         }
     }
 
-    /// <inheritdoc/>
     public void DeleteSave()
     {
         if (HasSave())
