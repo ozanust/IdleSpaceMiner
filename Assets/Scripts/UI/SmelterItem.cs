@@ -55,12 +55,12 @@ public class SmelterItem : MonoBehaviour
         {
 	        if (data != null)
 	        {
-		        recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString();
+		        recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString("N1");
 		        recipeProgressSlider.value = data.SmeltedTime;
 	        }
 	        else if (crafterData != null)
 	        {
-		        recipeRemainingTimeText.text = (crafterData.SmeltTime - crafterData.SmeltedTime).ToString();
+		        recipeRemainingTimeText.text = (crafterData.SmeltTime - crafterData.SmeltedTime).ToString("N1");
 		        recipeProgressSlider.value = crafterData.SmeltedTime;
 	        }
         }
