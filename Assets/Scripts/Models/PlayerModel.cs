@@ -12,9 +12,14 @@ public class PlayerModel : IPlayerModel
 	private List<AlloyType> unlockedAlloys = new List<AlloyType>();
 	private List<ResourceType> unlockedItemRecipes = new List<ResourceType>();
 	private List<ResearchType> unlockedResearchs = new List<ResearchType>();
+	private List<int> unlockedSmelters = new List<int>();
+	private List<int> unlockedCrafters = new List<int>();
+	private Dictionary<int, ResourceType> smeltersWorking = new Dictionary<int, ResourceType>();
+	private Dictionary<int, ResourceType> craftersWorking = new Dictionary<int, ResourceType>();
 	private int lastUnlockedSmelterId = 0;
-	private int lastUnlockedCrafterId = 49;
+	private int lastUnlockedCrafterId = 0;
 	private int recipeSelectionTargetSmelter = -1;
+	private int recipeSelectionTargetCrafter = -1;
 
 	readonly SignalBus signalBus;
 
@@ -241,6 +246,16 @@ public class PlayerModel : IPlayerModel
 		return unlockedAlloys.ToArray();
 	}
 
+	public int[] GetUnlockedSmelters()
+	{
+		return unlockedSmelters.ToArray();
+	}
+
+	public int[] GetUnlockedCrafters()
+	{
+		return unlockedCrafters.ToArray();
+	}
+
 	public void UnlockItemRecipe(ResourceType type)
 	{
 		unlockedItemRecipes.Add(type);
@@ -273,6 +288,11 @@ public class PlayerModel : IPlayerModel
 	public void UnlockSmelter(int smelterId)
 	{
 		lastUnlockedSmelterId = smelterId;
+
+		if (unlockedSmelters != null && !unlockedSmelters.Contains(smelterId))
+		{
+			unlockedSmelters.Add(smelterId);	
+		}
 		signalBus.Fire<PlayerModelUpdatedSignal>();
 		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedSmelterId });
 	}
@@ -285,6 +305,12 @@ public class PlayerModel : IPlayerModel
 	public void UnlockCrafter(int smelterId)
 	{
 		lastUnlockedCrafterId = smelterId;
+		
+		if (unlockedCrafters != null && !unlockedCrafters.Contains(smelterId))
+		{
+			unlockedCrafters.Add(smelterId);	
+		}
+		
 		signalBus.Fire<PlayerModelUpdatedSignal>();
 		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedCrafterId });
 	}
@@ -302,5 +328,35 @@ public class PlayerModel : IPlayerModel
 	public int GetTargetSmelter()
 	{
 		return recipeSelectionTargetSmelter;
+	}
+
+	public void SetTargetCrafter(int crafterId)
+	{
+		recipeSelectionTargetCrafter = crafterId;
+	}
+
+	public int GetTargetCrafter()
+	{
+		return recipeSelectionTargetCrafter;
+	}
+
+	public void AddWorkingSmelter(int id, ResourceType type)
+	{
+		smeltersWorking[id] = type;
+	}
+
+	public void AddWorkingCrafter(int id, ResourceType type)
+	{
+		craftersWorking[id] = type;
+	}
+
+	public void RemoveWorkingSmelter(int id)
+	{
+		smeltersWorking.Remove(id);
+	}
+
+	public void RemoveWorkingCrafter(int id)
+	{
+		craftersWorking.Remove(id);
 	}
 }

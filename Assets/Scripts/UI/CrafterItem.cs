@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Zenject;
 
-public class SmelterItem : MonoBehaviour
+public class CrafterItem : MonoBehaviour
 {
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
@@ -29,7 +27,7 @@ public class SmelterItem : MonoBehaviour
     [SerializeField] private bool isUnlocked = false;
     [SerializeField] private int smelterId;
     
-    private SmelterAlloyData data;
+    private CrafterAlloyData data;
 
 	private void Awake()
 	{
@@ -40,9 +38,9 @@ public class SmelterItem : MonoBehaviour
 
 	private void Start()
 	{
-        signalBus.Subscribe<SmeltRecipeAddSignal>(OnSmeltRecipeAdded);
-        signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnSmeltRecipeRemoved);
-        signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+        signalBus.Subscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
+        signalBus.Subscribe<CraftRecipeAddSignal>(OnCraftRecipeAdded);
+        signalBus.Subscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
     }
 
 	private void Update()
@@ -64,10 +62,10 @@ public class SmelterItem : MonoBehaviour
     
     private void OnClickUnlockButton()
 	{
-		productionController.TryUnlockSmelter();
+		productionController.TryUnlockCrafter();
 	}
 
-    private void UnlockSmelter(int id)
+    private void UnlockCrafter(int id)
 	{
         smelterUnlockedPanel.SetActive(true);
         smelterLockedPanel.SetActive(false);
@@ -76,54 +74,54 @@ public class SmelterItem : MonoBehaviour
         smelterId = id;
 	}
 
-    private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
+    private void OnCrafterUnlocked(CrafterUnlockedSignal signal)
 	{
         if (!isUnlocked)
 		{
-			UnlockSmelter(signal.SmelterId);
+			UnlockCrafter(signal.CrafterId);
 		}
 	}
 
     private void OnClickSetRecipe()
     {
-        playerModel.SetTargetSmelter(smelterId);
-	    signalBus.Fire(new MenuOpenSignal() { Type = MenuType.SmeltRecipes });
+        playerModel.SetTargetCrafter(smelterId);
+	    signalBus.Fire(new MenuOpenSignal() { Type = MenuType.CraftRecipes });
     }
 
     private void OnClickRemoveRecipe()
     {
-	    signalBus.Fire(new SmeltRecipeRemoveSignal() { SmelterId = smelterId });
+	    signalBus.Fire(new CraftRecipeRemoveSignal() { SmelterId = smelterId });
     }
-
-    private void OnSmeltRecipeRemoved(SmeltRecipeRemoveSignal signal)
+    
+	private void OnCraftRecipeAdded(CraftRecipeAddSignal signal)
 	{
-        if (signal.SmelterId == smelterId)
-        {
-            recipeProgressSlider.value = 0;
-            recipeRemainingTimeText.text = "OFF";
-            noRecipeSelectedText.gameObject.SetActive(true);
-            selectedRecipeImagesParent.SetActive(false);
-            data = null;
-            recipeProgressSlider.maxValue = 0;
-            recipeProgressSlider.minValue = 0;
-        }
-    }
+		if (isUnlocked && smelterId == signal.SmelterId)
+		{
+			AlloyDataSetting settings = resourceSettings.GetAlloyData(ResourceToAlloyConverter.Convert(signal.RecipeType));
+			ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.RecipeType);
 
-    private void OnSmeltRecipeAdded(SmeltRecipeAddSignal signal)
+			noRecipeSelectedText.gameObject.SetActive(false);
+			selectedRecipeImagesParent.SetActive(true);
+			sourceResourceImage.sprite = settings.Icon;
+			targetResourceImage.sprite = sourceSetting.Icon;
+			data = productionController.GetCraftingAlloyData(signal.SmelterId);
+			recipeProgressSlider.maxValue = data.SmeltTime;
+			recipeProgressSlider.minValue = 0;
+		}
+	}
+	
+	private void OnCraftRecipeRemoved(CraftRecipeRemoveSignal signal)
 	{
-        if (isUnlocked && smelterId == signal.SmelterId)
-        {
-            AlloyDataSetting settings = resourceSettings.GetAlloyData(signal.RecipeType);
-            ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.ItemRecipeType);
-
-            noRecipeSelectedText.gameObject.SetActive(false);
-            selectedRecipeImagesParent.SetActive(true);
-            sourceResourceImage.sprite = settings.Icon;
-            targetResourceImage.sprite = sourceSetting.Icon;
-            data = productionController.GetAlloyData(signal.SmelterId);
-            recipeProgressSlider.maxValue = data.SmeltTime;
-            recipeProgressSlider.minValue = 0;
-        }
+		if (signal.SmelterId == smelterId)
+		{
+			recipeProgressSlider.value = 0;
+			recipeRemainingTimeText.text = "OFF";
+			noRecipeSelectedText.gameObject.SetActive(true);
+			selectedRecipeImagesParent.SetActive(false);
+			data = null;
+			recipeProgressSlider.maxValue = 0;
+			recipeProgressSlider.minValue = 0;
+		}
 	}
 
     public void SetInjections(SignalBus signalBus, ResourceSettings resourceSettings, IProductionController productionController, IPlayerModel playerModel)

@@ -37,6 +37,8 @@ public class SaveController : ITickable, IDisposable
         this.spaceModel = spaceModel;
         this.miningController = miningController;
         this.signalBus = signalBus;
+        
+        saveService.DeleteSave();
 
         signalBus.Subscribe<PlanetUpdatedSignal>(OnSaveTrigger);
         signalBus.Subscribe<PlanetUnlockedSignal>(OnSaveTrigger);
@@ -214,15 +216,21 @@ public class SaveController : ITickable, IDisposable
             MiningData md;
             if (miningController.TryGetMiningData(planet.PlanetIndex, out md))
             {
-                PlanetMineSaveEntry entry = new PlanetMineSaveEntry { PlanetId = planet.PlanetIndex };
+                SaveEntry entry = new SaveEntry { Id = planet.PlanetIndex };
                 foreach (ResourceMiningData pmd in md.MineDatas)
                 {
-                    entry.MinedAmounts.Add(new MineAmountEntry { Type = pmd.Type, Amount = pmd.MinedAmount });
+                    entry.MinedAmounts.Add(new AmountEntry { Type = pmd.Type, Amount = pmd.MinedAmount });
                 }
                 miningData.PlanetMineEntries.Add(entry);
             }
         }
 
         return miningData;
+    }
+
+    private SmeltingSaveData BuildSmeltingSaveData()
+    {
+        SmeltingSaveData smeltingData = new SmeltingSaveData();
+        return smeltingData;
     }
 }

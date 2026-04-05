@@ -18,6 +18,7 @@ public class ProductionView : MonoBehaviour
 
 	[SerializeField] private SmelterItem smelterItemPrototype;
 	[SerializeField] private GameObject smelterItemContainer;
+	[SerializeField] private CrafterItem crafterItemPrototype;
 	[SerializeField] private GameObject crafterItemContainer;
 
 	[SerializeField] private Button smeltButton;
@@ -39,6 +40,7 @@ public class ProductionView : MonoBehaviour
 	{
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+		signalBus.Subscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
 		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
@@ -46,6 +48,7 @@ public class ProductionView : MonoBehaviour
 	{
 		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Unsubscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+		signalBus.Unsubscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
 		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
@@ -64,20 +67,16 @@ public class ProductionView : MonoBehaviour
 
 	private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-		if (signal.SmelterId <= 49)
-		{
-			SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
-			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
-			item.SetType(SmelterType.Smelter);
-		}
-		else
-		{
-			SmelterItem item = Instantiate(smelterItemPrototype, crafterItemContainer.transform);
-			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
-			item.SetType(SmelterType.Crafter);
-		}
+		SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
+		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
+		item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+	}
+	
+	private void OnCrafterUnlocked(CrafterUnlockedSignal signal)
+	{
+		CrafterItem item = Instantiate(crafterItemPrototype, crafterItemContainer.transform);
+		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
+		item.SetSmelterUnlockPrice(resourceSettings.GetCrafterSetting(signal.CrafterId + 1).Price);
 	}
 
 	private void OnResearchCompleted(ResearchCompletedSignal signal)

@@ -153,15 +153,15 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 	private void RestoreMinedAmounts(MiningSaveData miningData)
 	{
-		foreach (PlanetMineSaveEntry entry in miningData.PlanetMineEntries)
+		foreach (SaveEntry entry in miningData.PlanetMineEntries)
 		{
 			MiningData md;
-			if (!miningController.TryGetMiningData(entry.PlanetId, out md))
+			if (!miningController.TryGetMiningData(entry.Id, out md))
 			{
 				continue;
 			}
 
-			foreach (MineAmountEntry amountEntry in entry.MinedAmounts)
+			foreach (AmountEntry amountEntry in entry.MinedAmounts)
 			{
 				foreach (ResourceMiningData pmd in md.MineDatas)
 				{

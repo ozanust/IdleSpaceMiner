@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Root serializable DTO that captures the full persistent game state.
@@ -10,6 +11,8 @@ public class SaveData
     public PlayerSaveData Player = new PlayerSaveData();
     public SpaceSaveData Space = new SpaceSaveData();
     public MiningSaveData Mining = new MiningSaveData();
+    public SmeltingSaveData Smelting = new SmeltingSaveData();
+    public CraftingSaveData Crafting = new CraftingSaveData();
 }
 
 [Serializable]
@@ -52,19 +55,31 @@ public class MiningSaveData
     /// Accumulated but not yet transferred mined amounts per planet.
     /// Key is PlanetIndex.
     /// </summary>
-    public List<PlanetMineSaveEntry> PlanetMineEntries = new List<PlanetMineSaveEntry>();
+    public List<SaveEntry> PlanetMineEntries = new List<SaveEntry>();
 }
 
 [Serializable]
-public class PlanetMineSaveEntry
+public class SaveEntry
 {
-    public int PlanetId;
-    public List<MineAmountEntry> MinedAmounts = new List<MineAmountEntry>();
+    public int Id;
+    public List<AmountEntry> MinedAmounts = new List<AmountEntry>();
 }
 
 [Serializable]
-public class MineAmountEntry
+public class AmountEntry
 {
     public ResourceType Type;
     public float Amount;
+}
+
+[Serializable]
+public class SmeltingSaveData
+{
+    public List<SaveEntry> SmeltEntries = new List<SaveEntry>();
+}
+
+[Serializable]
+public class CraftingSaveData
+{
+    public List<SaveEntry> CraftEntries = new List<SaveEntry>();
 }

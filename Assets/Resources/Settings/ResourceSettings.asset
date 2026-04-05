@@ -116,6 +116,16 @@ MonoBehaviour:
     Value: 8
   - Type: 4
     Value: 16
+  - Type: 5
+    Value: 1450
+  - Type: 6
+    Value: 3000
+  - Type: 7
+    Value: 6100
+  - Type: 8
+    Value: 12500
+  - Type: 9
+    Value: 27600
   resourceTypeSettings:
   - Type: 1
     SubTypes: 0000000001000000020000000300000004000000
@@ -185,15 +195,18 @@ MonoBehaviour:
   - SmelterId: 1
     Price: 50000
   - SmelterId: 2
-    Price: 474746
+    Price: 500000
   - SmelterId: 3
     Price: 1000000
-  - SmelterId: 50
+  crafterSettings:
+  - CrafterId: 0
     Price: 500000
-  - SmelterId: 51
+  - CrafterId: 1
     Price: 1000000
-  - SmelterId: 52
+  - CrafterId: 2
     Price: 2000000
+  - CrafterId: 3
+    Price: 10000000
   researchSettings:
   - Name: Telescope 1
     Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}

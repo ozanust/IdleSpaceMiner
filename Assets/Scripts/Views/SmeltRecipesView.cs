@@ -170,7 +170,7 @@ public class SmeltRecipesView : MonoBehaviour
 
 	private void OnClickItemRecipe(ResourceType resourceType)
 	{
-		signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = resourceType, SmelterId = playerModel.GetTargetSmelter() });
+		signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = resourceType, SmelterId = playerModel.GetTargetCrafter() });
 		panel.SetActive(false);
 	}
 }

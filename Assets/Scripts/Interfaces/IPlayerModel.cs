@@ -26,9 +26,17 @@ public interface IPlayerModel
     void UnlockItemRecipe(ResourceType type);
     ResourceType[] GetUnlockedItemRecipes();
     AlloyType[] GetUnlockedAlloys();
+    int[] GetUnlockedSmelters();
+    int[] GetUnlockedCrafters();
     void UnlockResearch(ResearchType type);
     ResearchType[] GetUnlockedResearchs();
     bool IsResearchUnlocked(ResearchType type);
     void SetTargetSmelter(int smelterId);
     int GetTargetSmelter();
+    void SetTargetCrafter(int crafterId);
+    int GetTargetCrafter();
+    void AddWorkingSmelter(int id, ResourceType type);
+    void AddWorkingCrafter(int id, ResourceType type);
+    void RemoveWorkingSmelter(int id);
+    void RemoveWorkingCrafter(int id);
 }
