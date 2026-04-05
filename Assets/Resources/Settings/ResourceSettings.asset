@@ -148,7 +148,7 @@ MonoBehaviour:
   - Type: 10
     NeededResources:
     - Type: 5
-      Amount: 5
+      Amount: 1
     TimeToSmelt: 60
     PriceToUnlock: 0
   - Type: 11
