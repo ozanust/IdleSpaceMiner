@@ -84,11 +84,10 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(signal.RecipeType);
 		CrafterAlloyData newData = new CrafterAlloyData(signal.SmelterId, signal.RecipeType, settings.TimeToSmelt);
 		craftingData.Add(signal.SmelterId, newData);
-
-		if (playerModel.HasResource(signal.RecipeType, resourceSettings.GetSmeltSetting(ResourceToAlloyConverter.Convert(signal.RecipeType)).ResourceNeeded))
+		
+		if (playerModel.TryUseResources(settings.NeededResources))
 		{
 			AddCraft(newData);
-			playerModel.TryUseResource(signal.RecipeType, resourceSettings.GetSmeltSetting(ResourceToAlloyConverter.Convert(signal.RecipeType)).ResourceNeeded);
 		}
 	}
 
@@ -198,9 +197,9 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		
 		foreach (CrafterAlloyData sad in craftingData.Values)
 		{
-			if (signal.UpdatedResourceType == sad.Type && !sad.IsSmelting && playerModel.HasResource(sad.Type, resourceSettings.GetSmeltSetting(ResourceToAlloyConverter.Convert(sad.Type)).ResourceNeeded))
+			ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(sad.Type);
+			if (!sad.IsSmelting && playerModel.TryUseResources(settings.NeededResources))
 			{
-				playerModel.TryUseResource(sad.Type, resourceSettings.GetSmeltSetting(ResourceToAlloyConverter.Convert(sad.Type)).ResourceNeeded);
 				AddCraft(sad);
 			}
 		}

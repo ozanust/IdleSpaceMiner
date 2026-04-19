@@ -9,6 +9,7 @@ public interface IPlayerModel
     bool HasCurrency(CurrencyType type, int amount);
     int GetCurrency(CurrencyType type);
     bool TryUseResource(ResourceType type, int amount);
+    bool TryUseResources(ResearchNeededResource[] data);
     bool HasResource(ResourceType type, int amount);
     bool HasResources(ResearchNeededResource[] data);
     int GetResource(ResourceType type);

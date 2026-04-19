@@ -8,6 +8,8 @@ public class PlayerModel : IPlayerModel
 	private int money;
 	private PlanetData[] planetData;
 	private Dictionary<ResourceType, int> resources;
+	private Dictionary<AlloyType, int> alloys;
+	private Dictionary<ItemType, int> items;
 	private Dictionary<CurrencyType, int> currencies;
 	private List<AlloyType> unlockedAlloys = new List<AlloyType>();
 	private List<ResourceType> unlockedItemRecipes = new List<ResourceType>();
@@ -49,6 +51,44 @@ public class PlayerModel : IPlayerModel
 
 		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedResourceType = type });
 	}
+	
+	public void AddResource(AlloyType type, int amount)
+	{
+		if (alloys == null)
+		{
+			alloys = new Dictionary<AlloyType, int>();
+		}
+
+		if (!alloys.ContainsKey(type))
+		{
+			alloys.Add(type, amount);
+		}
+		else
+		{
+			alloys[type] += amount;
+		}
+
+		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedAlloyType = type });
+	}
+	
+	public void AddResource(ItemType type, int amount)
+	{
+		if (items == null)
+		{
+			items = new Dictionary<ItemType, int>();
+		}
+
+		if (!items.ContainsKey(type))
+		{
+			items.Add(type, amount);
+		}
+		else
+		{
+			items[type] += amount;
+		}
+
+		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedItemType = type });
+	}
 
 	public Dictionary<ResourceType, int> GetResources()
 	{
@@ -84,6 +124,36 @@ public class PlayerModel : IPlayerModel
 
 		return resources[type] >= amount;
 	}
+	
+	public bool HasResource(AlloyType type, int amount)
+	{
+		if (alloys == null)
+		{
+			return false;
+		}
+
+		if (!alloys.ContainsKey(type))
+		{
+			return false;
+		}
+
+		return alloys[type] >= amount;
+	}
+	
+	public bool HasResource(ItemType type, int amount)
+	{
+		if (items == null)
+		{
+			return false;
+		}
+
+		if (!items.ContainsKey(type))
+		{
+			return false;
+		}
+
+		return items[type] >= amount;
+	}
 
 	public bool HasResources(ResearchNeededResource[] data)
 	{
@@ -117,6 +187,35 @@ public class PlayerModel : IPlayerModel
 		
 		resources[type] -= amount;
 		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedResourceType = type });
+		return true;
+	}
+	
+	public bool TryUseResources(ResearchNeededResource[]  data)
+	{
+		if (resources == null)
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < data.Length; i++)
+		{
+			if (!resources.ContainsKey(data[i].Type))
+			{
+				return false;
+			}
+			
+			if (resources[data[i].Type] < data[i].Amount)
+			{
+				return false;
+			}
+		}
+		
+		for (int i = 0; i < data.Length; i++)
+		{
+			resources[data[i].Type] -= data[i].Amount;
+			signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedResourceType = data[i].Type });
+		}
+		
 		return true;
 	}
 
@@ -312,7 +411,7 @@ public class PlayerModel : IPlayerModel
 		}
 		
 		signalBus.Fire<PlayerModelUpdatedSignal>();
-		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedCrafterId });
+		signalBus.Fire(new CrafterUnlockedSignal() { CrafterId = lastUnlockedCrafterId });
 	}
 
 	public int GetLastUnlockedCrafterId()
