@@ -62,7 +62,7 @@ public class MiningSaveData
 public class SaveEntry
 {
     public int Id;
-    public List<AmountEntry> MinedAmounts = new List<AmountEntry>();
+    public List<AmountEntry> Amounts = new List<AmountEntry>();
 }
 
 [Serializable]
@@ -73,13 +73,27 @@ public class AmountEntry
 }
 
 [Serializable]
+public class SmelterSaveData
+{
+    public int Id;
+    public AlloyType TargetAlloy;
+}
+
+[Serializable]
+public class CrafterSaveData
+{
+    public int Id;
+    public ResourceType TargetResource;
+}
+
+[Serializable]
 public class SmeltingSaveData
 {
-    public List<SaveEntry> SmeltEntries = new List<SaveEntry>();
+    public List<SmelterSaveData> SmeltEntries = new List<SmelterSaveData>();
 }
 
 [Serializable]
 public class CraftingSaveData
 {
-    public List<SaveEntry> CraftEntries = new List<SaveEntry>();
+    public List<CrafterSaveData> CraftEntries = new List<CrafterSaveData>();
 }

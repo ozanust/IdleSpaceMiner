@@ -5,4 +5,5 @@ public interface ISpaceController
     void UnlockPlanet(int planetIndex);
     void OpenPlanet(int planetIndex);
     void ClickPlanet(int planetIndex);
+    void OnRegister();
 }

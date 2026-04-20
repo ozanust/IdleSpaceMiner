@@ -107,6 +107,7 @@ public class CrafterItem : MonoBehaviour
 			data = productionController.GetCraftingAlloyData(signal.SmelterId);
 			recipeProgressSlider.maxValue = data.SmeltTime;
 			recipeProgressSlider.minValue = 0;
+			playerModel.AddWorkingCrafter(smelterId, signal.RecipeType);
 		}
 	}
 	
@@ -121,6 +122,7 @@ public class CrafterItem : MonoBehaviour
 			data = null;
 			recipeProgressSlider.maxValue = 0;
 			recipeProgressSlider.minValue = 0;
+			playerModel.RemoveWorkingCrafter(signal.SmelterId);
 		}
 	}
 

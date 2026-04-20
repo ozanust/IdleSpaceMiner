@@ -164,13 +164,15 @@ public class SmeltRecipesView : MonoBehaviour
 
 	private void OnClickRecipe(AlloyType alloyType)
 	{
-		signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = alloyType, SmelterId = playerModel.GetTargetSmelter() });
+		int targetSmelter = playerModel.GetTargetSmelter();
+		signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = alloyType, SmelterId = targetSmelter });
 		panel.SetActive(false);
 	}
 
 	private void OnClickItemRecipe(ResourceType resourceType)
 	{
-		signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = resourceType, SmelterId = playerModel.GetTargetCrafter() });
+		int targetCrafter = playerModel.GetTargetCrafter();
+		signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = resourceType, SmelterId = targetCrafter });
 		panel.SetActive(false);
 	}
 }

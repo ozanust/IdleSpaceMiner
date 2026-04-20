@@ -16,7 +16,7 @@ public class PlayerModel : IPlayerModel
 	private List<ResearchType> unlockedResearchs = new List<ResearchType>();
 	private List<int> unlockedSmelters = new List<int>();
 	private List<int> unlockedCrafters = new List<int>();
-	private Dictionary<int, ResourceType> smeltersWorking = new Dictionary<int, ResourceType>();
+	private Dictionary<int, AlloyType> smeltersWorking = new Dictionary<int, AlloyType>();
 	private Dictionary<int, ResourceType> craftersWorking = new Dictionary<int, ResourceType>();
 	private int lastUnlockedSmelterId = 0;
 	private int lastUnlockedCrafterId = 0;
@@ -392,6 +392,7 @@ public class PlayerModel : IPlayerModel
 		{
 			unlockedSmelters.Add(smelterId);	
 		}
+		
 		signalBus.Fire<PlayerModelUpdatedSignal>();
 		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedSmelterId });
 	}
@@ -439,7 +440,7 @@ public class PlayerModel : IPlayerModel
 		return recipeSelectionTargetCrafter;
 	}
 
-	public void AddWorkingSmelter(int id, ResourceType type)
+	public void AddWorkingSmelter(int id, AlloyType type)
 	{
 		smeltersWorking[id] = type;
 	}
@@ -457,5 +458,15 @@ public class PlayerModel : IPlayerModel
 	public void RemoveWorkingCrafter(int id)
 	{
 		craftersWorking.Remove(id);
+	}
+
+	public Dictionary<int, AlloyType> GetWorkingSmelters()
+	{
+		return smeltersWorking;
+	}
+	
+	public Dictionary<int, ResourceType> GetWorkingCrafters()
+	{
+		return craftersWorking;
 	}
 }

@@ -38,25 +38,25 @@ public class SaveController : ITickable, IDisposable
         this.miningController = miningController;
         this.signalBus = signalBus;
         
-        saveService.DeleteSave();
+        //saveService.DeleteSave();
 
-        signalBus.Subscribe<PlanetUpdatedSignal>(OnSaveTrigger);
+        /*signalBus.Subscribe<PlanetUpdatedSignal>(OnSaveTrigger);
         signalBus.Subscribe<PlanetUnlockedSignal>(OnSaveTrigger);
         signalBus.Subscribe<ResearchCompletedSignal>(OnSaveTrigger);
         signalBus.Subscribe<SmelterUnlockedSignal>(OnSaveTrigger);
         signalBus.Subscribe<ResourcesSellSignal>(OnSaveTrigger);
-        signalBus.Subscribe<RecipeUnlockedSignal>(OnSaveTrigger);
+        signalBus.Subscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Subscribe<OnApplicationQuitSignal>(OnApplicationQuit);
     }
     
     public void Dispose()
     {
-        signalBus.Unsubscribe<PlanetUpdatedSignal>(OnSaveTrigger);
+        /*signalBus.Unsubscribe<PlanetUpdatedSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<PlanetUnlockedSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<ResearchCompletedSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<SmelterUnlockedSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<ResourcesSellSignal>(OnSaveTrigger);
-        signalBus.Unsubscribe<RecipeUnlockedSignal>(OnSaveTrigger);
+        signalBus.Unsubscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Unsubscribe<OnApplicationQuitSignal>(OnApplicationQuit);
     }
 
@@ -70,7 +70,7 @@ public class SaveController : ITickable, IDisposable
     public void EndRestore()
     {
         isRestoring = false;
-        Save();
+        //Save();
     }
 
     private void OnApplicationQuit()
@@ -117,6 +117,8 @@ public class SaveController : ITickable, IDisposable
         data.Player = BuildPlayerSaveData();
         data.Space = BuildSpaceSaveData();
         data.Mining = BuildMiningSaveData();
+        data.Smelting = BuildSmeltingSaveData();
+        data.Crafting = BuildCraftingSaveData();
 
         return data;
     }
@@ -219,7 +221,7 @@ public class SaveController : ITickable, IDisposable
                 SaveEntry entry = new SaveEntry { Id = planet.PlanetIndex };
                 foreach (ResourceMiningData pmd in md.MineDatas)
                 {
-                    entry.MinedAmounts.Add(new AmountEntry { Type = pmd.Type, Amount = pmd.MinedAmount });
+                    entry.Amounts.Add(new AmountEntry { Type = pmd.Type, Amount = pmd.MinedAmount });
                 }
                 miningData.PlanetMineEntries.Add(entry);
             }
@@ -231,6 +233,30 @@ public class SaveController : ITickable, IDisposable
     private SmeltingSaveData BuildSmeltingSaveData()
     {
         SmeltingSaveData smeltingData = new SmeltingSaveData();
+
+        foreach (var smelter in playerModel.GetWorkingSmelters())
+        {
+            SmelterSaveData data = new SmelterSaveData();
+            data.Id = smelter.Key;
+            data.TargetAlloy = smelter.Value;
+            smeltingData.SmeltEntries.Add(data);
+        }
+        
         return smeltingData;
+    }
+    
+    private CraftingSaveData BuildCraftingSaveData()
+    {
+        CraftingSaveData craftingSaveData = new CraftingSaveData();
+        
+        foreach (var crafter in playerModel.GetWorkingCrafters())
+        {
+            CrafterSaveData data = new CrafterSaveData();
+            data.Id = crafter.Key;
+            data.TargetResource = crafter.Value;
+            craftingSaveData.CraftEntries.Add(data);
+        }
+        
+        return craftingSaveData;
     }
 }

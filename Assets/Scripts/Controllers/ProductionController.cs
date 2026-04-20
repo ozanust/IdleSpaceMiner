@@ -52,8 +52,6 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 
 	private void OnRecipeAdded(SmeltRecipeAddSignal signal)
 	{
-		Debug.Log(signal.SmelterId);
-
 		// Smelter already has some recipe
 		if (smeltingData.ContainsKey(signal.SmelterId))
 		{
@@ -73,8 +71,6 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 
 	private void OnCraftRecipeAdded(CraftRecipeAddSignal signal)
 	{
-		Debug.Log(signal.SmelterId);
-
 		// Smelter already has some recipe
 		if (craftingData.ContainsKey(signal.SmelterId))
 		{
@@ -274,9 +270,6 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	public void TryUnlockCrafter()
 	{
 		int nextCrafterId = playerModel.GetLastUnlockedCrafterId() + 1;
-		Debug.Log(resourceSettings);
-		Debug.Log(nextCrafterId);
-		Debug.Log(resourceSettings.GetCrafterSetting(nextCrafterId));
 		int nextCrafterPrice = resourceSettings.GetCrafterSetting(nextCrafterId).Price;
 		if (playerModel.HasMoney(nextCrafterPrice))
 		{

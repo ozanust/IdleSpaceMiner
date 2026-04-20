@@ -34,7 +34,7 @@ public class SpaceView : MonoBehaviour
 		if (!isViewInitialized)
 		{
 			InitializePlanets(planetSettings);
-			InitializePlanetData(spaceModel.GetPlanetsData());
+			spaceController.OnRegister();
 		}
 	}
 

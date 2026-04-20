@@ -50,10 +50,10 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		asteroidPrototype.gameObject.SetActive(false);
 		missilePrototype.gameObject.SetActive(false);
 
-		OnRegister();
+		//OnRegister();
 	}
 
-	private void OnRegister()
+	public void OnRegister()
 	{
 		SaveData save = saveService.Load();
 		bool isNew = save == null;
@@ -123,17 +123,14 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		}
 
 		// --- Smelter / crafter slot progression ---
-		int savedSmelterId = save.Player.LastUnlockedSmelterId;
-		int currentSmelterId = playerModel.GetLastUnlockedSmelterId();
-		for (int i = currentSmelterId + 1; i <= savedSmelterId; i++)
+		int[] unlockedSmelters = playerModel.GetUnlockedSmelters();
+		for (int i = 0; i <= unlockedSmelters.Length; i++)
 		{
 			playerModel.UnlockSmelter(i);
 		}
-
-		int savedCrafterId = save.Player.LastUnlockedCrafterId;
-		int currentCrafterId = playerModel.GetLastUnlockedCrafterId();
-		// CrafterId starts at 49 by default; only restore if higher values were saved
-		for (int i = currentCrafterId + 1; i <= savedCrafterId; i++)
+		
+		int[] unlockedCrafters = playerModel.GetUnlockedCrafters();
+		for (int i = 0; i <= unlockedCrafters.Length; i++)
 		{
 			playerModel.UnlockCrafter(i);
 		}
@@ -149,6 +146,26 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 				gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
 			isAsteroidMinerUnlocked = true;
 		}
+		
+		// --- Working smelters ---
+		if (save.Smelting != null && save.Smelting.SmeltEntries.Count > 0)
+		{
+			foreach (var data in save.Smelting.SmeltEntries)
+			{
+				//playerModel.AddWorkingSmelter(data.Id, data.TargetAlloy);
+				signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = data.TargetAlloy, SmelterId = data.Id });
+			}
+		}
+		
+		// --- Working crafters ---
+		if (save.Crafting != null && save.Crafting.CraftEntries.Count > 0)
+		{
+			foreach (var data in save.Crafting.CraftEntries)
+			{
+				//playerModel.AddWorkingCrafter(data.Id, data.TargetResource);
+				signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = data.TargetResource, SmelterId = data.Id });
+			}
+		}
 	}
 
 	private void RestoreMinedAmounts(MiningSaveData miningData)
@@ -161,7 +178,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 				continue;
 			}
 
-			foreach (AmountEntry amountEntry in entry.MinedAmounts)
+			foreach (AmountEntry amountEntry in entry.Amounts)
 			{
 				foreach (ResourceMiningData pmd in md.MineDatas)
 				{

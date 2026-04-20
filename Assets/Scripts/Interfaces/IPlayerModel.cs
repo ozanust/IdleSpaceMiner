@@ -36,8 +36,10 @@ public interface IPlayerModel
     int GetTargetSmelter();
     void SetTargetCrafter(int crafterId);
     int GetTargetCrafter();
-    void AddWorkingSmelter(int id, ResourceType type);
+    void AddWorkingSmelter(int id, AlloyType type);
     void AddWorkingCrafter(int id, ResourceType type);
     void RemoveWorkingSmelter(int id);
     void RemoveWorkingCrafter(int id);
+    Dictionary<int, AlloyType> GetWorkingSmelters();
+    Dictionary<int, ResourceType> GetWorkingCrafters();
 }

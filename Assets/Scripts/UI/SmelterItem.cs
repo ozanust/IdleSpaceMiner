@@ -106,6 +106,7 @@ public class SmelterItem : MonoBehaviour
             data = null;
             recipeProgressSlider.maxValue = 0;
             recipeProgressSlider.minValue = 0;
+            playerModel.RemoveWorkingSmelter(signal.SmelterId);
         }
     }
 
@@ -123,6 +124,7 @@ public class SmelterItem : MonoBehaviour
             data = productionController.GetAlloyData(signal.SmelterId);
             recipeProgressSlider.maxValue = data.SmeltTime;
             recipeProgressSlider.minValue = 0;
+            playerModel.AddWorkingSmelter(smelterId, signal.RecipeType);
         }
 	}
 
