@@ -11,15 +11,17 @@ public class CargoController : ICargoController, IDisposable
 	private PlanetSettings planetSettings;
 	private ISpaceModel spaceModel;
 	private CargoShipView cargoShipPrototype;
+	private DiContainer container;
 
 	private Dictionary<int, CargoShipView> ships = new Dictionary<int, CargoShipView>();
 
-    public CargoController(SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel)
+    public CargoController(DiContainer container, SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel)
 	{
 		this.signalBus = signalBus;
 		this.cargoShipPrototype = cargoShipPrototype;
 		this.planetSettings = planetSettings;
 		this.spaceModel = spaceModel;
+		this.container = container;
 
 		this.cargoShipPrototype.gameObject.SetActive(false);
 		this.signalBus.Subscribe<PlanetTransformSignal>(OnPlanetUnlocked);
@@ -55,7 +57,7 @@ public class CargoController : ICargoController, IDisposable
 
 	private void SpawnCargoShipAndAssign(int planetId)
 	{
-		CargoShipView ship = Object.Instantiate(cargoShipPrototype);
+		CargoShipView ship = container.InstantiatePrefabForComponent<CargoShipView>(cargoShipPrototype);
 
 		PlanetData data;
 		PlanetDataSetting setting;
@@ -68,7 +70,6 @@ public class CargoController : ICargoController, IDisposable
 			ship.SetShipSpeed(shipSpeed);
 			ship.SetCargoSize(cargoSize);
 			ship.SetTargetPlanet(planetTransform, planetId);
-			ship.SetSignalBus(signalBus);
 			ship.gameObject.SetActive(true);
 
 			if (!ships.ContainsKey(planetId))
