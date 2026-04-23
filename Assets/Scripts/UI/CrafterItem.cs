@@ -97,7 +97,7 @@ public class CrafterItem : MonoBehaviour
     
 	private void OnCraftRecipeAdded(CraftRecipeAddSignal signal)
 	{
-		if (isUnlocked && smelterId == signal.SmelterId)
+		if (isUnlocked && smelterId == signal.SmelterId && data == null)
 		{
 			AlloyDataSetting settings = resourceSettings.GetAlloyData(ResourceToAlloyConverter.Convert(signal.RecipeType));
 			ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.RecipeType);

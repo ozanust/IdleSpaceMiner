@@ -112,7 +112,7 @@ public class SmelterItem : MonoBehaviour
 
     private void OnSmeltRecipeAdded(SmeltRecipeAddSignal signal)
 	{
-        if (isUnlocked && smelterId == signal.SmelterId)
+        if (isUnlocked && smelterId == signal.SmelterId && data == null)
         {
             AlloyDataSetting settings = resourceSettings.GetAlloyData(signal.RecipeType);
             ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.ItemRecipeType);

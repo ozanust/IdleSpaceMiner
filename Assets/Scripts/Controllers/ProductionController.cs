@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-using System.Linq;
 using System;
 
 public class ProductionController : IProductionController, ITickable, IDisposable
@@ -12,10 +10,10 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	private ResourceSettings resourceSettings;
 
 	private Dictionary<int, SmelterAlloyData> smeltingData = new Dictionary<int, SmelterAlloyData>();
-	private List<SmelterAlloyData> smeltData = new List<SmelterAlloyData>();
+	private Dictionary<int, SmelterAlloyData> smeltData = new Dictionary<int, SmelterAlloyData>();
 
 	private Dictionary<int, CrafterAlloyData> craftingData = new Dictionary<int, CrafterAlloyData>();
-	private List<CrafterAlloyData> craftData = new List<CrafterAlloyData>();
+	private Dictionary<int, CrafterAlloyData> craftData = new Dictionary<int, CrafterAlloyData>();
 
 	float smeltSpeed = 1;
 
@@ -29,7 +27,6 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		this.signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnRecipeRemoved);
 		this.signalBus.Subscribe<CraftRecipeAddSignal>(OnCraftRecipeAdded);
 		this.signalBus.Subscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
-		this.signalBus.Subscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
 		this.signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
@@ -40,7 +37,6 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		signalBus.Unsubscribe<SmeltRecipeRemoveSignal>(OnRecipeRemoved);
 		signalBus.Unsubscribe<CraftRecipeAddSignal>(OnCraftRecipeAdded);
 		signalBus.Unsubscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
-		signalBus.Unsubscribe<PlayerModelUpdatedSignal>(OnPlayerModelUpdated);
 		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
@@ -59,7 +55,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 
 		AlloySmeltSettings settings = resourceSettings.GetSmeltSetting(signal.RecipeType);
-		SmelterAlloyData newData = new SmelterAlloyData(signal.RecipeType, settings.TimeToSmelt);
+		SmelterAlloyData newData = new SmelterAlloyData(signal.SmelterId, signal.RecipeType, settings.TimeToSmelt);
 		smeltingData.Add(signal.SmelterId, newData);
 
 		if (playerModel.HasResource(AlloyToResourceConverter.ConvertToRaw(signal.RecipeType), resourceSettings.GetSmeltSetting(signal.RecipeType).ResourceNeeded))
@@ -94,10 +90,10 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 			smeltingData.Remove(signal.SmelterId);
 
 			// Refund used resource if smelting in progress
-			if (smeltData.Count > signal.SmelterId)
+			if (smeltData.ContainsKey(signal.SmelterId))
 			{
 				playerModel.AddResource(AlloyToResourceConverter.ConvertToRaw(smeltData[signal.SmelterId].Type), resourceSettings.GetSmeltSetting(smeltData[signal.SmelterId].Type).ResourceNeeded);
-				smeltData.RemoveAt(signal.SmelterId);
+				smeltData.Remove(signal.SmelterId);
 			}
 		}
 	}
@@ -117,7 +113,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 					playerModel.AddResource(requiredResource.Type, requiredResource.Amount);
 				}
 				
-				craftData.Remove(cData);
+				craftData.Remove(cData.Id);
 			}
 		}
 	}
@@ -129,9 +125,8 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 			return;
 		}
 
-		for (int i = 0; i < smeltData.Count; i++)
+		foreach (var sad in smeltData.Values)
 		{
-			SmelterAlloyData sad = smeltData[i];
 			sad.SmeltedTime += Time.deltaTime * smeltSpeed;
 			if (sad.SmeltedTime >= sad.SmeltTime)
 			{
@@ -141,7 +136,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 				// Remove if there is not enough raw material to smelt
 				if (!playerModel.HasResource(AlloyToResourceConverter.ConvertToRaw(sad.Type), resourceSettings.GetSmeltSetting(sad.Type).ResourceNeeded))
 				{
-					smeltData.Remove(sad);
+					smeltData.Remove(sad.Id);
 					sad.IsSmelting = false;
 				}
 			}
@@ -155,9 +150,8 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 			return;
 		}
 
-		for (int i = 0; i < craftData.Count; i++)
+		foreach (var sad in craftData.Values)
 		{
-			CrafterAlloyData sad = craftData[i];
 			sad.SmeltedTime += Time.deltaTime * smeltSpeed;
 			if (sad.SmeltedTime >= sad.SmeltTime)
 			{
@@ -171,32 +165,11 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 				{
 					if (!playerModel.HasResource(sad.Type, res.Amount))
 					{
-						craftData.Remove(sad);
+						craftData.Remove(sad.Id);
 						sad.IsSmelting = false;
 						return;
 					}
 				}
-			}
-		}
-	}
-
-	private void OnPlayerModelUpdated(PlayerModelUpdatedSignal signal)
-	{
-		foreach (SmelterAlloyData sad in smeltingData.Values)
-		{
-			if (signal.UpdatedResourceType == AlloyToResourceConverter.ConvertToRaw(sad.Type) && !sad.IsSmelting && playerModel.HasResource(AlloyToResourceConverter.ConvertToRaw(sad.Type), resourceSettings.GetSmeltSetting(sad.Type).ResourceNeeded))
-			{
-				playerModel.TryUseResource(AlloyToResourceConverter.ConvertToRaw(sad.Type), resourceSettings.GetSmeltSetting(sad.Type).ResourceNeeded);
-				AddSmelt(sad);
-			}
-		}
-		
-		foreach (CrafterAlloyData sad in craftingData.Values)
-		{
-			ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(sad.Type);
-			if (!sad.IsSmelting && playerModel.TryUseResources(settings.NeededResources))
-			{
-				AddCraft(sad);
 			}
 		}
 	}
@@ -211,26 +184,23 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 
 	private void AddSmelt(SmelterAlloyData data)
 	{
-		smeltData.Add(data);
+		smeltData.Add(data.Id, data);
 		data.IsSmelting = true;
 	}
 
 	private void AddCraft(CrafterAlloyData data)
 	{
-		craftData.Add(data);
+		craftData.Add(data.Id, data);
 		data.IsSmelting = true;
 	}
 
 	private bool TryGetCraftData(int id, out CrafterAlloyData data)
 	{
 		data = null;
-		foreach (var cdata in craftData)
+		if (craftData.ContainsKey(id))
 		{
-			if (cdata.Id == id)
-			{
-				data = cdata;
-				return true;
-			}
+			data = craftData[id];
+			return true;
 		}
 		
 		return false;
