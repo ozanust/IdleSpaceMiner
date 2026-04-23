@@ -130,6 +130,8 @@ public class SaveController : ITickable, IDisposable
         playerData.Money = playerModel.GetMoney();
         playerData.LastUnlockedSmelterId = playerModel.GetLastUnlockedSmelterId();
         playerData.LastUnlockedCrafterId = playerModel.GetLastUnlockedCrafterId();
+        playerData.UnlockedCrafters = playerModel.GetUnlockedCrafters();
+        playerData.UnlockedSmelters = playerModel.GetUnlockedSmelters();
 
         // Aggregate delivered player resources and in-transit cargo into a single
         // centralized mothership snapshot, keyed by ResourceType to avoid duplicates.

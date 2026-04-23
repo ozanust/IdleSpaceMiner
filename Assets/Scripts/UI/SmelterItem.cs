@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -38,13 +36,6 @@ public class SmelterItem : MonoBehaviour
         unlockButton.onClick.AddListener(OnClickUnlockButton);
     }
 
-	private void Start()
-	{
-        signalBus.Subscribe<SmeltRecipeAddSignal>(OnSmeltRecipeAdded);
-        signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnSmeltRecipeRemoved);
-        signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
-    }
-
 	private void Update()
 	{
         if (isUnlocked)
@@ -55,6 +46,15 @@ public class SmelterItem : MonoBehaviour
 		        recipeProgressSlider.value = data.SmeltedTime;
 	        }
         }
+	}
+	
+	[Inject]
+	public void Construct(SignalBus sb)
+	{
+		signalBus = sb;
+		signalBus.Subscribe<SmeltRecipeAddSignal>(OnSmeltRecipeAdded);
+		signalBus.Subscribe<SmeltRecipeRemoveSignal>(OnSmeltRecipeRemoved);
+		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
 	}
 
     public void SetSmelterUnlockPrice(int price)

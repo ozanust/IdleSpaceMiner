@@ -35,13 +35,15 @@ public class CrafterItem : MonoBehaviour
         cancelRecipeButton.onClick.AddListener(OnClickRemoveRecipe);
         unlockButton.onClick.AddListener(OnClickUnlockButton);
     }
-
-	private void Start()
+	
+	[Inject]
+	public void Construct(SignalBus sb)
 	{
-        signalBus.Subscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
-        signalBus.Subscribe<CraftRecipeAddSignal>(OnCraftRecipeAdded);
-        signalBus.Subscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
-    }
+		signalBus = sb;
+		signalBus.Subscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
+		signalBus.Subscribe<CraftRecipeAddSignal>(OnCraftRecipeAdded);
+		signalBus.Subscribe<CraftRecipeRemoveSignal>(OnCraftRecipeRemoved);
+	}
 
 	private void Update()
 	{

@@ -24,6 +24,8 @@ public class PlayerSaveData
     public List<AlloyType> UnlockedAlloys = new List<AlloyType>();
     public List<ResourceType> UnlockedItemRecipes = new List<ResourceType>();
     public List<ResearchType> UnlockedResearches = new List<ResearchType>();
+    public int[] UnlockedSmelters;
+    public int[] UnlockedCrafters;
     public int LastUnlockedSmelterId;
     public int LastUnlockedCrafterId;
 }

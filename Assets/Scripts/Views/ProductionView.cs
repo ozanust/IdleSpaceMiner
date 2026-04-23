@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -11,6 +9,7 @@ public class ProductionView : MonoBehaviour
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
 	[Inject] IProductionController productionController;
+	[Inject] private DiContainer container;
 
 	[SerializeField] private GameObject panel;
 	[SerializeField] private Button closeButton;
@@ -28,20 +27,20 @@ public class ProductionView : MonoBehaviour
 	[SerializeField] private GameObject craftLayout;
 
 	private MenuType type = MenuType.Production;
-
-	private void Awake()
+	
+	[Inject]
+	public void Construct(SignalBus sb)
 	{
-		smeltButton.onClick.AddListener(OnSmeltSelected);
-		craftButton.onClick.AddListener(OnCraftSelected);
-		closeButton.onClick.AddListener(CloseView);
-	}
-
-	private void Start()
-	{
+		signalBus = sb;
+        
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
 		signalBus.Subscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
 		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
+		
+		smeltButton.onClick.AddListener(OnSmeltSelected);
+		craftButton.onClick.AddListener(OnCraftSelected);
+		closeButton.onClick.AddListener(CloseView);
 	}
 
 	private void OnDestroy()
@@ -67,14 +66,14 @@ public class ProductionView : MonoBehaviour
 
 	private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-		SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
+		SmelterItem item = container.InstantiatePrefabForComponent<SmelterItem>(smelterItemPrototype, smelterItemContainer.transform);
 		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
 		item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
 	}
 	
 	private void OnCrafterUnlocked(CrafterUnlockedSignal signal)
 	{
-		CrafterItem item = Instantiate(crafterItemPrototype, crafterItemContainer.transform);
+		CrafterItem item = container.InstantiatePrefabForComponent<CrafterItem>(crafterItemPrototype, crafterItemContainer.transform);
 		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
 		item.SetSmelterUnlockPrice(resourceSettings.GetCrafterSetting(signal.CrafterId + 1).Price);
 	}

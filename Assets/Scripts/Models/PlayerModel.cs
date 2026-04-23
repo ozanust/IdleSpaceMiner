@@ -390,7 +390,7 @@ public class PlayerModel : IPlayerModel
 
 		if (unlockedSmelters != null && !unlockedSmelters.Contains(smelterId))
 		{
-			unlockedSmelters.Add(smelterId);	
+			unlockedSmelters.Add(smelterId);
 		}
 		
 		signalBus.Fire<PlayerModelUpdatedSignal>();
@@ -408,7 +408,7 @@ public class PlayerModel : IPlayerModel
 		
 		if (unlockedCrafters != null && !unlockedCrafters.Contains(smelterId))
 		{
-			unlockedCrafters.Add(smelterId);	
+			unlockedCrafters.Add(smelterId);
 		}
 		
 		signalBus.Fire<PlayerModelUpdatedSignal>();

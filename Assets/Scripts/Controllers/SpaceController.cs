@@ -123,16 +123,16 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		}
 
 		// --- Smelter / crafter slot progression ---
-		int[] unlockedSmelters = playerModel.GetUnlockedSmelters();
-		for (int i = 0; i <= unlockedSmelters.Length; i++)
+		int[] unlockedSmelters = save.Player.UnlockedSmelters;
+		for (int i = 0; i < unlockedSmelters.Length; i++)
 		{
-			playerModel.UnlockSmelter(i);
+			playerModel.UnlockSmelter(unlockedSmelters[i]);
 		}
-		
-		int[] unlockedCrafters = playerModel.GetUnlockedCrafters();
-		for (int i = 0; i <= unlockedCrafters.Length; i++)
+
+		int[] unlockedCrafters = save.Player.UnlockedCrafters;
+		for (int i = 0; i < unlockedCrafters.Length; i++)
 		{
-			playerModel.UnlockCrafter(i);
+			playerModel.UnlockCrafter(unlockedCrafters[i]);
 		}
 
 		// --- Mining accumulated amounts ---
