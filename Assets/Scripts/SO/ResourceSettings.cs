@@ -13,6 +13,7 @@ public class ResourceSettings : ScriptableObject
 	[SerializeField] private AlloySmeltSettings[] alloySmeltTimeSettings;
 	[SerializeField] private ItemSmeltSettings[] itemSmeltTimeSettings;
 	[SerializeField] private SmelterSetting[] smelterSettings;
+	[SerializeField] private CrafterSetting[] crafterSettings;
 	[SerializeField] private ResearchSettings[] researchSettings;
 
 	public ResourceDataSetting[] ResourceDataSettings => resourceDataSettings;
@@ -23,6 +24,7 @@ public class ResourceSettings : ScriptableObject
 	public AlloySmeltSettings[] AlloySmeltSettings => alloySmeltTimeSettings;
 	public ItemSmeltSettings[] ItemSmeltTimeSettings => itemSmeltTimeSettings;
 	public SmelterSetting[] SmelterSettings => smelterSettings;
+	public CrafterSetting[] CrafterSettings => crafterSettings;
 	public ResearchSettings[] ResearchSettings => researchSettings;
 
 	public int GetResourceValue(ResourceType type)
@@ -144,6 +146,19 @@ public class ResourceSettings : ScriptableObject
 
 		return null;
 	}
+	
+	public CrafterSetting GetCrafterSetting(int crafterId)
+	{
+		for (int i = 0; i < crafterSettings.Length; i++)
+		{
+			if (crafterId == crafterSettings[i].CrafterId)
+			{
+				return crafterSettings[i];
+			}
+		}
+
+		return null;
+	}
 
 	public ResearchSettings GetResearchSetting(ResearchType type)
 	{
@@ -219,6 +234,13 @@ public class ItemSmeltSettings
 public class SmelterSetting
 {
 	public int SmelterId;
+	public int Price;
+}
+
+[System.Serializable]
+public class CrafterSetting
+{
+	public int CrafterId;
 	public int Price;
 }
 

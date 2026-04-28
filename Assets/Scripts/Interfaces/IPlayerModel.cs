@@ -9,6 +9,7 @@ public interface IPlayerModel
     bool HasCurrency(CurrencyType type, int amount);
     int GetCurrency(CurrencyType type);
     bool TryUseResource(ResourceType type, int amount);
+    bool TryUseResources(ResearchNeededResource[] data);
     bool HasResource(ResourceType type, int amount);
     bool HasResources(ResearchNeededResource[] data);
     int GetResource(ResourceType type);
@@ -26,9 +27,19 @@ public interface IPlayerModel
     void UnlockItemRecipe(ResourceType type);
     ResourceType[] GetUnlockedItemRecipes();
     AlloyType[] GetUnlockedAlloys();
+    int[] GetUnlockedSmelters();
+    int[] GetUnlockedCrafters();
     void UnlockResearch(ResearchType type);
     ResearchType[] GetUnlockedResearchs();
     bool IsResearchUnlocked(ResearchType type);
     void SetTargetSmelter(int smelterId);
     int GetTargetSmelter();
+    void SetTargetCrafter(int crafterId);
+    int GetTargetCrafter();
+    void AddWorkingSmelter(int id, AlloyType type);
+    void AddWorkingCrafter(int id, ResourceType type);
+    void RemoveWorkingSmelter(int id);
+    void RemoveWorkingCrafter(int id);
+    Dictionary<int, AlloyType> GetWorkingSmelters();
+    Dictionary<int, ResourceType> GetWorkingCrafters();
 }

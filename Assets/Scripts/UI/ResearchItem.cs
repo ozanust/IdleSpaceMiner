@@ -65,7 +65,7 @@ public class ResearchItem : MonoBehaviour
 	{
 		if (isResearchUnlockable)
 		{
-			if (playerModel.HasResources(settings.NeededResources))
+			if (!playerModel.IsResearchUnlocked(type) && playerModel.HasResources(settings.NeededResources))
 			{
 				borderImage.color = Color.cyan;
 			}

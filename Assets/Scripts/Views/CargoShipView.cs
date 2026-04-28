@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -15,8 +13,9 @@ public class CargoShipView : MonoBehaviour
 	private Transform targetPlanet;
 	private Vector3 mothershipDefaultPosition = new Vector3(0, 0, 0);
 
-	// Don't happy with this "Set" methods, let's find a better way
-	public void SetSignalBus(SignalBus signalBus)
+	
+	[Inject]
+	public void Construct(SignalBus signalBus)
 	{
 		this.signalBus = signalBus;
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
@@ -56,6 +55,19 @@ public class CargoShipView : MonoBehaviour
 	private void Update()
 	{
 		this.transform.position += (currentTarget - transform.position).normalized * shipSpeed * Time.deltaTime * 5;
+		
+		Vector3 direction = (currentTarget - transform.position).normalized;
+
+		transform.position += direction * shipSpeed * Time.deltaTime * 5f;
+
+		float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+		Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
+
+		transform.rotation = Quaternion.RotateTowards(
+			transform.rotation,
+			targetRotation,
+			180f * Time.deltaTime * 10 // turn speed
+		);
 	}
 
 	private void OnPlanetUpdated(PlanetUpdatedSignal signal)

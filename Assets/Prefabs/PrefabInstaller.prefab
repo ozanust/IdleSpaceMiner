@@ -44,9 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9101f778077d242ac85bf3d8fa4e81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputServicePrefab: {fileID: 6116853921020469572, guid: bffe7a442a2e6894ca04c8ea9bb4c9e5,
-    type: 3}
-  gameManager: {fileID: 8751675735837698060, guid: 6c3ea1ef38a7ebf4c959bd6312375961,
-    type: 3}
-  unitPool: {fileID: 3737689904574423880, guid: 6de7c10de8ed0314283b46a1a664b504,
-    type: 3}
+  inputServicePrefab: {fileID: 6116853921020469572, guid: bffe7a442a2e6894ca04c8ea9bb4c9e5, type: 3}
+  gameManager: {fileID: 8751675735837698060, guid: 6c3ea1ef38a7ebf4c959bd6312375961, type: 3}
+  lifecycleBroadcaster: {fileID: 2777311477507583059, guid: 40a3026d4bb938d4687ee58f879aa867, type: 3}

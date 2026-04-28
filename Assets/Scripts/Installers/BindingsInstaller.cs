@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Zenject;
 
 public class BindingsInstaller : MonoInstaller
@@ -15,16 +12,18 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<CargoShipView>().FromComponentInNewPrefabResource("Game/CargoShip").AsSingle();
 		Container.Bind<AsteroidView>().FromComponentInNewPrefabResource("Game/Asteroid").AsSingle();
 		Container.Bind<MissileView>().FromComponentInNewPrefabResource("Game/Missile").AsSingle();
+		Container.Bind<ISaveService>().To<SaveService>().AsSingle();
 		Container.Bind<IResourcesService>().To<ResourcesService>().AsSingle();
 		Container.Bind<IPlayerModel>().To<PlayerModel>().AsSingle();
 		Container.Bind<ISpaceModel>().To<SpaceModel>().AsSingle();
-		Container.Bind(typeof(ISpaceController), typeof(ITickable)).To<SpaceController>().AsSingle();
 		Container.Bind(typeof(IMiningController), typeof(ITickable)).To<MiningController>().AsSingle();
 		Container.Bind<ICargoController>().To<CargoController>().AsSingle().NonLazy();
 		Container.Bind<IResourcesViewController>().To<ResourcesViewController>().AsSingle().NonLazy();
 		Container.Bind<IResourcesSellViewController>().To<ResourcesSellViewController>().AsSingle().NonLazy();
 		Container.Bind<IPlanetInfoController>().To<PlanetInfoController>().AsSingle();
 		Container.Bind(typeof(IProductionController), typeof(ITickable)).To<ProductionController>().AsSingle().NonLazy();
+		Container.Bind(typeof(ISpaceController), typeof(ITickable)).To<SpaceController>().AsSingle().NonLazy();
+		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
 	}
 
 	void InstallSignals()
@@ -56,10 +55,16 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<SmeltRecipeAddSignal>();
 		Container.DeclareSignal<SmeltRecipeRemoveSignal>();
 		Container.DeclareSignal<SmelterUnlockedSignal>();
+		Container.DeclareSignal<CrafterUnlockedSignal>();
 		Container.DeclareSignal<RecipeUnlockedSignal>();
+		Container.DeclareSignal<CraftRecipeAddSignal>();
+		Container.DeclareSignal<CraftRecipeRemoveSignal>();
 		
 		Container.DeclareSignal<ResearchCompletedSignal>();
 		Container.DeclareSignal<ResearchInfoOpenSignal>();
+		
+		Container.DeclareSignal<OnApplicationFocusSignal>();
+		Container.DeclareSignal<OnApplicationQuitSignal>();
 
 		Container.DeclareSignal<MenuOpenSignal>();
 

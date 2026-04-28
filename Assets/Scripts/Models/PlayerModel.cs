@@ -8,13 +8,20 @@ public class PlayerModel : IPlayerModel
 	private int money;
 	private PlanetData[] planetData;
 	private Dictionary<ResourceType, int> resources;
+	private Dictionary<AlloyType, int> alloys;
+	private Dictionary<ItemType, int> items;
 	private Dictionary<CurrencyType, int> currencies;
 	private List<AlloyType> unlockedAlloys = new List<AlloyType>();
 	private List<ResourceType> unlockedItemRecipes = new List<ResourceType>();
 	private List<ResearchType> unlockedResearchs = new List<ResearchType>();
+	private List<int> unlockedSmelters = new List<int>();
+	private List<int> unlockedCrafters = new List<int>();
+	private Dictionary<int, AlloyType> smeltersWorking = new Dictionary<int, AlloyType>();
+	private Dictionary<int, ResourceType> craftersWorking = new Dictionary<int, ResourceType>();
 	private int lastUnlockedSmelterId = 0;
-	private int lastUnlockedCrafterId = 49;
+	private int lastUnlockedCrafterId = 0;
 	private int recipeSelectionTargetSmelter = -1;
+	private int recipeSelectionTargetCrafter = -1;
 
 	readonly SignalBus signalBus;
 
@@ -43,6 +50,44 @@ public class PlayerModel : IPlayerModel
 		}
 
 		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedResourceType = type });
+	}
+	
+	public void AddResource(AlloyType type, int amount)
+	{
+		if (alloys == null)
+		{
+			alloys = new Dictionary<AlloyType, int>();
+		}
+
+		if (!alloys.ContainsKey(type))
+		{
+			alloys.Add(type, amount);
+		}
+		else
+		{
+			alloys[type] += amount;
+		}
+
+		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedAlloyType = type });
+	}
+	
+	public void AddResource(ItemType type, int amount)
+	{
+		if (items == null)
+		{
+			items = new Dictionary<ItemType, int>();
+		}
+
+		if (!items.ContainsKey(type))
+		{
+			items.Add(type, amount);
+		}
+		else
+		{
+			items[type] += amount;
+		}
+
+		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedItemType = type });
 	}
 
 	public Dictionary<ResourceType, int> GetResources()
@@ -79,6 +124,36 @@ public class PlayerModel : IPlayerModel
 
 		return resources[type] >= amount;
 	}
+	
+	public bool HasResource(AlloyType type, int amount)
+	{
+		if (alloys == null)
+		{
+			return false;
+		}
+
+		if (!alloys.ContainsKey(type))
+		{
+			return false;
+		}
+
+		return alloys[type] >= amount;
+	}
+	
+	public bool HasResource(ItemType type, int amount)
+	{
+		if (items == null)
+		{
+			return false;
+		}
+
+		if (!items.ContainsKey(type))
+		{
+			return false;
+		}
+
+		return items[type] >= amount;
+	}
 
 	public bool HasResources(ResearchNeededResource[] data)
 	{
@@ -112,6 +187,35 @@ public class PlayerModel : IPlayerModel
 		
 		resources[type] -= amount;
 		signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedResourceType = type });
+		return true;
+	}
+	
+	public bool TryUseResources(ResearchNeededResource[]  data)
+	{
+		if (resources == null)
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < data.Length; i++)
+		{
+			if (!resources.ContainsKey(data[i].Type))
+			{
+				return false;
+			}
+			
+			if (resources[data[i].Type] < data[i].Amount)
+			{
+				return false;
+			}
+		}
+		
+		for (int i = 0; i < data.Length; i++)
+		{
+			resources[data[i].Type] -= data[i].Amount;
+			signalBus.Fire(new PlayerModelUpdatedSignal() { UpdatedResourceType = data[i].Type });
+		}
+		
 		return true;
 	}
 
@@ -241,6 +345,16 @@ public class PlayerModel : IPlayerModel
 		return unlockedAlloys.ToArray();
 	}
 
+	public int[] GetUnlockedSmelters()
+	{
+		return unlockedSmelters.ToArray();
+	}
+
+	public int[] GetUnlockedCrafters()
+	{
+		return unlockedCrafters.ToArray();
+	}
+
 	public void UnlockItemRecipe(ResourceType type)
 	{
 		unlockedItemRecipes.Add(type);
@@ -273,6 +387,12 @@ public class PlayerModel : IPlayerModel
 	public void UnlockSmelter(int smelterId)
 	{
 		lastUnlockedSmelterId = smelterId;
+
+		if (unlockedSmelters != null && !unlockedSmelters.Contains(smelterId))
+		{
+			unlockedSmelters.Add(smelterId);
+		}
+		
 		signalBus.Fire<PlayerModelUpdatedSignal>();
 		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedSmelterId });
 	}
@@ -285,8 +405,14 @@ public class PlayerModel : IPlayerModel
 	public void UnlockCrafter(int smelterId)
 	{
 		lastUnlockedCrafterId = smelterId;
+		
+		if (unlockedCrafters != null && !unlockedCrafters.Contains(smelterId))
+		{
+			unlockedCrafters.Add(smelterId);
+		}
+		
 		signalBus.Fire<PlayerModelUpdatedSignal>();
-		signalBus.Fire(new SmelterUnlockedSignal() { SmelterId = lastUnlockedCrafterId });
+		signalBus.Fire(new CrafterUnlockedSignal() { CrafterId = lastUnlockedCrafterId });
 	}
 
 	public int GetLastUnlockedCrafterId()
@@ -302,5 +428,45 @@ public class PlayerModel : IPlayerModel
 	public int GetTargetSmelter()
 	{
 		return recipeSelectionTargetSmelter;
+	}
+
+	public void SetTargetCrafter(int crafterId)
+	{
+		recipeSelectionTargetCrafter = crafterId;
+	}
+
+	public int GetTargetCrafter()
+	{
+		return recipeSelectionTargetCrafter;
+	}
+
+	public void AddWorkingSmelter(int id, AlloyType type)
+	{
+		smeltersWorking[id] = type;
+	}
+
+	public void AddWorkingCrafter(int id, ResourceType type)
+	{
+		craftersWorking[id] = type;
+	}
+
+	public void RemoveWorkingSmelter(int id)
+	{
+		smeltersWorking.Remove(id);
+	}
+
+	public void RemoveWorkingCrafter(int id)
+	{
+		craftersWorking.Remove(id);
+	}
+
+	public Dictionary<int, AlloyType> GetWorkingSmelters()
+	{
+		return smeltersWorking;
+	}
+	
+	public Dictionary<int, ResourceType> GetWorkingCrafters()
+	{
+		return craftersWorking;
 	}
 }

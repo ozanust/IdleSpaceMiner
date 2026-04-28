@@ -21,6 +21,12 @@ public class SpaceView : MonoBehaviour
 		signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
+		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+	}
+
 	private void Start()
 	{
 		Application.targetFrameRate = 60;
@@ -28,7 +34,7 @@ public class SpaceView : MonoBehaviour
 		if (!isViewInitialized)
 		{
 			InitializePlanets(planetSettings);
-			InitializePlanetData(spaceModel.GetPlanetsData());
+			spaceController.OnRegister();
 		}
 	}
 
@@ -76,7 +82,14 @@ public class SpaceView : MonoBehaviour
 			if (data[i].IsUnlocked)
 			{
 				planets[planetIndex].Unlock();
-				// set planet data?
+
+				// Fire PlanetTransformSignal so CargoController and SpaceModel
+				// register the planet transform for already-unlocked planets on load.
+				signalBus.Fire(new PlanetTransformSignal()
+				{
+					PlanetId = planetIndex,
+					PlanetTransform = planets[planetIndex].transform
+				});
 			}
 
 			planets[planetIndex].OnClick.AddListener(OnClickPlanet);

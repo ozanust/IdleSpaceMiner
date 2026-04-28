@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -11,6 +9,7 @@ public class ProductionView : MonoBehaviour
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
 	[Inject] IProductionController productionController;
+	[Inject] private DiContainer container;
 
 	[SerializeField] private GameObject panel;
 	[SerializeField] private Button closeButton;
@@ -18,6 +17,7 @@ public class ProductionView : MonoBehaviour
 
 	[SerializeField] private SmelterItem smelterItemPrototype;
 	[SerializeField] private GameObject smelterItemContainer;
+	[SerializeField] private CrafterItem crafterItemPrototype;
 	[SerializeField] private GameObject crafterItemContainer;
 
 	[SerializeField] private Button smeltButton;
@@ -27,19 +27,28 @@ public class ProductionView : MonoBehaviour
 	[SerializeField] private GameObject craftLayout;
 
 	private MenuType type = MenuType.Production;
-
-	private void Awake()
+	
+	[Inject]
+	public void Construct(SignalBus sb)
 	{
+		signalBus = sb;
+        
+		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
+		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+		signalBus.Subscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
+		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
+		
 		smeltButton.onClick.AddListener(OnSmeltSelected);
 		craftButton.onClick.AddListener(OnCraftSelected);
 		closeButton.onClick.AddListener(CloseView);
 	}
 
-	private void Start()
+	private void OnDestroy()
 	{
-		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
-		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
-		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+		signalBus.Unsubscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
+		signalBus.Unsubscribe<CrafterUnlockedSignal>(OnCrafterUnlocked);
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
 
 	private void OnMenuOpen(MenuOpenSignal signal)
@@ -57,20 +66,16 @@ public class ProductionView : MonoBehaviour
 
 	private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
-		if (signal.SmelterId <= 49)
-		{
-			SmelterItem item = Instantiate(smelterItemPrototype, smelterItemContainer.transform);
-			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
-			item.SetType(SmelterType.Smelter);
-		}
-		else
-		{
-			SmelterItem item = Instantiate(smelterItemPrototype, crafterItemContainer.transform);
-			item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-			item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
-			item.SetType(SmelterType.Crafter);
-		}
+		SmelterItem item = container.InstantiatePrefabForComponent<SmelterItem>(smelterItemPrototype, smelterItemContainer.transform);
+		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
+		item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+	}
+	
+	private void OnCrafterUnlocked(CrafterUnlockedSignal signal)
+	{
+		CrafterItem item = container.InstantiatePrefabForComponent<CrafterItem>(crafterItemPrototype, crafterItemContainer.transform);
+		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
+		item.SetSmelterUnlockPrice(resourceSettings.GetCrafterSetting(signal.CrafterId + 1).Price);
 	}
 
 	private void OnResearchCompleted(ResearchCompletedSignal signal)

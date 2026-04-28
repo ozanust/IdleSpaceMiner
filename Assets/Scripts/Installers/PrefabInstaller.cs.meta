@@ -3,7 +3,10 @@ guid: fa9101f778077d242ac85bf3d8fa4e81
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - inputServicePrefab: {instanceID: 0}
+  - gameManager: {instanceID: 0}
+  - lifecycleBroadcaster: {fileID: 2777311477507583059, guid: 40a3026d4bb938d4687ee58f879aa867, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -28,6 +28,12 @@ public class SmeltRecipesView : MonoBehaviour
 		Init();
 	}
 
+	private void OnDestroy()
+	{
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+		signalBus.Unsubscribe<RecipeUnlockedSignal>(OnRecipeUnlocked);
+	}
+
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
 		if (signal.Type == type)
@@ -158,13 +164,15 @@ public class SmeltRecipesView : MonoBehaviour
 
 	private void OnClickRecipe(AlloyType alloyType)
 	{
-		signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = alloyType, SmelterId = playerModel.GetTargetSmelter() });
+		int targetSmelter = playerModel.GetTargetSmelter();
+		signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = alloyType, SmelterId = targetSmelter });
 		panel.SetActive(false);
 	}
 
 	private void OnClickItemRecipe(ResourceType resourceType)
 	{
-		signalBus.Fire(new SmeltRecipeAddSignal() { ItemRecipeType = resourceType, SmelterId = playerModel.GetTargetSmelter() });
+		int targetCrafter = playerModel.GetTargetCrafter();
+		signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = resourceType, SmelterId = targetCrafter });
 		panel.SetActive(false);
 	}
 }

@@ -1,9 +1,10 @@
 using Zenject;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MiningController : IMiningController, ITickable
+public class MiningController : IMiningController, ITickable, IDisposable
 {
 	private PlanetSettings planetSettings;
 	private IPlayerModel playerModel;
@@ -19,10 +20,36 @@ public class MiningController : IMiningController, ITickable
 		this.playerModel = playerModel;
 		this.spaceModel = spaceModel;
 
+		this.signalBus.Subscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		this.signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
 		this.signalBus.Subscribe<CargoShipMothershipArrivalSignal>(OnCargoArrivedMothership);
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+	}
+
+	/// <summary>Unsubscribes from all signals.</summary>
+	public void Dispose()
+	{
+		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
+		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+		signalBus.Unsubscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
+		signalBus.Unsubscribe<CargoShipMothershipArrivalSignal>(OnCargoArrivedMothership);
+		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+	}
+
+	/// <summary>
+	/// Pre-populates mining data for planets that are already unlocked when
+	/// loading from a save, so the cargo loop and planet info UI work immediately.
+	/// </summary>
+	private void OnSpaceModelInitialized(SpaceModelInitializedSignal signal)
+	{
+		foreach (PlanetData planet in signal.Data)
+		{
+			if (planet.IsUnlocked && !mineData.ContainsKey(planet.PlanetIndex))
+			{
+				RegisterMiningData(planet.PlanetIndex, planet.CurrentTotalMiningRate);
+			}
+		}
 	}
 
 	public void Tick()
@@ -35,8 +62,23 @@ public class MiningController : IMiningController, ITickable
 		PlanetDataSetting planetDataSettings;
 		if (planetSettings.TryGetPlanetSetting(signal.PlanetId, out planetDataSettings))
 		{
-			MiningData md = new MiningData(planetDataSettings.TotalStartingMiningRate, planetDataSettings.MiningYieldRatios);
-			mineData.Add(signal.PlanetId, md);
+			RegisterMiningData(signal.PlanetId, planetDataSettings.TotalStartingMiningRate);
+		}
+	}
+
+	/// <summary>Adds a new MiningData entry for the given planet if one does not already exist.</summary>
+	private void RegisterMiningData(int planetId, float totalMineRate)
+	{
+		if (mineData.ContainsKey(planetId))
+		{
+			return;
+		}
+
+		PlanetDataSetting planetDataSettings;
+		if (planetSettings.TryGetPlanetSetting(planetId, out planetDataSettings))
+		{
+			MiningData md = new MiningData(totalMineRate, planetDataSettings.MiningYieldRatios);
+			mineData.Add(planetId, md);
 		}
 	}
 
@@ -63,10 +105,13 @@ public class MiningController : IMiningController, ITickable
 
 	private void OnCargoArrivedMothership(CargoShipMothershipArrivalSignal signal)
 	{
-		TransferResourcesData[] resourcesData = transferData[signal.PlanetId];
-		for (int i = 0; i < resourcesData.Length; i++)
+		if (transferData.ContainsKey(signal.PlanetId))
 		{
-			playerModel.AddResource(resourcesData[i].Type, resourcesData[i].Amount);
+			TransferResourcesData[] resourcesData = transferData[signal.PlanetId];
+			for (int i = 0; i < resourcesData.Length; i++)
+			{
+				playerModel.AddResource(resourcesData[i].Type, resourcesData[i].Amount);
+			}
 		}
 	}
 
@@ -127,5 +172,31 @@ public class MiningController : IMiningController, ITickable
 		}
 
 		return false;
+	}
+
+	/// <summary>
+	/// Aggregates all resources currently in transit across all cargo ships into a single dictionary.
+	/// Called during save to fold in-transit cargo into the centralized mothership snapshot.
+	/// </summary>
+	public Dictionary<ResourceType, int> GetTransferData()
+	{
+		Dictionary<ResourceType, int> result = new Dictionary<ResourceType, int>();
+
+		foreach (TransferResourcesData[] entries in transferData.Values)
+		{
+			foreach (TransferResourcesData entry in entries)
+			{
+				if (result.ContainsKey(entry.Type))
+				{
+					result[entry.Type] += entry.Amount;
+				}
+				else
+				{
+					result[entry.Type] = entry.Amount;
+				}
+			}
+		}
+
+		return result;
 	}
 }
