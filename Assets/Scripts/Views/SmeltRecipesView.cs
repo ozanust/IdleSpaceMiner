@@ -4,26 +4,37 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 using UnityEngine.UI;
+using TMPro;
 
 public class SmeltRecipesView : MonoBehaviour
 {
 	[Inject] SignalBus signalBus;
 	[Inject] IPlayerModel playerModel;
 	[Inject] ResourceSettings resourceSettings;
+	[Inject] IProductionController productionController;
 	[SerializeField] private SmeltRecipeItem smeltRecipeItemPrototype;
 	[SerializeField] private GameObject panel;
 	[SerializeField] private GameObject smeltRecipeItemsContainer;
 	[SerializeField] private GameObject craftRecipeItemsContainer;
+	[Header("Optional")]
+	[SerializeField] private TMP_Text titleText;
+	[SerializeField] private Button closeButton;
 
 	private MenuType type = MenuType.SmeltRecipes;
 	private MenuType typeCraft = MenuType.CraftRecipes;
 	private List<AlloyType> alloyTypes = new List<AlloyType>();
 	private List<ResourceType> craftTypes = new List<ResourceType>();
+	private readonly List<SmeltRecipeItem> items = new List<SmeltRecipeItem>();
 
 	private void Start()
 	{
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Subscribe<RecipeUnlockedSignal>(OnRecipeUnlocked);
+
+		if (closeButton != null)
+		{
+			closeButton.onClick.AddListener(() => panel.SetActive(false));
+		}
 
 		Init();
 	}
@@ -38,15 +49,29 @@ public class SmeltRecipesView : MonoBehaviour
 	{
 		if (signal.Type == type)
 		{
-			panel.SetActive(true);
-			craftRecipeItemsContainer.gameObject.SetActive(false);
-			smeltRecipeItemsContainer.gameObject.SetActive(true);
+			Open(false);
 		}
 		else if (signal.Type == typeCraft)
 		{
-			panel.SetActive(true);
-			craftRecipeItemsContainer.gameObject.SetActive(true);
-			smeltRecipeItemsContainer.gameObject.SetActive(false);
+			Open(true);
+		}
+	}
+
+	private void Open(bool crafting)
+	{
+		panel.SetActive(true);
+		craftRecipeItemsContainer.gameObject.SetActive(crafting);
+		smeltRecipeItemsContainer.gameObject.SetActive(!crafting);
+
+		if (titleText != null)
+		{
+			titleText.text = crafting ? "Craft Recipes" : "Smelt Recipes";
+		}
+
+		// Research may have changed ingredient amounts and times since the cards were made
+		foreach (SmeltRecipeItem item in items)
+		{
+			item.Refresh();
 		}
 	}
 
@@ -58,12 +83,11 @@ public class SmeltRecipesView : MonoBehaviour
 			if (!alloyTypes.Contains(type))
 			{
 				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings);
+				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+				items.Add(item);
 				item.SetLockedItemType(AlloyToResourceConverter.Convert(type));
 				item.SetAlloyType(type);
 				item.SetType(SmelterType.Smelter);
-				item.SetTitle(type.ToString());
-				item.SetDuration(Mathf.RoundToInt(resourceSettings.GetSmeltSetting(type).TimeToSmelt));
 				item.OnClick += OnClickRecipe;
 				item.Unlock();
 				item.Init();
@@ -75,10 +99,10 @@ public class SmeltRecipesView : MonoBehaviour
 		{
 			AlloyType nextType = types[types.Length - 1] + 1;
 			SmeltRecipeItem nextItem = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-			nextItem.SetInjections(signalBus, playerModel, resourceSettings);
+			nextItem.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+				items.Add(nextItem);
 			nextItem.SetAlloyType(nextType);
 			nextItem.SetType(SmelterType.Smelter);
-			nextItem.SetTitle(type.ToString());
 			nextItem.SetLockedItemType(AlloyToResourceConverter.Convert(nextType));
 			nextItem.OnClick += OnClickRecipe;
 			nextItem.Init();
@@ -91,12 +115,11 @@ public class SmeltRecipesView : MonoBehaviour
 			if (!craftTypes.Contains(type))
 			{
 				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings);
+				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+				items.Add(item);
 				item.SetLockedItemType(type);
 				item.SetResourceType(type);
 				item.SetType(SmelterType.Crafter);
-				item.SetTitle(type.ToString());
-				item.SetDuration(Mathf.RoundToInt(resourceSettings.GetItemSmeltSetting(type).TimeToSmelt));
 				item.OnClickItemRecipe += OnClickItemRecipe;
 				item.Unlock();
 				item.Init();
@@ -108,10 +131,10 @@ public class SmeltRecipesView : MonoBehaviour
 		{
 			ResourceType nextType = restypes[restypes.Length - 1] + 1;
 			SmeltRecipeItem nextCraftItem = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-			nextCraftItem.SetInjections(signalBus, playerModel, resourceSettings);
+			nextCraftItem.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+				items.Add(nextCraftItem);
 			nextCraftItem.SetResourceType(nextType);
 			nextCraftItem.SetType(SmelterType.Crafter);
-			nextCraftItem.SetTitle(type.ToString());
 			nextCraftItem.SetLockedItemType(nextType);
 			nextCraftItem.OnClickItemRecipe += OnClickItemRecipe;
 			nextCraftItem.Init();
@@ -135,10 +158,10 @@ public class SmeltRecipesView : MonoBehaviour
 			if (!alloyTypes.Contains(type))
 			{
 				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings);
+				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+				items.Add(item);
 				item.SetAlloyType(type);
 				item.SetType(SmelterType.Smelter);
-				item.SetTitle(type.ToString());
 				item.SetLockedItemType(nextType);
 				item.OnClick += OnClickRecipe;
 				item.Init();
@@ -150,10 +173,10 @@ public class SmeltRecipesView : MonoBehaviour
 			if (!craftTypes.Contains(nextType))
 			{
 				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings);
+				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+				items.Add(item);
 				item.SetResourceType(nextType);
 				item.SetType(SmelterType.Crafter);
-				item.SetTitle(type.ToString());
 				item.SetLockedItemType(nextType);
 				item.OnClickItemRecipe += OnClickItemRecipe;
 				item.Init();

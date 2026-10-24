@@ -42,7 +42,9 @@ public class SmelterItem : MonoBehaviour
         {
 	        if (data != null)
 	        {
-		        recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString("N1");
+		        recipeRemainingTimeText.text = data.IsSmelting
+			        ? NumberFormatter.FormatDuration(productionController.GetSmeltTime(data.Type) * (1f - data.SmeltedTime / data.SmeltTime), true)
+			        : "Waiting for ore";
 		        recipeProgressSlider.value = data.SmeltedTime;
 	        }
         }
@@ -100,7 +102,7 @@ public class SmelterItem : MonoBehaviour
         if (signal.SmelterId == smelterId)
         {
             recipeProgressSlider.value = 0;
-            recipeRemainingTimeText.text = "OFF";
+            recipeRemainingTimeText.text = "Idle";
             noRecipeSelectedText.gameObject.SetActive(true);
             selectedRecipeImagesParent.SetActive(false);
             data = null;
@@ -114,13 +116,12 @@ public class SmelterItem : MonoBehaviour
 	{
         if (isUnlocked && smelterId == signal.SmelterId && data == null)
         {
-            AlloyDataSetting settings = resourceSettings.GetAlloyData(signal.RecipeType);
-            ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.ItemRecipeType);
+            ResourceType ore = AlloyToResourceConverter.ConvertToRaw(signal.RecipeType);
 
             noRecipeSelectedText.gameObject.SetActive(false);
             selectedRecipeImagesParent.SetActive(true);
-            sourceResourceImage.sprite = settings.Icon;
-            targetResourceImage.sprite = sourceSetting.Icon;
+            sourceResourceImage.sprite = resourceSettings.GetResourceData(ore).Icon;
+            targetResourceImage.sprite = resourceSettings.GetResourceData(AlloyToResourceConverter.Convert(signal.RecipeType)).Icon;
             data = productionController.GetAlloyData(signal.SmelterId);
             recipeProgressSlider.maxValue = data.SmeltTime;
             recipeProgressSlider.minValue = 0;

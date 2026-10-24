@@ -35,4 +35,26 @@ public static class NumberFormatter
 	{
 		return "$" + Format(value);
 	}
+
+	/// <summary>Durations like 45s, 12.5s (with decimals), 2m 30s or 1h 5m.</summary>
+	public static string FormatDuration(double seconds, bool decimals = false)
+	{
+		if (seconds < 0)
+		{
+			seconds = 0;
+		}
+
+		if (seconds < 60)
+		{
+			return seconds.ToString(decimals ? "0.0" : "0", CultureInfo.InvariantCulture) + "s";
+		}
+
+		int total = (int)System.Math.Round(seconds);
+		if (total < 3600)
+		{
+			return $"{total / 60}m {total % 60}s";
+		}
+
+		return $"{total / 3600}h {total % 3600 / 60}m";
+	}
 }

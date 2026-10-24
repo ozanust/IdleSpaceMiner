@@ -44,7 +44,7 @@ MonoBehaviour:
     Name: Aluminum Bar
     Icon: {fileID: 21300000, guid: 39dd0244f54aebf4e85882397bd5d7b2, type: 3}
   - Type: 10
-    Name: Cooper Wire
+    Name: Copper Wire
     Icon: {fileID: 21300000, guid: 6349abdfd485b084e82ccfc8bb9a6700, type: 3}
   - Type: 11
     Name: Iron Nail

@@ -222,9 +222,19 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 	}
 
-	private int GetSmeltResourceNeeded(AlloyType type)
+	public int GetSmeltResourceNeeded(AlloyType type)
 	{
 		return Mathf.CeilToInt(resourceSettings.GetSmeltSetting(type).ResourceNeeded * smeltIngredientMultiplier);
+	}
+
+	public float GetSmeltTime(AlloyType type)
+	{
+		return resourceSettings.GetSmeltSetting(type).TimeToSmelt / smeltSpeed;
+	}
+
+	public float GetCraftTime(ResourceType type)
+	{
+		return resourceSettings.GetItemSmeltSetting(type).TimeToSmelt / craftSpeed;
 	}
 
 	/// <summary>Consumes the raw material for one alloy and marks the smelter as working.</summary>
