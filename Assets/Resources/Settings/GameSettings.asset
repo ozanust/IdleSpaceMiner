@@ -19,3 +19,99 @@ MonoBehaviour:
     AsteroidSpawnTimes: 780000002c010000
     OfflineMiningMultiplier: 0.22
     MaxOfflineSeconds: 7200
+  tasks:
+  - Type: 0
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 50
+  - Type: 1
+    TargetAmount: 50
+    Resource: 1
+    Research: 0
+    Reward: 150
+  - Type: 2
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 250
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 1
+    Reward: 300
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 0
+    Reward: 300
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 2
+    Reward: 400
+  - Type: 1
+    TargetAmount: 1
+    Resource: 5
+    Research: 0
+    Reward: 400
+  - Type: 2
+    TargetAmount: 4
+    Resource: 0
+    Research: 0
+    Reward: 500
+  - Type: 1
+    TargetAmount: 100
+    Resource: 2
+    Research: 0
+    Reward: 500
+  - Type: 1
+    TargetAmount: 1
+    Resource: 6
+    Research: 0
+    Reward: 1000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 8
+    Reward: 1000
+  - Type: 0
+    TargetAmount: 40
+    Resource: 0
+    Research: 0
+    Reward: 1000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 3
+    Reward: 1500
+  - Type: 1
+    TargetAmount: 3
+    Resource: 10
+    Research: 0
+    Reward: 2000
+  - Type: 1
+    TargetAmount: 3
+    Resource: 7
+    Research: 0
+    Reward: 3000
+  - Type: 4
+    TargetAmount: 2
+    Resource: 0
+    Research: 0
+    Reward: 10000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 12
+    Research: 0
+    Reward: 15000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 9
+    Reward: 10000
+  - Type: 5
+    TargetAmount: 100000
+    Resource: 0
+    Research: 0
+    Reward: 25000

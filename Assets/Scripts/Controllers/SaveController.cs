@@ -15,6 +15,7 @@ public class SaveController : ITickable, IDisposable
     private readonly IPlayerModel playerModel;
     private readonly ISpaceModel spaceModel;
     private readonly IMiningController miningController;
+    private readonly ITaskController taskController;
     private readonly SignalBus signalBus;
 
     private float autoSaveTimer;
@@ -30,12 +31,14 @@ public class SaveController : ITickable, IDisposable
         IPlayerModel playerModel,
         ISpaceModel spaceModel,
         IMiningController miningController,
+        ITaskController taskController,
         SignalBus signalBus)
     {
         this.saveService = saveService;
         this.playerModel = playerModel;
         this.spaceModel = spaceModel;
         this.miningController = miningController;
+        this.taskController = taskController;
         this.signalBus = signalBus;
         
         //saveService.DeleteSave();
@@ -131,6 +134,7 @@ public class SaveController : ITickable, IDisposable
         data.Smelting = BuildSmeltingSaveData();
         data.Crafting = BuildCraftingSaveData();
         data.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
+        data.CurrentTaskIndex = taskController.CurrentTaskIndex;
 
         return data;
     }

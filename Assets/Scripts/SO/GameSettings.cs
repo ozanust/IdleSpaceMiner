@@ -7,9 +7,11 @@ public class GameSettings : ScriptableObject
 {
 	[SerializeField] private EconomySettings economySettings;
 	[SerializeField] private GlobalSettings globalSettings;
+	[SerializeField] private TaskSetting[] tasks;
 
 	public EconomySettings EconomySettings => economySettings;
 	public GlobalSettings GlobalSettings => globalSettings;
+	public TaskSetting[] Tasks => tasks;
 
 	public int GetInitialAmount(ResourceType type)
 	{
@@ -31,4 +33,15 @@ public class GlobalSettings
 	// Mining speed while the game is not running, relative to normal speed
 	public float OfflineMiningMultiplier;
 	public int MaxOfflineSeconds;
+}
+
+/// <summary>One step of the guided task chain. Only the fields matching Type are used.</summary>
+[System.Serializable]
+public class TaskSetting
+{
+	public TaskType Type;
+	public int TargetAmount;
+	public ResourceType Resource;
+	public ResearchType Research;
+	public long Reward;
 }
