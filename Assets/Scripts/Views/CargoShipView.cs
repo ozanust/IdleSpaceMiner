@@ -17,8 +17,8 @@ public class CargoShipView : MonoBehaviour
 	private Vector3 mothershipDefaultPosition = new Vector3(0, 0, 0);
 
 	[Header("Trail")]
-	[SerializeField] private float trailTime = 0.3f;
-	[SerializeField] private float trailWidth = 0.06f;
+	[SerializeField] private float trailTime = 0.6f;
+	[SerializeField] private float trailWidth = 0.12f;
 	[SerializeField] private Color trailColor = new Color(1f, 1f, 1f, 0.5f);
 	[SerializeField] private int trailSortingOrder = -1;
 
