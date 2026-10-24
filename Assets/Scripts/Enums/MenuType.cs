@@ -9,5 +9,6 @@ public enum MenuType
 	ResarchInfo,
 	Managers,
 	Boosts,
-	Mothership
+	Mothership,
+	Tasks
 }

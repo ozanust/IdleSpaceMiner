@@ -1,12 +1,15 @@
+using System.Collections.Generic;
+
 public interface ITaskController
 {
-	int CurrentTaskIndex { get; }
-	int TaskCount { get; }
 	bool AreAllTasksCompleted { get; }
-	bool IsCurrentTaskCompleted { get; }
-	string GetCurrentTaskDescription();
-	string GetCurrentTaskProgress();
-	float GetCurrentTaskProgressRatio();
-	long GetCurrentTaskReward();
-	void ClaimCurrentTask();
+	IReadOnlyList<int> GetActiveTasks();
+	int[] GetClaimedTasks();
+	bool HasClaimableTask();
+	bool IsTaskCompleted(int index);
+	void ClaimTask(int index);
+	long GetTaskReward(int index);
+	string GetTaskDescription(int index);
+	string GetTaskProgressText(int index);
+	float GetTaskProgressRatio(int index);
 }

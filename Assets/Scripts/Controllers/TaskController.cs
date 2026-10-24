@@ -1,13 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
 /// <summary>
-/// Guided task chain that doubles as the tutorial: one active task at a time,
-/// each paying a cash reward when claimed. Tasks check game state, so no progress counters are saved.
+/// Task list that doubles as the tutorial: the first few unclaimed tasks are active at once,
+/// each paying a cash reward when claimed. Tasks check game state, so only claims are saved.
 /// </summary>
 public class TaskController : ITaskController, IInitializable, ITickable
 {
 	private const float CheckInterval = 0.5f;
+	private const int MaxActiveTasks = 4;
 
 	private readonly IPlayerModel playerModel;
 	private readonly ISpaceModel spaceModel;
@@ -16,14 +18,11 @@ public class TaskController : ITaskController, IInitializable, ITickable
 	private readonly ResourceSettings resourceSettings;
 	private readonly SignalBus signalBus;
 
+	private readonly HashSet<int> claimedTasks = new HashSet<int>();
+	private readonly List<int> activeTasks = new List<int>();
 	private float checkTimer;
 
-	public int CurrentTaskIndex { get; private set; }
-	public int TaskCount => gameSettings.Tasks.Length;
-	public bool AreAllTasksCompleted => CurrentTaskIndex >= gameSettings.Tasks.Length;
-	public bool IsCurrentTaskCompleted => !AreAllTasksCompleted && GetProgress(CurrentTask) >= CurrentTask.TargetAmount;
-
-	private TaskSetting CurrentTask => gameSettings.Tasks[CurrentTaskIndex];
+	public bool AreAllTasksCompleted => claimedTasks.Count >= gameSettings.Tasks.Length;
 
 	public TaskController(
 		IPlayerModel playerModel,
@@ -44,10 +43,18 @@ public class TaskController : ITaskController, IInitializable, ITickable
 	public void Initialize()
 	{
 		SaveData save = saveService.Load();
-		if (save != null)
+		if (save != null && save.ClaimedTasks != null)
 		{
-			CurrentTaskIndex = Mathf.Clamp(save.CurrentTaskIndex, 0, gameSettings.Tasks.Length);
+			foreach (int index in save.ClaimedTasks)
+			{
+				if (index >= 0 && index < gameSettings.Tasks.Length)
+				{
+					claimedTasks.Add(index);
+				}
+			}
 		}
+
+		UpdateActiveTasks();
 	}
 
 	public void Tick()
@@ -64,31 +71,58 @@ public class TaskController : ITaskController, IInitializable, ITickable
 		signalBus.Fire<TaskUpdatedSignal>();
 	}
 
-	public void ClaimCurrentTask()
+	public IReadOnlyList<int> GetActiveTasks()
 	{
-		if (!IsCurrentTaskCompleted)
+		return activeTasks;
+	}
+
+	public int[] GetClaimedTasks()
+	{
+		int[] result = new int[claimedTasks.Count];
+		claimedTasks.CopyTo(result);
+		return result;
+	}
+
+	public bool HasClaimableTask()
+	{
+		foreach (int index in activeTasks)
+		{
+			if (IsTaskCompleted(index))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public bool IsTaskCompleted(int index)
+	{
+		TaskSetting task = gameSettings.Tasks[index];
+		return GetProgress(task) >= task.TargetAmount;
+	}
+
+	public void ClaimTask(int index)
+	{
+		if (!activeTasks.Contains(index) || !IsTaskCompleted(index))
 		{
 			return;
 		}
 
-		playerModel.AddMoney(CurrentTask.Reward);
-		CurrentTaskIndex++;
+		claimedTasks.Add(index);
+		playerModel.AddMoney(gameSettings.Tasks[index].Reward);
+		UpdateActiveTasks();
 		signalBus.Fire<TaskUpdatedSignal>();
 	}
 
-	public long GetCurrentTaskReward()
+	public long GetTaskReward(int index)
 	{
-		return AreAllTasksCompleted ? 0 : CurrentTask.Reward;
+		return gameSettings.Tasks[index].Reward;
 	}
 
-	public string GetCurrentTaskDescription()
+	public string GetTaskDescription(int index)
 	{
-		if (AreAllTasksCompleted)
-		{
-			return "All tasks completed!";
-		}
-
-		TaskSetting task = CurrentTask;
+		TaskSetting task = gameSettings.Tasks[index];
 		switch (task.Type)
 		{
 			case TaskType.UpgradePlanets:
@@ -108,25 +142,30 @@ public class TaskController : ITaskController, IInitializable, ITickable
 		}
 	}
 
-	public string GetCurrentTaskProgress()
+	public string GetTaskProgressText(int index)
 	{
-		if (AreAllTasksCompleted)
-		{
-			return "";
-		}
-
-		long progress = System.Math.Min(GetProgress(CurrentTask), CurrentTask.TargetAmount);
-		return $"{NumberFormatter.Format(progress)} / {NumberFormatter.Format(CurrentTask.TargetAmount)}";
+		TaskSetting task = gameSettings.Tasks[index];
+		long progress = System.Math.Min(GetProgress(task), task.TargetAmount);
+		return $"{NumberFormatter.Format(progress)} / {NumberFormatter.Format(task.TargetAmount)}";
 	}
 
-	public float GetCurrentTaskProgressRatio()
+	public float GetTaskProgressRatio(int index)
 	{
-		if (AreAllTasksCompleted)
-		{
-			return 1;
-		}
+		TaskSetting task = gameSettings.Tasks[index];
+		return Mathf.Clamp01((float)GetProgress(task) / task.TargetAmount);
+	}
 
-		return Mathf.Clamp01((float)GetProgress(CurrentTask) / CurrentTask.TargetAmount);
+	/// <summary>Active tasks are the first unclaimed ones, in the order they are defined.</summary>
+	private void UpdateActiveTasks()
+	{
+		activeTasks.Clear();
+		for (int i = 0; i < gameSettings.Tasks.Length && activeTasks.Count < MaxActiveTasks; i++)
+		{
+			if (!claimedTasks.Contains(i))
+			{
+				activeTasks.Add(i);
+			}
+		}
 	}
 
 	private long GetProgress(TaskSetting task)

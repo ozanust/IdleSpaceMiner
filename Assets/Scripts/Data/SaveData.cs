@@ -14,7 +14,7 @@ public class SaveData
     public SmeltingSaveData Smelting = new SmeltingSaveData();
     public CraftingSaveData Crafting = new CraftingSaveData();
     public long SavedAtUtcTicks;
-    public int CurrentTaskIndex;
+    public List<int> ClaimedTasks = new List<int>();
 }
 
 [Serializable]

@@ -134,7 +134,7 @@ public class SaveController : ITickable, IDisposable
         data.Smelting = BuildSmeltingSaveData();
         data.Crafting = BuildCraftingSaveData();
         data.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
-        data.CurrentTaskIndex = taskController.CurrentTaskIndex;
+        data.ClaimedTasks = new List<int>(taskController.GetClaimedTasks());
 
         return data;
     }
