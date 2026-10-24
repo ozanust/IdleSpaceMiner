@@ -13,6 +13,13 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 	public UnityEvent<int> OnClick;
 	private int index;
 
+	/// <summary>Planets stay hidden until a telescope reveals them.</summary>
+	public void Hide()
+	{
+		planetSpriteRenderer.enabled = false;
+		priceText.gameObject.SetActive(false);
+	}
+
     public void Unravel()
 	{
 		planetSpriteRenderer.enabled = true;

@@ -8,6 +8,9 @@ using Object = UnityEngine.Object;
 
 public class SpaceController : ISpaceController, ITickable, IDisposable
 {
+	private const int DefaultVisiblePlanets = 4;
+	private const int PlanetsPerTelescope = 3;
+
 	PlanetSettings planetSettings;
 	ISpaceModel spaceModel;
 	IPlayerModel playerModel;
@@ -82,7 +85,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	private void RestoreFromSave(SaveData save)
 	{
 		// --- Space state ---
-		spaceModel.InitializePlanetData(save.Space.Planets);
+		spaceModel.InitializePlanetData(AddMissingPlanets(save.Space.Planets));
 
 		// --- Player money ---
 		playerModel.AddMoney(save.Player.Money);
@@ -125,6 +128,8 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		foreach (ResearchType research in save.Player.UnlockedResearches)
 		{
 			playerModel.UnlockResearch(research);
+			// Saves from before a planet was added don't have it revealed yet
+			RevealTelescopePlanets(research);
 		}
 
 		// --- Smelter / crafter slot progression ---
@@ -199,39 +204,29 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 	private PlanetData[] GetSampleData()
 	{
-		PlanetData data = new PlanetData();
+		return AddMissingPlanets(new PlanetData[0]);
+	}
 
-		data.IsUnraveled = true;
-		data.PlanetIndex = 0;
-		data.MiningRateLevel = 0;
-		data.ShipCargoLevel = 0;
-		data.ShipSpeedLevel = 0;
+	/// <summary>Appends data for planets in the settings that the given data doesn't have yet.</summary>
+	private PlanetData[] AddMissingPlanets(PlanetData[] planets)
+	{
+		int planetCount = planetSettings.Settings.Length;
+		if (planets.Length >= planetCount)
+		{
+			return planets;
+		}
 
-		PlanetData data2 = new PlanetData();
+		PlanetData[] result = new PlanetData[planetCount];
+		System.Array.Copy(planets, result, planets.Length);
 
-		data2.IsUnraveled = true;
-		data2.PlanetIndex = 1;
-		data2.MiningRateLevel = 0;
-		data2.ShipCargoLevel = 0;
-		data2.ShipSpeedLevel = 0;
-		
-		PlanetData data3 = new PlanetData();
+		for (int i = planets.Length; i < planetCount; i++)
+		{
+			result[i] = new PlanetData();
+			result[i].PlanetIndex = i;
+			result[i].IsUnraveled = i < DefaultVisiblePlanets;
+		}
 
-		data3.IsUnraveled = false;
-		data3.PlanetIndex = 2;
-		data3.MiningRateLevel = 0;
-		data3.ShipCargoLevel = 0;
-		data3.ShipSpeedLevel = 0;
-		
-		PlanetData data4 = new PlanetData();
-
-		data4.IsUnraveled = false;
-		data4.PlanetIndex = 3;
-		data4.MiningRateLevel = 0;
-		data4.ShipCargoLevel = 0;
-		data4.ShipSpeedLevel = 0;
-
-		return new PlanetData[] { data, data2, data3, data4 };
+		return result;
 	}
 
 	private void OnAsteroidResearchUnlocked(ResearchCompletedSignal signal)
@@ -245,18 +240,29 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 	private void OnTelescopeResearchUnlocked(ResearchCompletedSignal signal)
 	{
-		if (signal.ResearchType < ResearchType.Telescope1 || signal.ResearchType > ResearchType.Telescope5)
+		RevealTelescopePlanets(signal.ResearchType);
+	}
+
+	/// <summary>
+	/// The first planets are visible from the start, then each telescope reveals the next few
+	/// (Telescope 1 reveals planets 5-7, Telescope 2 planets 8-10, like Idle Planet Miner).
+	/// </summary>
+	private void RevealTelescopePlanets(ResearchType research)
+	{
+		if (research < ResearchType.Telescope1 || research > ResearchType.Telescope5)
 		{
 			return;
 		}
 
-		// Planets 0 and 1 are visible from the start, each telescope reveals the next one
-		int planetIndex = signal.ResearchType - ResearchType.Telescope1 + 2;
+		int firstPlanet = DefaultVisiblePlanets + (research - ResearchType.Telescope1) * PlanetsPerTelescope;
 		PlanetData[] planetData = spaceModel.GetPlanetsData();
 
-		if (planetIndex < planetData.Length && !planetData[planetIndex].IsUnraveled)
+		for (int i = firstPlanet; i < firstPlanet + PlanetsPerTelescope && i < planetData.Length; i++)
 		{
-			spaceModel.UnravelPlanet(planetIndex);
+			if (!planetData[i].IsUnraveled)
+			{
+				spaceModel.UnravelPlanet(i);
+			}
 		}
 	}
 

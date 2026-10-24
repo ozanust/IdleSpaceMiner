@@ -85,6 +85,10 @@ public class SpaceView : MonoBehaviour
 			{
 				planets[planetIndex].Unravel();
 			}
+			else
+			{
+				planets[planetIndex].Hide();
+			}
 
 			if (data[i].IsUnlocked)
 			{
