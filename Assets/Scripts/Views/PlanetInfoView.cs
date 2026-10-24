@@ -90,7 +90,7 @@ public class PlanetInfoView : MonoBehaviour
 		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 		{
 			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate), "sec");
+			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate * miningController.MiningRateMultiplier), "sec");
 			miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
 
 			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
@@ -113,13 +113,13 @@ public class PlanetInfoView : MonoBehaviour
 			{
 				MiningInfoItem item = Instantiate(miningInfoItemPrototype, miningInfoPanel.transform);
 				ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
-				item.Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * pmd.Ratio, pmd.MinedAmount);
+				item.Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * miningController.MiningRateMultiplier * pmd.Ratio, pmd.MinedAmount);
 				infoItems.Add(pmd.Type, item);
 			}
 			else
 			{
 				ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
-				infoItems[pmd.Type].Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * pmd.Ratio, pmd.MinedAmount);
+				infoItems[pmd.Type].Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * miningController.MiningRateMultiplier * pmd.Ratio, pmd.MinedAmount);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class PlanetInfoView : MonoBehaviour
 		foreach (ResourceMiningData pmd in mineDatas)
 		{
 			ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
-			infoItems[pmd.Type].UpdateMiningRate(data.TotalMineRate * pmd.Ratio);
+			infoItems[pmd.Type].UpdateMiningRate(data.TotalMineRate * miningController.MiningRateMultiplier * pmd.Ratio);
 		}
 	}
 
@@ -144,7 +144,7 @@ public class PlanetInfoView : MonoBehaviour
 		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 		{
 			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate), "sec");
+			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate * miningController.MiningRateMultiplier), "sec");
 			miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
 
 			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);

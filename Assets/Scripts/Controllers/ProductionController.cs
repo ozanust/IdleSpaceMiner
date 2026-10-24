@@ -208,8 +208,10 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	{
 		switch (signal.ResearchType)
 		{
+			// Furnace upgrades stack
 			case ResearchType.AdvancedFurnace:
-				smeltSpeed = 1.2f;
+			case ResearchType.SuperiorFurnace:
+				smeltSpeed *= 1.2f;
 				break;
 			case ResearchType.AdvancedCrafter:
 				craftSpeed = 1.2f;

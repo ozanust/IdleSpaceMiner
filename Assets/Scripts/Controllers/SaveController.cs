@@ -146,6 +146,7 @@ public class SaveController : ITickable, IDisposable
         playerData.Money = playerModel.GetMoney();
         playerData.LastUnlockedSmelterId = playerModel.GetLastUnlockedSmelterId();
         playerData.LastUnlockedCrafterId = playerModel.GetLastUnlockedCrafterId();
+        playerData.AsteroidsDestroyed = playerModel.AsteroidsDestroyed;
         playerData.UnlockedCrafters = playerModel.GetUnlockedCrafters();
         playerData.UnlockedSmelters = playerModel.GetUnlockedSmelters();
 

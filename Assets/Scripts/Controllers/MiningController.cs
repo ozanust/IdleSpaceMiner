@@ -12,14 +12,19 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	private SignalBus signalBus;
 	private Dictionary<int, MiningData> mineData = new Dictionary<int, MiningData>();
 	private Dictionary<int, TransferResourcesData[]> transferData = new Dictionary<int, TransferResourcesData[]>();
+	private ResourceSettings resourceSettings;
 
-	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, IPlayerModel playerModel, ISpaceModel spaceModel)
+	public float MiningRateMultiplier { get; private set; } = 1f;
+
+	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel)
 	{
 		this.signalBus = signalBus;
 		this.planetSettings = planetSettings;
+		this.resourceSettings = resourceSettings;
 		this.playerModel = playerModel;
 		this.spaceModel = spaceModel;
 
+		this.signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 		this.signalBus.Subscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		this.signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
@@ -30,6 +35,7 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	/// <summary>Unsubscribes from all signals.</summary>
 	public void Dispose()
 	{
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
 		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
 		signalBus.Unsubscribe<CargoShipPlanetArrivalSignal>(OnCargoArrivedPlanet);
@@ -126,9 +132,31 @@ public class MiningController : IMiningController, ITickable, IDisposable
 		{
 			for (int i = 0; i < md.MineDatas.Length; i++)
 			{
-				md.MineDatas[i].MinedAmount += md.TotalMineRate * md.MineDatas[i].Ratio * Time.deltaTime;
+				md.MineDatas[i].MinedAmount += md.TotalMineRate * MiningRateMultiplier * md.MineDatas[i].Ratio * Time.deltaTime;
 			}
 		}
+	}
+
+	private void OnResearchCompleted(ResearchCompletedSignal signal)
+	{
+		if (signal.ResearchType == ResearchType.Management)
+		{
+			MiningRateMultiplier = 1.1f;
+		}
+	}
+
+	public float GetValuePerSecond()
+	{
+		float total = 0f;
+		foreach (MiningData md in mineData.Values)
+		{
+			foreach (ResourceMiningData resource in md.MineDatas)
+			{
+				total += md.TotalMineRate * MiningRateMultiplier * resource.Ratio * resourceSettings.GetResourceValue(resource.Type);
+			}
+		}
+
+		return total;
 	}
 
 	public TransferResourcesData[] TransferResources(int planetId, int amount)

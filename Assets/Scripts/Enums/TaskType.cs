@@ -5,5 +5,7 @@ public enum TaskType
 	UnlockPlanets = 2,
 	Research = 3,
 	HaveSmelters = 4,
-	HaveMoney = 5
+	HaveMoney = 5,
+	DestroyAsteroids = 6,
+	HaveCrafters = 7
 }

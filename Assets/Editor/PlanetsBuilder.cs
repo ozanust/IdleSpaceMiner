@@ -3,7 +3,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Adds the planets revealed by Telescope 1 (Verr, Newton, Widow) to GameScene as Planet.prefab
+/// Adds the planets revealed by telescopes (Telescope 1: Verr, Newton, Widow, Telescope 2: Acheron,
+/// Yangtze, Solveig) to GameScene as Planet.prefab
 /// instances, styled like the existing planets, and registers them in SpaceView in planet id order.
 /// Running it again only moves planets that already exist back to their default position.
 /// </summary>
@@ -18,6 +19,9 @@ public static class PlanetsBuilder
 		("Planet (4)", new Vector3(-11f, -5f, 0f)),    // Verr
 		("Planet (5)", new Vector3(11.5f, 6f, 0f)),    // Newton
 		("Planet (6)", new Vector3(-9.5f, -19f, 0f)),  // Widow
+		("Planet (7)", new Vector3(-1.5f, 20f, 0f)),   // Acheron, Telescope 2
+		("Planet (8)", new Vector3(2.5f, 9.5f, 0f)),   // Yangtze
+		("Planet (9)", new Vector3(-0.5f, -20.5f, 0f)), // Solveig
 	};
 
 	// Existing planets that sat outside the default camera view
@@ -26,7 +30,7 @@ public static class PlanetsBuilder
 		("Planet (2)", new Vector3(1.5f, -13.5f, 0f)), // Anadius, was behind the nav bar
 	};
 
-	[MenuItem("Tools/Planets/Add Telescope 1 Planets")]
+	[MenuItem("Tools/Planets/Add Telescope Planets")]
 	public static void BuildInOpenScene()
 	{
 		Build();

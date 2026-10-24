@@ -21,7 +21,7 @@ public class AsteroidView : MonoBehaviour, IPointerClickHandler
 	{
 		if (collision.gameObject.tag == "Missile")
 		{
-			signalBus.Fire(new AsteroidDestroyedSignal() { AsteroidId = id });
+			signalBus.Fire(new AsteroidDestroyedSignal() { AsteroidId = id, Position = transform.position });
 			Destroy(this.gameObject);
 		}
 	}

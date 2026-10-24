@@ -23,6 +23,8 @@ public interface IPlayerModel
     int GetLastUnlockedSmelterId();
     void UnlockCrafter(int smelterId);
     int GetLastUnlockedCrafterId();
+    int AsteroidsDestroyed { get; }
+    void AddDestroyedAsteroids(int count);
     void UnlockAlloy(AlloyType type);
     void UnlockItemRecipe(ResourceType type);
     ResourceType[] GetUnlockedItemRecipes();

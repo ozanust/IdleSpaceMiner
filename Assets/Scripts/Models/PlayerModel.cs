@@ -420,6 +420,13 @@ public class PlayerModel : IPlayerModel
 		return lastUnlockedCrafterId;
 	}
 
+	public int AsteroidsDestroyed { get; private set; }
+
+	public void AddDestroyedAsteroids(int count)
+	{
+		AsteroidsDestroyed += count;
+	}
+
 	public void SetTargetSmelter(int smelterId)
 	{
 		recipeSelectionTargetSmelter = smelterId;

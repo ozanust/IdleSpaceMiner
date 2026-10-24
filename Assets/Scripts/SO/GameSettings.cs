@@ -33,6 +33,8 @@ public class GlobalSettings
 	// Mining speed while the game is not running, relative to normal speed
 	public float OfflineMiningMultiplier;
 	public int MaxOfflineSeconds;
+	// An asteroid holds this many seconds worth of all planets' mining
+	public float AsteroidRewardSeconds;
 }
 
 /// <summary>One step of the guided task chain. Only the fields matching Type are used.</summary>

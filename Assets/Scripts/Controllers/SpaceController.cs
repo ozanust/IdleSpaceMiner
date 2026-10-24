@@ -8,8 +8,8 @@ using Object = UnityEngine.Object;
 
 public class SpaceController : ISpaceController, ITickable, IDisposable
 {
-	private const int DefaultVisiblePlanets = 4;
-	private const int PlanetsPerTelescope = 3;
+	public const int DefaultVisiblePlanets = 4;
+	public const int PlanetsPerTelescope = 3;
 
 	PlanetSettings planetSettings;
 	ISpaceModel spaceModel;
@@ -20,6 +20,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	IMiningController miningController;
 	SaveController saveController;
 	IOfflineProgressController offlineProgressController;
+	ResourceSettings resourceSettings;
 	AsteroidView asteroidPrototype;
 	MissileView missilePrototype;
 
@@ -27,9 +28,12 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	int nextAsteroidSpawnTime;
 	float asteroidSpawnTimer;
 	int asteroidNumber = -1;
+	// Only one asteroid at a time, the next one waits until this one is mined
+	int activeAsteroidId = -1;
 
 	public SpaceController(
 		PlanetSettings planetSettings,
+		ResourceSettings resourceSettings,
 		ISpaceModel spaceModel,
 		IPlayerModel playerModel,
 		GameSettings gameSettings,
@@ -42,6 +46,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		MissileView missileView)
 	{
 		this.planetSettings = planetSettings;
+		this.resourceSettings = resourceSettings;
 		this.spaceModel = spaceModel;
 		this.playerModel = playerModel;
 		this.gameSettings = gameSettings;
@@ -89,6 +94,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 		// --- Player money ---
 		playerModel.AddMoney(save.Player.Money);
+		playerModel.AddDestroyedAsteroids(save.Player.AsteroidsDestroyed);
 
 		// --- Resources ---
 		foreach (ResourceSaveEntry entry in save.Player.Resources)
@@ -272,9 +278,49 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		foreach (ResourceData rd in rewards)
 		{
 			playerModel.AddResource(rd.Type, rd.Amount);
+
+			ResourceDataSetting resource = resourceSettings.GetResourceData(rd.Type);
+			string name = resource != null ? resource.Name : rd.Type.ToString();
+			FloatingTextView.Spawn($"+{NumberFormatter.Format(rd.Amount)} {name}", signal.Position, new Color(0.6f, 1f, 0.6f));
 		}
 
 		spaceModel.RemoveAsteroidData(signal.AsteroidId);
+		playerModel.AddDestroyedAsteroids(1);
+
+		if (signal.AsteroidId == activeAsteroidId)
+		{
+			activeAsteroidId = -1;
+		}
+	}
+
+	/// <summary>
+	/// Like Idle Planet Miner, an asteroid is worth a fixed number of seconds of all planets'
+	/// mining, paid out in one random ore that the bought planets produce.
+	/// </summary>
+	private ResourceData CreateAsteroidReward()
+	{
+		List<ResourceType> ores = new List<ResourceType>();
+		foreach (PlanetData planet in spaceModel.GetPlanetsData())
+		{
+			PlanetDataSetting setting;
+			if (!planet.IsUnlocked || !planetSettings.TryGetPlanetSetting(planet.PlanetIndex, out setting))
+			{
+				continue;
+			}
+
+			foreach (PlanetMiningYield yield in setting.MiningYieldRatios)
+			{
+				if (!ores.Contains(yield.Type))
+				{
+					ores.Add(yield.Type);
+				}
+			}
+		}
+
+		ResourceType ore = ores.Count > 0 ? ores[Random.Range(0, ores.Count)] : ResourceType.Copper;
+		float value = gameSettings.GlobalSettings.AsteroidRewardSeconds * miningController.GetValuePerSecond();
+		int amount = Mathf.Max(1, Mathf.RoundToInt(value / Mathf.Max(1, resourceSettings.GetResourceValue(ore))));
+		return new ResourceData(ore, amount);
 	}
 
 	/// <summary>Unsubscribes from all signals.</summary>
@@ -329,7 +375,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 	public void Tick()
 	{
-		if (isAsteroidMinerUnlocked)
+		if (isAsteroidMinerUnlocked && activeAsteroidId < 0)
 		{
 			asteroidSpawnTimer += Time.deltaTime;
 			if (asteroidSpawnTimer >= nextAsteroidSpawnTime)
@@ -346,8 +392,10 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 				asteroid.OnClick.AddListener(OnClickAsteroid);
 				asteroid.gameObject.SetActive(true);
 
-				AsteroidData data = new AsteroidData(new ResourceData[] { new ResourceData(ResourceType.Copper, Mathf.RoundToInt(playerModel.GetResource(ResourceType.Copper) * 0.2f)), new ResourceData(ResourceType.Iron, Mathf.RoundToInt(playerModel.GetResource(ResourceType.Iron) * 0.2f)) });
+				// The reward is fixed when the asteroid appears, so hoarding ore doesn't change it
+				AsteroidData data = new AsteroidData(new ResourceData[] { CreateAsteroidReward() });
 				spaceModel.AddAsteroidData(data, id);
+				activeAsteroidId = id;
 				
 				nextAsteroidSpawnTime = Random.Range(gameSettings.GlobalSettings.AsteroidSpawnTimes[0], gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
 				asteroidSpawnTimer = 0;

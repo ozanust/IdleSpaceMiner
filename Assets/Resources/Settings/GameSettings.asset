@@ -19,6 +19,7 @@ MonoBehaviour:
     AsteroidSpawnTimes: 780000002c010000
     OfflineMiningMultiplier: 0.22
     MaxOfflineSeconds: 7200
+    AsteroidRewardSeconds: 130
   tasks:
   - Type: 0
     TargetAmount: 5
@@ -41,6 +42,11 @@ MonoBehaviour:
     Research: 1
     Reward: 300
   - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 0
+    Reward: 300
+  - Type: 6
     TargetAmount: 1
     Resource: 0
     Research: 0
@@ -80,6 +86,16 @@ MonoBehaviour:
     Resource: 0
     Research: 0
     Reward: 1000
+  - Type: 2
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 2000
+  - Type: 6
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 2000
   - Type: 3
     TargetAmount: 1
     Resource: 0
@@ -90,6 +106,11 @@ MonoBehaviour:
     Resource: 10
     Research: 0
     Reward: 2000
+  - Type: 2
+    TargetAmount: 7
+    Resource: 0
+    Research: 0
+    Reward: 5000
   - Type: 1
     TargetAmount: 3
     Resource: 7
@@ -101,6 +122,11 @@ MonoBehaviour:
     Research: 0
     Reward: 10000
   - Type: 1
+    TargetAmount: 5
+    Resource: 8
+    Research: 0
+    Reward: 8000
+  - Type: 1
     TargetAmount: 1
     Resource: 12
     Research: 0
@@ -110,8 +136,68 @@ MonoBehaviour:
     Resource: 0
     Research: 9
     Reward: 10000
-  - Type: 5
-    TargetAmount: 100000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 14
+    Research: 0
+    Reward: 20000
+  - Type: 0
+    TargetAmount: 100
+    Resource: 0
+    Research: 0
+    Reward: 15000
+  - Type: 2
+    TargetAmount: 8
     Resource: 0
     Research: 0
     Reward: 25000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 5
+    Reward: 25000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 13
+    Research: 0
+    Reward: 30000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 9
+    Research: 0
+    Reward: 30000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 7
+    Reward: 30000
+  - Type: 2
+    TargetAmount: 10
+    Resource: 0
+    Research: 0
+    Reward: 60000
+  - Type: 6
+    TargetAmount: 15
+    Resource: 0
+    Research: 0
+    Reward: 20000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 4
+    Reward: 50000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 6
+    Reward: 60000
+  - Type: 4
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 100000
+  - Type: 5
+    TargetAmount: 1000000
+    Resource: 0
+    Research: 0
+    Reward: 250000

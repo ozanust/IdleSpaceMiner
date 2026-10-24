@@ -30,6 +30,7 @@ public class PlayerSaveData
     public int[] UnlockedCrafters;
     public int LastUnlockedSmelterId;
     public int LastUnlockedCrafterId;
+    public int AsteroidsDestroyed;
 }
 
 [Serializable]

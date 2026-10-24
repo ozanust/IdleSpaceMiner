@@ -137,6 +137,10 @@ public class TaskController : ITaskController, IInitializable, ITickable
 				return $"Build {task.TargetAmount} smelters";
 			case TaskType.HaveMoney:
 				return $"Have {NumberFormatter.FormatMoney(task.TargetAmount)}";
+			case TaskType.DestroyAsteroids:
+				return task.TargetAmount == 1 ? "Mine an asteroid" : $"Mine {task.TargetAmount} asteroids";
+			case TaskType.HaveCrafters:
+				return $"Build {task.TargetAmount} crafters";
 			default:
 				return task.Type.ToString();
 		}
@@ -185,6 +189,11 @@ public class TaskController : ITaskController, IInitializable, ITickable
 				return playerModel.IsResearchUnlocked(ResearchType.Smelter) ? playerModel.GetLastUnlockedSmelterId() + 1 : 0;
 			case TaskType.HaveMoney:
 				return playerModel.GetMoney();
+			case TaskType.DestroyAsteroids:
+				return playerModel.AsteroidsDestroyed;
+			case TaskType.HaveCrafters:
+				// Crafter 0 comes with the Crafter research, ids are unlocked in order
+				return playerModel.IsResearchUnlocked(ResearchType.Crafter) ? playerModel.GetLastUnlockedCrafterId() + 1 : 0;
 			default:
 				return 0;
 		}

@@ -16,6 +16,7 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 	private readonly IPlayerModel playerModel;
 	private readonly ISpaceModel spaceModel;
 	private readonly IProductionController productionController;
+	private readonly IMiningController miningController;
 	private readonly PlanetSettings planetSettings;
 	private readonly GameSettings gameSettings;
 
@@ -26,12 +27,14 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 		IPlayerModel playerModel,
 		ISpaceModel spaceModel,
 		IProductionController productionController,
+		IMiningController miningController,
 		PlanetSettings planetSettings,
 		GameSettings gameSettings)
 	{
 		this.playerModel = playerModel;
 		this.spaceModel = spaceModel;
 		this.productionController = productionController;
+		this.miningController = miningController;
 		this.planetSettings = planetSettings;
 		this.gameSettings = gameSettings;
 	}
@@ -86,7 +89,7 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 			return;
 		}
 
-		float miningSeconds = seconds * gameSettings.GlobalSettings.OfflineMiningMultiplier;
+		float miningSeconds = seconds * gameSettings.GlobalSettings.OfflineMiningMultiplier * miningController.MiningRateMultiplier;
 
 		foreach (PlanetData planet in planets)
 		{
