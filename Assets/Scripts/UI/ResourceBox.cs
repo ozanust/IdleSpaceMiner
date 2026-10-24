@@ -17,12 +17,12 @@ public class ResourceBox : MonoBehaviour
 	{
         this.type = type;
         resourceNameText.text = name;
-        resourceAmountText.text = amount.ToString();
+        resourceAmountText.text = NumberFormatter.Format(amount);
         resourceIconImage.sprite = icon;
 	}
 
     public void UpdateAmount(int amount)
 	{
-        resourceAmountText.text = amount.ToString();
+        resourceAmountText.text = NumberFormatter.Format(amount);
 	}
 }

@@ -24,8 +24,8 @@ public class ResourceInfoItem : MonoBehaviour
 
     public void UpdateAmount(int resourceAmount, long totalValue)
 	{
-        resourceAmountText.text = resourceAmount.ToString();
-        resourceTotalValueText.text = totalValue.ToString();
+        resourceAmountText.text = NumberFormatter.Format(resourceAmount);
+        resourceTotalValueText.text = NumberFormatter.Format(totalValue);
 	}
 
     public void SetSelectionButtonAction(Action onClick)

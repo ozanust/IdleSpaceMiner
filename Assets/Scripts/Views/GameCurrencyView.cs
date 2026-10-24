@@ -39,7 +39,7 @@ public class GameCurrencyView : MonoBehaviour
 
 	private void OnCurrencyUpdated()
 	{
-		moneyText.text = playerModel.GetMoney().ToString();
+		moneyText.text = NumberFormatter.Format(playerModel.GetMoney());
 		darkMatterText.text = playerModel.GetCurrency(CurrencyType.DarkMatter).ToString();
 		specialCurrencyText.text = playerModel.GetCurrency(CurrencyType.Special).ToString();
 	}

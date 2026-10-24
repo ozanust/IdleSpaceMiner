@@ -27,7 +27,7 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 
 	public void SetPrice(long price)
 	{
-		priceText.text = string.Format("{0}{1}", "$", price.ToString());
+		priceText.text = NumberFormatter.FormatMoney(price);
 	}
 
 	public void SetPlanetIcon(Sprite icon)

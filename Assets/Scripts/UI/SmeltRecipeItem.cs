@@ -79,10 +79,10 @@ public class SmeltRecipeItem : MonoBehaviour
 			AlloySmeltSettings settings = resourceSettings.GetSmeltSetting(targetAlloyType);
 			price = settings.PriceToUnlock;
 			durationText.text = settings.TimeToSmelt.ToString();
-			sourceNeededAmountText.text = settings.ResourceNeeded.ToString();
+			sourceNeededAmountText.text = NumberFormatter.Format(settings.ResourceNeeded);
 			sourceImage.sprite = resourceSettings.GetResourceData(AlloyToResourceConverter.ConvertToRaw(targetAlloyType)).Icon;
 			targetImage.sprite = resourceSettings.GetAlloyData(targetAlloyType).Icon;
-			priceText.text = price.ToString();
+			priceText.text = NumberFormatter.Format(price);
 			iconImage.sprite = resourceSettings.GetAlloyData(targetAlloyType).Icon;
 			titleText.text = resourceSettings.GetAlloyData(targetAlloyType).Name;
 		}
@@ -91,7 +91,7 @@ public class SmeltRecipeItem : MonoBehaviour
 			ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(targetResourceType);
 			price = settings.PriceToUnlock;
 			durationText.text = settings.TimeToSmelt.ToString();
-			priceText.text = price.ToString();
+			priceText.text = NumberFormatter.Format(price);
 
 			ResearchNeededResource[] resources = settings.NeededResources;
 			if (resources.Length > 1)

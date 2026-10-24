@@ -59,7 +59,7 @@ public class CrafterItem : MonoBehaviour
 
     public void SetSmelterUnlockPrice(long price)
     {
-        smelterUnlockPriceText.text = price.ToString() + "$";
+        smelterUnlockPriceText.text = NumberFormatter.FormatMoney(price);
     }
     
     private void OnClickUnlockButton()

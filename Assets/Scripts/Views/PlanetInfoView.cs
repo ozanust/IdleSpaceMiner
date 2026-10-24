@@ -88,16 +88,16 @@ public class PlanetInfoView : MonoBehaviour
 		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 		{
 			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", planetData.CurrentTotalMiningRate, "sec");
-			miningRateUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.TotalMiningRateUpdatePrice);
+			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate), "sec");
+			miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
 
 			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-			shipSpeedText.text = string.Format("{0} {1}", planetData.CurrentShipSpeed, "mkph");
-			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipSpeedUpdatePrice);
+			shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed), "mkph");
+			shipSpeedUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipSpeedUpdatePrice);
 
 			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
-			shipCargoText.text = planetData.CurrentShipCargo.ToString();
-			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipCargoUpdatePrice);
+			shipCargoText.text = NumberFormatter.Format(planetData.CurrentShipCargo);
+			shipCargoUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipCargoUpdatePrice);
 		}
 
 		panel.SetActive(true);
@@ -142,16 +142,16 @@ public class PlanetInfoView : MonoBehaviour
 		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 		{
 			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", planetData.CurrentTotalMiningRate, "sec");
-			miningRateUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.TotalMiningRateUpdatePrice);
+			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate), "sec");
+			miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
 
 			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-			shipSpeedText.text = string.Format("{0} {1}", planetData.CurrentShipSpeed, "mkph");
-			shipSpeedUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipSpeedUpdatePrice);
+			shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed), "mkph");
+			shipSpeedUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipSpeedUpdatePrice);
 
 			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
-			shipCargoText.text = planetData.CurrentShipCargo.ToString();
-			shipCargoUpdatePriceText.text = string.Format("{0}{1}", "$", planetData.ShipCargoUpdatePrice);
+			shipCargoText.text = NumberFormatter.Format(planetData.CurrentShipCargo);
+			shipCargoUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipCargoUpdatePrice);
 		}
 
 		MiningData tempData;

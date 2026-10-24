@@ -53,15 +53,15 @@ public class ResourcesSellView : MonoBehaviour
 
         sellResourceSlider.maxValue = selectedTotalResourceAmount;
         sellResourceSlider.value = selectedTotalResourceAmount;
-        sellingAmountText.text = selectedTotalResourceAmount.ToString();
-        sellingAmountValueText.text = string.Format("{0}{1}", "$", selectedTotalResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
+        sellingAmountText.text = NumberFormatter.Format(selectedTotalResourceAmount);
+        sellingAmountValueText.text = NumberFormatter.FormatMoney(selectedTotalResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
     }
 
     private void OnSellingSliderMoved(float value)
 	{
         currentSelectedResourceAmount = Mathf.RoundToInt(value);
-        sellingAmountText.text = currentSelectedResourceAmount.ToString();
-        sellingAmountValueText.text = string.Format("{0}{1}", "$", currentSelectedResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
+        sellingAmountText.text = NumberFormatter.Format(currentSelectedResourceAmount);
+        sellingAmountValueText.text = NumberFormatter.FormatMoney(currentSelectedResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
     }
 
     private void OnResourceDeselected()
