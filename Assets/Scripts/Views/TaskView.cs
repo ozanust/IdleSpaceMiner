@@ -14,6 +14,10 @@ public class TaskView : MonoBehaviour
 	[SerializeField] private TMP_Text rewardText;
 	[SerializeField] private Button claimButton;
 
+	[Header("Optional")]
+	[SerializeField] private Slider progressSlider;
+	[SerializeField] private TMP_Text taskCounterText;
+
 	private void Awake()
 	{
 		signalBus.Subscribe<TaskUpdatedSignal>(Refresh);
@@ -46,5 +50,17 @@ public class TaskView : MonoBehaviour
 
 		claimButton.gameObject.SetActive(hasTask);
 		claimButton.interactable = taskController.IsCurrentTaskCompleted;
+
+		if (progressSlider != null)
+		{
+			progressSlider.gameObject.SetActive(hasTask);
+			progressSlider.value = taskController.GetCurrentTaskProgressRatio();
+		}
+
+		if (taskCounterText != null)
+		{
+			taskCounterText.gameObject.SetActive(hasTask);
+			taskCounterText.text = $"Task {taskController.CurrentTaskIndex + 1} / {taskController.TaskCount}";
+		}
 	}
 }

@@ -19,6 +19,7 @@ public class TaskController : ITaskController, IInitializable, ITickable
 	private float checkTimer;
 
 	public int CurrentTaskIndex { get; private set; }
+	public int TaskCount => gameSettings.Tasks.Length;
 	public bool AreAllTasksCompleted => CurrentTaskIndex >= gameSettings.Tasks.Length;
 	public bool IsCurrentTaskCompleted => !AreAllTasksCompleted && GetProgress(CurrentTask) >= CurrentTask.TargetAmount;
 
@@ -116,6 +117,16 @@ public class TaskController : ITaskController, IInitializable, ITickable
 
 		long progress = System.Math.Min(GetProgress(CurrentTask), CurrentTask.TargetAmount);
 		return $"{NumberFormatter.Format(progress)} / {NumberFormatter.Format(CurrentTask.TargetAmount)}";
+	}
+
+	public float GetCurrentTaskProgressRatio()
+	{
+		if (AreAllTasksCompleted)
+		{
+			return 1;
+		}
+
+		return Mathf.Clamp01((float)GetProgress(CurrentTask) / CurrentTask.TargetAmount);
 	}
 
 	private long GetProgress(TaskSetting task)
