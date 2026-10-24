@@ -32,6 +32,7 @@ public class ResourcesView : MonoBehaviour
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
+		TutorialTarget.Mark(closeButton.gameObject, TutorialTargetId.ResourcesCloseButton);
 		oreButton.onClick.AddListener(OnOreSelected);
 		alloyButton.onClick.AddListener(OnAlloySelected);
 		itemButton.onClick.AddListener(OnItemSelected);
@@ -61,17 +62,9 @@ public class ResourcesView : MonoBehaviour
 
 	private void OnResourcesInitialized(ResourcesViewInitializedSignal signal)
 	{
-		foreach(ResourceType rt in signal.ResourcesToInitialize.Keys)
+		foreach (ResourceType rt in signal.ResourcesToInitialize.Keys)
 		{
-			if (!infoItems.ContainsKey(rt))
-			{
-				MainResourceType mainType = resourceSettings.GetResourceParentType(rt);
-				ResourceInfoItem infoItem = Instantiate(infoItemPrototype, GetResourceParent(mainType));
-				ResourceDataSetting resourceData = resourceSettings.GetResourceData(rt);
-				infoItem.InitializeResource(resourceData.Icon, resourceData.Name);
-
-				infoItems.Add(rt, infoItem);
-			}
+			UpdateItem(rt);
 		}
 	}
 
@@ -79,22 +72,29 @@ public class ResourcesView : MonoBehaviour
 	{
 		foreach (ResourceType rt in signal.ResourcesToUpdate.Keys)
 		{
-			if (!infoItems.ContainsKey(rt))
-			{
-				MainResourceType mainType = resourceSettings.GetResourceParentType(rt);
-				ResourceInfoItem infoItem = Instantiate(infoItemPrototype, GetResourceParent(mainType));
-				ResourceDataSetting resourceData = resourceSettings.GetResourceData(rt);
-				infoItem.InitializeResource(resourceData.Icon, resourceData.Name);
-				infoItem.UpdateAmount(playerModel.GetResource(rt), playerModel.GetResource(rt) * resourceSettings.GetResourceValue(rt));
-				infoItem.SetSelectionButtonAction(() => OnSelectResourceItem(rt));
-
-				infoItems.Add(rt, infoItem);
-			}
-			else
-			{
-				infoItems[rt].UpdateAmount(playerModel.GetResource(rt), playerModel.GetResource(rt) * resourceSettings.GetResourceValue(rt));
-			}
+			UpdateItem(rt);
 		}
+	}
+
+	// Rows made for loaded resources need the sell selection too, or they can't be sold
+	private void UpdateItem(ResourceType rt)
+	{
+		if (!infoItems.ContainsKey(rt))
+		{
+			MainResourceType mainType = resourceSettings.GetResourceParentType(rt);
+			ResourceInfoItem infoItem = Instantiate(infoItemPrototype, GetResourceParent(mainType));
+			ResourceDataSetting resourceData = resourceSettings.GetResourceData(rt);
+			infoItem.InitializeResource(resourceData.Icon, resourceData.Name);
+			infoItem.SetSelectionButtonAction(() => OnSelectResourceItem(rt));
+			if (rt == ResourceType.Copper)
+			{
+				TutorialTarget.Mark(infoItem.gameObject, TutorialTargetId.CopperResource);
+			}
+
+			infoItems.Add(rt, infoItem);
+		}
+
+		infoItems[rt].UpdateAmount(playerModel.GetResource(rt), playerModel.GetResource(rt) * resourceSettings.GetResourceValue(rt));
 	}
 
 	private void OnSelectResourceItem(ResourceType type)

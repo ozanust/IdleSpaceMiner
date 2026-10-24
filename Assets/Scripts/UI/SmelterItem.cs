@@ -38,6 +38,8 @@ public class SmelterItem : MonoBehaviour
         setRecipeButton.onClick.AddListener(OnClickSetRecipe);
         cancelRecipeButton.onClick.AddListener(OnClickRemoveRecipe);
         unlockButton.onClick.AddListener(OnClickUnlockButton);
+        TutorialTarget.Mark(setRecipeButton.gameObject, TutorialTargetId.SmelterRecipeButton);
+        TutorialTarget.Mark(unlockButton.gameObject, TutorialTargetId.SmelterUnlockButton);
     }
 
 	private void Update()

@@ -74,6 +74,9 @@ public class SpaceView : MonoBehaviour
 			planets[i].SetPrice(setting.PlanetPrice);
 			planets[i].SetPlanetIcon(setting.Icon);
 		}
+
+		TutorialTarget.Mark(planets[0].gameObject, TutorialTargetId.FirstPlanet);
+		TutorialTarget.Mark(planets[1].gameObject, TutorialTargetId.SecondPlanet);
 	}
 
 	private void InitializePlanetData(PlanetData[] data)

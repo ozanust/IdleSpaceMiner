@@ -18,6 +18,11 @@ public class TasksButton : MonoBehaviour
 	private void Awake()
 	{
 		button.onClick.AddListener(OnClick);
+		if (type == MenuType.Tasks)
+		{
+			TutorialTarget.Mark(button.gameObject, TutorialTargetId.TasksButton);
+		}
+
 		signalBus.Subscribe<TaskUpdatedSignal>(OnTaskUpdated);
 	}
 

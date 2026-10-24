@@ -21,6 +21,10 @@ public class ResearchItem : MonoBehaviour
 	private void Awake()
 	{
 		button.onClick.AddListener(OnClickButton);
+		if (type == ResearchType.Smelter)
+		{
+			TutorialTarget.Mark(button.gameObject, TutorialTargetId.SmelterResearch);
+		}
 	}
 
 	private void Start()

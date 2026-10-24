@@ -31,6 +31,7 @@ public class ResourcesSellView : MonoBehaviour
         signalBus.Subscribe<ResourceDeselectedToSellSignal>(OnResourceDeselectedToSell);
         sellResourceSlider.onValueChanged.AddListener(OnSellingSliderMoved);
         sellButton.onClick.AddListener(OnSellButtonClicked);
+        TutorialTarget.Mark(sellButton.gameObject, TutorialTargetId.SellButton);
 	}
 
 	private void OnDestroy()

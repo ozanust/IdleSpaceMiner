@@ -28,6 +28,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<IGoalProgressService>().To<GoalProgressService>().AsSingle();
 		Container.BindInterfacesTo<TaskController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<AchievementController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<TutorialController>().AsSingle().NonLazy();
 		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
 	}
 

@@ -18,6 +18,7 @@ public class SaveController : ITickable, IDisposable
     private readonly ITaskController taskController;
     private readonly IAchievementController achievementController;
     private readonly IManagerController managerController;
+    private readonly ITutorialController tutorialController;
     private readonly SignalBus signalBus;
 
     private float autoSaveTimer;
@@ -36,6 +37,7 @@ public class SaveController : ITickable, IDisposable
         ITaskController taskController,
         IAchievementController achievementController,
         IManagerController managerController,
+        ITutorialController tutorialController,
         SignalBus signalBus)
     {
         this.saveService = saveService;
@@ -45,6 +47,7 @@ public class SaveController : ITickable, IDisposable
         this.taskController = taskController;
         this.achievementController = achievementController;
         this.managerController = managerController;
+        this.tutorialController = tutorialController;
         this.signalBus = signalBus;
         
         //saveService.DeleteSave();
@@ -146,6 +149,7 @@ public class SaveController : ITickable, IDisposable
         data.ManagerSlots = managerController.Slots;
         data.ManagersHired = managerController.TotalHired;
         data.FreeManagerGranted = managerController.FreeManagerGranted;
+        data.TutorialStep = tutorialController.StepIndex;
 
         return data;
     }

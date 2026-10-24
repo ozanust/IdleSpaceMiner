@@ -51,6 +51,7 @@ public class PlanetInfoView : MonoBehaviour
 	{
 		closeButton.onClick.AddListener(CloseView);
 		miningRateUpdateButton.onClick.AddListener(OnMiningRateUpdateButtonClick);
+		TutorialTarget.Mark(miningRateUpdateButton.gameObject, TutorialTargetId.MiningUpgradeButton);
 		shipSpeedUpdateButton.onClick.AddListener(OnShipSpeedUpdateButtonClick);
 		shipCargoUpdateButton.onClick.AddListener(OnShipCargoUpdateButtonClick);
 		if (managerButton != null)

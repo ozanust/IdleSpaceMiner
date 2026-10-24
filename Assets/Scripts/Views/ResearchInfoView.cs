@@ -37,6 +37,7 @@ public class ResearchInfoView : MonoBehaviour
 	{
 		closeButton.onClick.AddListener(CloseView);
 		researchButton.onClick.AddListener(OnClickUnlock);
+		TutorialTarget.Mark(researchButton.gameObject, TutorialTargetId.ResearchButton);
 	}
 
 	private void Start()

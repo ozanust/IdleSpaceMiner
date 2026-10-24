@@ -144,6 +144,11 @@ public class SmeltRecipesView : MonoBehaviour
 		item.SetType(SmelterType.Smelter);
 		item.SetLockedItemType(AlloyToResourceConverter.Convert(alloy));
 		item.OnClick += OnClickRecipe;
+		if (alloy == AlloyType.CopperBar)
+		{
+			TutorialTarget.Mark(item.gameObject, TutorialTargetId.CopperBarRecipe);
+		}
+
 		if (unlocked)
 		{
 			item.Unlock();

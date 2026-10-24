@@ -26,6 +26,9 @@ public class NavBarView : MonoBehaviour
         managersButton.onClick.AddListener(OnClickManagers);
         boostsButton.onClick.AddListener(OnClickBoosts);
         mothershipButton.onClick.AddListener(OnClickMothership);
+        TutorialTarget.Mark(resourcesButton.gameObject, TutorialTargetId.ResourcesNavButton);
+        TutorialTarget.Mark(productionButton.gameObject, TutorialTargetId.ProductionNavButton);
+        TutorialTarget.Mark(projectsButton.gameObject, TutorialTargetId.ProjectsNavButton);
 
         // Managers open after the Management research
         managersButton.interactable = playerModel.IsResearchUnlocked(ResearchType.Management);

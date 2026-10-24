@@ -20,6 +20,7 @@ public class SaveData
     public int ManagerSlots;
     public int ManagersHired;
     public bool FreeManagerGranted;
+    public int TutorialStep;
 }
 
 [Serializable]
