@@ -65,10 +65,8 @@ public class CargoController : ICargoController, IDisposable
 
 		if (spaceModel.TryGetPlanetData(planetId, out data) && planetSettings.TryGetPlanetSetting(planetId, out setting) && spaceModel.TryGetPlanetTransform(planetId, out planetTransform))
 		{
-			float shipSpeed = setting.StartingShipSpeed * Mathf.Pow(setting.ShipSpeedIncreaseMultiplier, data.ShipSpeedLevel);
-			int cargoSize = Mathf.FloorToInt(setting.StartingShipCargo * Mathf.Pow(setting.CargoIncreaseMultiplier, data.ShipCargoLevel));
-			ship.SetShipSpeed(shipSpeed);
-			ship.SetCargoSize(cargoSize);
+			ship.SetShipSpeed(PlanetUpgradeFormula.GetShipSpeed(setting, data.ShipSpeedLevel));
+			ship.SetCargoSize(PlanetUpgradeFormula.GetShipCargo(setting, data.ShipCargoLevel));
 			ship.SetTargetPlanet(planetTransform, planetId);
 			ship.gameObject.SetActive(true);
 

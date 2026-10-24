@@ -33,13 +33,7 @@ public class PlanetDataSetting
 	public float TotalStartingMiningRate;
 	public float StartingShipSpeed;
 	public int StartingShipCargo;
-	public int StartingMiningRatePrice;
-	public int StartingShipSpeedPrice;
-	public int StartingShipCargoPrice;
 	public float PriceIncreaseMultiplier;
-	public float MiningRateIncreaseMultiplier;
-	public float ShipSpeedIncreaseMultiplier;
-	public float CargoIncreaseMultiplier;
 	public string Name;
 	public Sprite Icon;
 }

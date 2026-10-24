@@ -71,6 +71,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		}
 
 		signalBus.Subscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
+		signalBus.Subscribe<ResearchCompletedSignal>(OnTelescopeResearchUnlocked);
 		signalBus.Subscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 	}
 
@@ -212,7 +213,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		
 		PlanetData data3 = new PlanetData();
 
-		data3.IsUnraveled = true;
+		data3.IsUnraveled = false;
 		data3.PlanetIndex = 2;
 		data3.MiningRateLevel = 0;
 		data3.ShipCargoLevel = 0;
@@ -220,7 +221,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		
 		PlanetData data4 = new PlanetData();
 
-		data4.IsUnraveled = true;
+		data4.IsUnraveled = false;
 		data4.PlanetIndex = 3;
 		data4.MiningRateLevel = 0;
 		data4.ShipCargoLevel = 0;
@@ -235,6 +236,23 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		{
 			nextAsteroidSpawnTime = Random.Range(gameSettings.GlobalSettings.AsteroidSpawnTimes[0], gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
 			isAsteroidMinerUnlocked = true;
+		}
+	}
+
+	private void OnTelescopeResearchUnlocked(ResearchCompletedSignal signal)
+	{
+		if (signal.ResearchType < ResearchType.Telescope1 || signal.ResearchType > ResearchType.Telescope5)
+		{
+			return;
+		}
+
+		// Planets 0 and 1 are visible from the start, each telescope reveals the next one
+		int planetIndex = signal.ResearchType - ResearchType.Telescope1 + 2;
+		PlanetData[] planetData = spaceModel.GetPlanetsData();
+
+		if (planetIndex < planetData.Length && !planetData[planetIndex].IsUnraveled)
+		{
+			spaceModel.UnravelPlanet(planetIndex);
 		}
 	}
 
@@ -253,6 +271,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	public void Dispose()
 	{
 		signalBus.Unsubscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnTelescopeResearchUnlocked);
 		signalBus.Unsubscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 	}
 

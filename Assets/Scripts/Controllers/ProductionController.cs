@@ -9,11 +9,9 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	private SignalBus signalBus;
 	private ResourceSettings resourceSettings;
 
+	// Recipes assigned to smelters/crafters; IsSmelting marks the ones whose input is already consumed
 	private Dictionary<int, SmelterAlloyData> smeltingData = new Dictionary<int, SmelterAlloyData>();
-	private Dictionary<int, SmelterAlloyData> smeltData = new Dictionary<int, SmelterAlloyData>();
-
 	private Dictionary<int, CrafterAlloyData> craftingData = new Dictionary<int, CrafterAlloyData>();
-	private Dictionary<int, CrafterAlloyData> craftData = new Dictionary<int, CrafterAlloyData>();
 
 	float smeltSpeed = 1;
 
@@ -58,11 +56,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		SmelterAlloyData newData = new SmelterAlloyData(signal.SmelterId, signal.RecipeType, settings.TimeToSmelt);
 		smeltingData.Add(signal.SmelterId, newData);
 
-		if (playerModel.HasResource(AlloyToResourceConverter.ConvertToRaw(signal.RecipeType), resourceSettings.GetSmeltSetting(signal.RecipeType).ResourceNeeded))
-		{
-			AddSmelt(newData);
-			playerModel.TryUseResource(AlloyToResourceConverter.ConvertToRaw(signal.RecipeType), resourceSettings.GetSmeltSetting(signal.RecipeType).ResourceNeeded);
-		}
+		TryStartSmelt(newData);
 	}
 
 	private void OnCraftRecipeAdded(CraftRecipeAddSignal signal)
@@ -76,100 +70,82 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(signal.RecipeType);
 		CrafterAlloyData newData = new CrafterAlloyData(signal.SmelterId, signal.RecipeType, settings.TimeToSmelt);
 		craftingData.Add(signal.SmelterId, newData);
-		
-		if (playerModel.TryUseResources(settings.NeededResources))
-		{
-			AddCraft(newData);
-		}
+
+		TryStartCraft(newData);
 	}
 
 	private void OnRecipeRemoved(SmeltRecipeRemoveSignal signal)
 	{
-		if (smeltingData.ContainsKey(signal.SmelterId))
+		if (smeltingData.TryGetValue(signal.SmelterId, out SmelterAlloyData sData))
 		{
 			smeltingData.Remove(signal.SmelterId);
 
 			// Refund used resource if smelting in progress
-			if (smeltData.ContainsKey(signal.SmelterId))
+			if (sData.IsSmelting)
 			{
-				playerModel.AddResource(AlloyToResourceConverter.ConvertToRaw(smeltData[signal.SmelterId].Type), resourceSettings.GetSmeltSetting(smeltData[signal.SmelterId].Type).ResourceNeeded);
-				smeltData.Remove(signal.SmelterId);
+				playerModel.AddResource(AlloyToResourceConverter.ConvertToRaw(sData.Type), resourceSettings.GetSmeltSetting(sData.Type).ResourceNeeded);
 			}
 		}
 	}
 
 	private void OnCraftRecipeRemoved(CraftRecipeRemoveSignal signal)
 	{
-		if (craftingData.ContainsKey(signal.SmelterId))
+		if (craftingData.TryGetValue(signal.SmelterId, out CrafterAlloyData cData))
 		{
 			craftingData.Remove(signal.SmelterId);
 
-			if (TryGetCraftData(signal.SmelterId, out CrafterAlloyData cData))
+			// Refund used resource if crafting in progress
+			if (cData.IsSmelting)
 			{
-				// Refund used resource if smelting in progress
 				ResearchNeededResource[] requiredResources = resourceSettings.GetItemSmeltSetting(cData.Type).NeededResources;
 				foreach (var requiredResource in requiredResources)
 				{
 					playerModel.AddResource(requiredResource.Type, requiredResource.Amount);
 				}
-				
-				craftData.Remove(cData.Id);
 			}
 		}
 	}
 
 	private void Smelt()
 	{
-		if (smeltingData.Count <= 0)
+		foreach (var sad in smeltingData.Values)
 		{
-			return;
-		}
+			// Idle smelters wait until there is enough raw material again
+			if (!sad.IsSmelting && !TryStartSmelt(sad))
+			{
+				continue;
+			}
 
-		foreach (var sad in smeltData.Values)
-		{
 			sad.SmeltedTime += Time.deltaTime * smeltSpeed;
 			if (sad.SmeltedTime >= sad.SmeltTime)
 			{
 				sad.SmeltedTime = 0;
+				sad.IsSmelting = false;
 				playerModel.AddResource(AlloyToResourceConverter.Convert(sad.Type), 1);
 
-				// Remove if there is not enough raw material to smelt
-				if (!playerModel.HasResource(AlloyToResourceConverter.ConvertToRaw(sad.Type), resourceSettings.GetSmeltSetting(sad.Type).ResourceNeeded))
-				{
-					smeltData.Remove(sad.Id);
-					sad.IsSmelting = false;
-				}
+				TryStartSmelt(sad);
 			}
 		}
 	}
 
 	private void Craft()
 	{
-		if (craftingData.Count <= 0)
+		foreach (var cad in craftingData.Values)
 		{
-			return;
-		}
-
-		foreach (var sad in craftData.Values)
-		{
-			sad.SmeltedTime += Time.deltaTime * smeltSpeed;
-			if (sad.SmeltedTime >= sad.SmeltTime)
+			// Idle crafters wait until all required resources are available again
+			if (!cad.IsSmelting && !TryStartCraft(cad))
 			{
-				sad.SmeltedTime = 0;
-				playerModel.AddResource(sad.Type, 1);
+				continue;
+			}
 
-				// Remove if there is not enough raw material to smelt
-				ResearchNeededResource[] requiredResources = resourceSettings.GetItemSmeltSetting(sad.Type).NeededResources;
+			cad.SmeltedTime += Time.deltaTime * smeltSpeed;
+			if (cad.SmeltedTime >= cad.SmeltTime)
+			{
+				cad.SmeltedTime = 0;
+				cad.IsSmelting = false;
+				playerModel.AddResource(cad.Type, 1);
 
-				foreach(ResearchNeededResource res in requiredResources)
-				{
-					if (!playerModel.HasResource(sad.Type, res.Amount))
-					{
-						craftData.Remove(sad.Id);
-						sad.IsSmelting = false;
-						return;
-					}
-				}
+				TryStartCraft(cad);
 			}
 		}
 	}
@@ -182,28 +158,29 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 	}
 
-	private void AddSmelt(SmelterAlloyData data)
+	/// <summary>Consumes the raw material for one alloy and marks the smelter as working.</summary>
+	private bool TryStartSmelt(SmelterAlloyData data)
 	{
-		smeltData.Add(data.Id, data);
-		data.IsSmelting = true;
-	}
-
-	private void AddCraft(CrafterAlloyData data)
-	{
-		craftData.Add(data.Id, data);
-		data.IsSmelting = true;
-	}
-
-	private bool TryGetCraftData(int id, out CrafterAlloyData data)
-	{
-		data = null;
-		if (craftData.ContainsKey(id))
+		int resourceNeeded = resourceSettings.GetSmeltSetting(data.Type).ResourceNeeded;
+		if (!playerModel.TryUseResource(AlloyToResourceConverter.ConvertToRaw(data.Type), resourceNeeded))
 		{
-			data = craftData[id];
-			return true;
+			return false;
 		}
-		
-		return false;
+
+		data.IsSmelting = true;
+		return true;
+	}
+
+	/// <summary>Consumes the ingredients for one item and marks the crafter as working.</summary>
+	private bool TryStartCraft(CrafterAlloyData data)
+	{
+		if (!playerModel.TryUseResources(resourceSettings.GetItemSmeltSetting(data.Type).NeededResources))
+		{
+			return false;
+		}
+
+		data.IsSmelting = true;
+		return true;
 	}
 
 	public SmelterAlloyData GetAlloyData(int smelterId)

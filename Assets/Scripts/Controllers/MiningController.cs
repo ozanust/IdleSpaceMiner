@@ -126,7 +126,7 @@ public class MiningController : IMiningController, ITickable, IDisposable
 		{
 			for (int i = 0; i < md.MineDatas.Length; i++)
 			{
-				md.MineDatas[i].MinedAmount += md.TotalMineRate * md.MineDatas[i].Ratio * Time.deltaTime * 5;
+				md.MineDatas[i].MinedAmount += md.TotalMineRate * md.MineDatas[i].Ratio * Time.deltaTime;
 			}
 		}
 	}

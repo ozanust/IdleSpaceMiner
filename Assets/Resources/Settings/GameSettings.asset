@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   economySettings:
-    StartingMoney: 10000000
+    StartingMoney: 180
     StartingDarkMatter: 0
   globalSettings:
     AsteroidSpawnTimes: 780000002c010000

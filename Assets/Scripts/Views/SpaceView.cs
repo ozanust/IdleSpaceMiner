@@ -19,12 +19,14 @@ public class SpaceView : MonoBehaviour
 	{
 		signalBus.Subscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+		signalBus.Subscribe<PlanetUnraveledSignal>(OnPlanetUnraveled);
 	}
 
 	private void OnDestroy()
 	{
 		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+		signalBus.Unsubscribe<PlanetUnraveledSignal>(OnPlanetUnraveled);
 	}
 
 	private void Start()
@@ -46,6 +48,11 @@ public class SpaceView : MonoBehaviour
 	private void OnSpaceModelInitialized(SpaceModelInitializedSignal signal)
 	{
 		InitializePlanetData(signal.Data);
+	}
+
+	private void OnPlanetUnraveled(PlanetUnraveledSignal signal)
+	{
+		planets[signal.PlanetId].Unravel();
 	}
 
 	private void OnPlanetUnlocked(PlanetUnlockedSignal signal)
