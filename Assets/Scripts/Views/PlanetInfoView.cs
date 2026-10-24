@@ -18,6 +18,7 @@ public class PlanetInfoView : MonoBehaviour
 	[SerializeField] private GameObject miningInfoPanel;
 	[SerializeField] private GameObject updatePanel;
 	[SerializeField] private MiningInfoItem miningInfoItemPrototype;
+	[SerializeField] private Image planetImage;
 	[SerializeField] private TMP_Text planetNameText;
 	[SerializeField] private Button closeButton;
 
@@ -77,6 +78,7 @@ public class PlanetInfoView : MonoBehaviour
 		if (data != null && planetSettings.TryGetPlanetSetting(signal.PlanetId, out settings))
 		{
 			planetNameText.text = settings.Name;
+			planetImage.sprite = settings.Icon;
 			openPlanetId = signal.PlanetId;
 		}
 		else

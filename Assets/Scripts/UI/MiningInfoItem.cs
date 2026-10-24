@@ -25,7 +25,7 @@ public class MiningInfoItem : MonoBehaviour
         planetImage.sprite = planetIcon;
         resourceNameText.text = planetName;
         yieldPercentageText.text = Mathf.RoundToInt(yieldPercentage * 100).ToString() + "%";
-        miningRateText.text = miningRate.ToString("F2") + "/sec";
+        miningRateText.text = NumberFormatter.Format(miningRate) + "/sec";
         minedAmountText.text = NumberFormatter.Format(Mathf.FloorToInt(minedAmount));
         gameObject.SetActive(true);
 	}
@@ -37,6 +37,6 @@ public class MiningInfoItem : MonoBehaviour
 
 	public void UpdateMiningRate(float miningRate)
 	{
-        miningRateText.text = miningRate.ToString("F2") + "/sec";
+        miningRateText.text = NumberFormatter.Format(miningRate) + "/sec";
     }
 }
