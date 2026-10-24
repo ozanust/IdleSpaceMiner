@@ -272,7 +272,13 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	public void TryUnlockSmelter()
 	{
 		int nextSmelterId = playerModel.GetLastUnlockedSmelterId() + 1;
-		long nextSmelterPrice = resourceSettings.GetSmelterSetting(nextSmelterId).Price;
+		SmelterSetting nextSmelter = resourceSettings.GetSmelterSetting(nextSmelterId);
+		if (nextSmelter == null)
+		{
+			return;
+		}
+
+		long nextSmelterPrice = nextSmelter.Price;
 		if (playerModel.HasMoney(nextSmelterPrice))
 		{
 			playerModel.UnlockSmelter(nextSmelterId);
@@ -283,7 +289,13 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	public void TryUnlockCrafter()
 	{
 		int nextCrafterId = playerModel.GetLastUnlockedCrafterId() + 1;
-		long nextCrafterPrice = resourceSettings.GetCrafterSetting(nextCrafterId).Price;
+		CrafterSetting nextCrafter = resourceSettings.GetCrafterSetting(nextCrafterId);
+		if (nextCrafter == null)
+		{
+			return;
+		}
+
+		long nextCrafterPrice = nextCrafter.Price;
 		if (playerModel.HasMoney(nextCrafterPrice))
 		{
 			playerModel.UnlockCrafter(nextCrafterId);

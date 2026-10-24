@@ -64,18 +64,31 @@ public class ProductionView : MonoBehaviour
 		panel.SetActive(false);
 	}
 
+	// Each unlock adds a locked slot for the next smelter/crafter, unless it was the last one
 	private void OnSmelterUnlocked(SmelterUnlockedSignal signal)
 	{
+		SmelterSetting nextSmelter = resourceSettings.GetSmelterSetting(signal.SmelterId + 1);
+		if (nextSmelter == null)
+		{
+			return;
+		}
+
 		SmelterItem item = container.InstantiatePrefabForComponent<SmelterItem>(smelterItemPrototype, smelterItemContainer.transform);
 		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-		item.SetSmelterUnlockPrice(resourceSettings.GetSmelterSetting(signal.SmelterId + 1).Price);
+		item.SetSmelterUnlockPrice(nextSmelter.Price);
 	}
-	
+
 	private void OnCrafterUnlocked(CrafterUnlockedSignal signal)
 	{
+		CrafterSetting nextCrafter = resourceSettings.GetCrafterSetting(signal.CrafterId + 1);
+		if (nextCrafter == null)
+		{
+			return;
+		}
+
 		CrafterItem item = container.InstantiatePrefabForComponent<CrafterItem>(crafterItemPrototype, crafterItemContainer.transform);
 		item.SetInjections(signalBus, resourceSettings, productionController, playerModel);
-		item.SetSmelterUnlockPrice(resourceSettings.GetCrafterSetting(signal.CrafterId + 1).Price);
+		item.SetSmelterUnlockPrice(nextCrafter.Price);
 	}
 
 	private void OnResearchCompleted(ResearchCompletedSignal signal)
