@@ -13,6 +13,7 @@ public class GameSettings : ScriptableObject
 	[SerializeField] private TaskSetting[] achievements = DefaultAchievements();
 	[SerializeField] private ManagerSettings managerSettings = new ManagerSettings();
 	[SerializeField] private GameAudioSettings audioSettings = new GameAudioSettings();
+	[SerializeField] private PrestigeSettings prestigeSettings = new PrestigeSettings();
 
 	public EconomySettings EconomySettings => economySettings;
 	public GlobalSettings GlobalSettings => globalSettings;
@@ -20,6 +21,7 @@ public class GameSettings : ScriptableObject
 	public TaskSetting[] Achievements => achievements;
 	public ManagerSettings ManagerSettings => managerSettings;
 	public GameAudioSettings AudioSettings => audioSettings;
+	public PrestigeSettings PrestigeSettings => prestigeSettings;
 
 	private static TaskSetting[] DefaultAchievements()
 	{
@@ -136,4 +138,37 @@ public class SoundClip
 {
 	public SoundType Type;
 	public AudioClip Clip;
+}
+
+/// <summary>Selling the galaxy for Dark Matter, and the mothership rooms it buys.</summary>
+[System.Serializable]
+public class PrestigeSettings
+{
+	// Dark Matter for a sale = RewardScale * sqrt(galaxy value / ValueDivider)
+	public float RewardScale = 5f;
+	public float ValueDivider = 10000f;
+	public int MinimumReward = 10;
+
+	public RoomSetting[] Rooms =
+	{
+		new RoomSetting { Type = RoomType.Engineering, Name = "Engineering", Effect = "Mining rate", BaseCost = 5, BonusPerLevel = 0.25f },
+		new RoomSetting { Type = RoomType.Aeronautical, Name = "Aeronautical", Effect = "Ship speed", BaseCost = 5, BonusPerLevel = 0.25f },
+		new RoomSetting { Type = RoomType.Packaging, Name = "Packaging", Effect = "Ship cargo", BaseCost = 5, BonusPerLevel = 0.25f },
+		new RoomSetting { Type = RoomType.Sales, Name = "Sales", Effect = "Sell price", BaseCost = 10, BonusPerLevel = 0.1f },
+		new RoomSetting { Type = RoomType.Forge, Name = "Forge", Effect = "Smelting speed", BaseCost = 10, BonusPerLevel = 0.2f },
+		new RoomSetting { Type = RoomType.Workshop, Name = "Workshop", Effect = "Crafting speed", BaseCost = 15, BonusPerLevel = 0.2f }
+	};
+}
+
+[System.Serializable]
+public class RoomSetting
+{
+	public RoomType Type;
+	public string Name;
+	// What the bonus applies to, shown as "<Effect> +25%"
+	public string Effect;
+	public int BaseCost;
+	public float CostMultiplier = 1.8f;
+	public float BonusPerLevel;
+	public int MaxLevel = 10;
 }

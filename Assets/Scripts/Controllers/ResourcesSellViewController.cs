@@ -9,9 +9,11 @@ public class ResourcesSellViewController : IResourcesSellViewController, IDispos
 	private SignalBus signalBus;
 	private IPlayerModel playerModel;
 	private ResourceSettings resourceSettings;
+	private IMothershipController mothershipController;
 
-	public ResourcesSellViewController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings)
+	public ResourcesSellViewController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings, IMothershipController mothershipController)
 	{
+		this.mothershipController = mothershipController;
 		this.signalBus = signalBus;
 		this.playerModel = playerModel;
 		this.resourceSettings = resourceSettings;
@@ -30,7 +32,8 @@ public class ResourcesSellViewController : IResourcesSellViewController, IDispos
 		if (playerModel.HasResource(signal.Type, signal.Amount))
 		{
 			playerModel.TryUseResource(signal.Type, signal.Amount);
-			playerModel.AddMoney(signal.Amount * resourceSettings.GetResourceValue(signal.Type));
+			// The Sales room raises every sell price
+			playerModel.AddMoney((long)Math.Round(signal.Amount * resourceSettings.GetResourceValue(signal.Type) * (double)mothershipController.GetMultiplier(RoomType.Sales)));
 		}
 	}
 }

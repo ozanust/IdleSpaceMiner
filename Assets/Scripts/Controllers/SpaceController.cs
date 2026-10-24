@@ -370,6 +370,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 			{
 				Kind = PurchaseKind.Planet,
 				Success = canBuy,
+				Price = setting.PlanetPrice,
 				FailMessage = $"You need {NumberFormatter.FormatMoney(setting.PlanetPrice)} to buy {setting.Name}"
 			});
 		}

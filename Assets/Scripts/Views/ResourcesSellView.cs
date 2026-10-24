@@ -10,6 +10,7 @@ public class ResourcesSellView : MonoBehaviour
     [Inject] ResourceSettings resourceSettings;
     [Inject] SignalBus signalBus;
     [Inject] IPlayerModel playerModel;
+    [Inject] IMothershipController mothershipController;
 
     [SerializeField] private GameObject selectResourceText;
     [SerializeField] private GameObject sellResourcePanel;
@@ -55,14 +56,20 @@ public class ResourcesSellView : MonoBehaviour
         sellResourceSlider.maxValue = selectedTotalResourceAmount;
         sellResourceSlider.value = selectedTotalResourceAmount;
         sellingAmountText.text = NumberFormatter.Format(selectedTotalResourceAmount);
-        sellingAmountValueText.text = NumberFormatter.FormatMoney(selectedTotalResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
+        sellingAmountValueText.text = NumberFormatter.FormatMoney(GetSellValue(selectedTotalResourceAmount));
     }
 
     private void OnSellingSliderMoved(float value)
 	{
         currentSelectedResourceAmount = Mathf.RoundToInt(value);
         sellingAmountText.text = NumberFormatter.Format(currentSelectedResourceAmount);
-        sellingAmountValueText.text = NumberFormatter.FormatMoney(currentSelectedResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
+        sellingAmountValueText.text = NumberFormatter.FormatMoney(GetSellValue(currentSelectedResourceAmount));
+    }
+
+    // Same as the money selling gives, including the Sales room
+    private long GetSellValue(int amount)
+    {
+        return (long)System.Math.Round(amount * resourceSettings.GetResourceValue(sellingResourceType) * (double)mothershipController.GetMultiplier(RoomType.Sales));
     }
 
     private void OnResourceDeselected()

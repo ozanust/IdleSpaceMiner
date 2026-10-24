@@ -20,6 +20,8 @@ public class SaveController : ITickable, IDisposable
     private readonly IAchievementController achievementController;
     private readonly IManagerController managerController;
     private readonly ITutorialController tutorialController;
+    private readonly IMothershipController mothershipController;
+    private readonly GameSettings gameSettings;
     private readonly SignalBus signalBus;
 
     private float autoSaveTimer;
@@ -42,6 +44,8 @@ public class SaveController : ITickable, IDisposable
         IAchievementController achievementController,
         IManagerController managerController,
         ITutorialController tutorialController,
+        IMothershipController mothershipController,
+        GameSettings gameSettings,
         SignalBus signalBus)
     {
         this.saveService = saveService;
@@ -52,6 +56,8 @@ public class SaveController : ITickable, IDisposable
         this.achievementController = achievementController;
         this.managerController = managerController;
         this.tutorialController = tutorialController;
+        this.mothershipController = mothershipController;
+        this.gameSettings = gameSettings;
         this.signalBus = signalBus;
         
         //saveService.DeleteSave();
@@ -64,6 +70,7 @@ public class SaveController : ITickable, IDisposable
         signalBus.Subscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Subscribe<OnApplicationQuitSignal>(OnApplicationQuit);
         signalBus.Subscribe<OnApplicationFocusSignal>(OnApplicationFocus);
+        signalBus.Subscribe<GalaxySoldSignal>(OnGalaxySold);
     }
     
     public void Dispose()
@@ -76,6 +83,7 @@ public class SaveController : ITickable, IDisposable
         signalBus.Unsubscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Unsubscribe<OnApplicationQuitSignal>(OnApplicationQuit);
         signalBus.Unsubscribe<OnApplicationFocusSignal>(OnApplicationFocus);
+        signalBus.Unsubscribe<GalaxySoldSignal>(OnGalaxySold);
     }
 
     /// <summary>Suppresses all saves until EndRestore is called.</summary>
@@ -110,6 +118,49 @@ public class SaveController : ITickable, IDisposable
     {
         isReset = true;
         saveService.DeleteSave();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    /// <summary>
+    /// Starts a new galaxy: writes a save that keeps only what survives a sale (Dark Matter plus the
+    /// reward, rooms, managers, achievements, the tutorial) and reloads the scene from it.
+    /// </summary>
+    private void OnGalaxySold(GalaxySoldSignal signal)
+    {
+        SaveData current = BuildSaveData();
+        SaveData next = new SaveData();
+
+        next.Player.Money = gameSettings.EconomySettings.StartingMoney;
+        next.Player.UnlockedSmelters = new int[0];
+        next.Player.UnlockedCrafters = new int[0];
+        next.Player.Currencies = current.Player.Currencies;
+        CurrencySaveEntry darkMatter = next.Player.Currencies.Find(c => c.Type == CurrencyType.DarkMatter);
+        if (darkMatter == null)
+        {
+            darkMatter = new CurrencySaveEntry { Type = CurrencyType.DarkMatter };
+            next.Player.Currencies.Add(darkMatter);
+        }
+
+        darkMatter.Amount += signal.Reward;
+
+        // Managers stay hired but have no planets to work on yet
+        next.Managers = current.Managers;
+        foreach (ManagerData manager in next.Managers)
+        {
+            manager.PlanetId = -1;
+        }
+
+        next.ManagerSlots = current.ManagerSlots;
+        next.ManagersHired = current.ManagersHired;
+        next.FreeManagerGranted = current.FreeManagerGranted;
+        next.ClaimedAchievements = current.ClaimedAchievements;
+        next.TutorialStep = current.TutorialStep;
+        next.Rooms = current.Rooms;
+        next.GalaxiesSold = current.GalaxiesSold;
+        next.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
+
+        isReset = true;
+        saveService.Save(next);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -162,6 +213,9 @@ public class SaveController : ITickable, IDisposable
         data.ManagersHired = managerController.TotalHired;
         data.FreeManagerGranted = managerController.FreeManagerGranted;
         data.TutorialStep = tutorialController.StepIndex;
+        data.Rooms = mothershipController.GetRoomSaveEntries();
+        data.GalaxiesSold = mothershipController.GalaxiesSold;
+        data.GalaxyValue = mothershipController.GetGalaxyValue();
 
         return data;
     }

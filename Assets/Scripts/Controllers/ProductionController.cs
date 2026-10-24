@@ -17,13 +17,15 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	float craftSpeed = 1;
 	float smeltIngredientMultiplier = 1;
 	private IManagerController managerController;
+	private IMothershipController mothershipController;
 
-	// Research speed combined with the managers' global smelt and craft bonuses
-	private float EffectiveSmeltSpeed => smeltSpeed * managerController.SmeltSpeedMultiplier;
-	private float EffectiveCraftSpeed => craftSpeed * managerController.CraftSpeedMultiplier;
+	// Research speed combined with the managers' global bonuses and the mothership rooms
+	private float EffectiveSmeltSpeed => smeltSpeed * managerController.SmeltSpeedMultiplier * mothershipController.GetMultiplier(RoomType.Forge);
+	private float EffectiveCraftSpeed => craftSpeed * managerController.CraftSpeedMultiplier * mothershipController.GetMultiplier(RoomType.Workshop);
 
-	public ProductionController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings, IManagerController managerController)
+	public ProductionController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings, IManagerController managerController, IMothershipController mothershipController)
 	{
+		this.mothershipController = mothershipController;
 		this.managerController = managerController;
 		this.signalBus = signalBus;
 		this.playerModel = playerModel;

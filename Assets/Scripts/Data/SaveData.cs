@@ -21,6 +21,10 @@ public class SaveData
     public int ManagersHired;
     public bool FreeManagerGranted;
     public int TutorialStep;
+    public List<RoomSaveEntry> Rooms = new List<RoomSaveEntry>();
+    public int GalaxiesSold;
+    // Money spent on planets and their upgrades in the current galaxy
+    public long GalaxyValue;
 }
 
 [Serializable]
@@ -107,4 +111,11 @@ public class SmeltingSaveData
 public class CraftingSaveData
 {
     public List<CrafterSaveData> CraftEntries = new List<CrafterSaveData>();
+}
+
+[Serializable]
+public class RoomSaveEntry
+{
+    public RoomType Type;
+    public int Level;
 }

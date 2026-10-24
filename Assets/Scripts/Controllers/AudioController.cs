@@ -179,7 +179,7 @@ public class AudioController : IAudioController, IInitializable, ITickable, IDis
 			return;
 		}
 
-		Play(signal.Kind == PurchaseKind.Upgrade ? SoundType.Upgrade : SoundType.Purchase);
+		Play(signal.Kind == PurchaseKind.Upgrade || signal.Kind == PurchaseKind.Room ? SoundType.Upgrade : SoundType.Purchase);
 	}
 
 	private void OnSell()

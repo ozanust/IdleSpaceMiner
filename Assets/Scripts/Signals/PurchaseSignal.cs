@@ -5,6 +5,8 @@ public class PurchaseSignal
 	public bool Success;
 	// Shown to the player when the purchase fails, null when the view explains it itself
 	public string FailMessage;
+	// Money paid when it succeeded, 0 for Dark Matter purchases
+	public long Price;
 }
 
 public enum PurchaseKind
@@ -12,5 +14,6 @@ public enum PurchaseKind
 	Planet,
 	Upgrade,
 	Production,
-	Manager
+	Manager,
+	Room
 }

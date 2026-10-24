@@ -13,11 +13,13 @@ public class CargoController : ICargoController, IDisposable
 	private CargoShipView cargoShipPrototype;
 	private DiContainer container;
 	private IManagerController managerController;
+	private IMothershipController mothershipController;
 
 	private Dictionary<int, CargoShipView> ships = new Dictionary<int, CargoShipView>();
 
-    public CargoController(DiContainer container, SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel, IManagerController managerController)
+    public CargoController(DiContainer container, SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel, IManagerController managerController, IMothershipController mothershipController)
 	{
+		this.mothershipController = mothershipController;
 		this.managerController = managerController;
 		this.signalBus = signalBus;
 		this.cargoShipPrototype = cargoShipPrototype;
@@ -29,6 +31,7 @@ public class CargoController : ICargoController, IDisposable
 		this.signalBus.Subscribe<PlanetTransformSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		this.signalBus.Subscribe<ManagersUpdatedSignal>(OnManagersUpdated);
+		this.signalBus.Subscribe<MothershipUpdatedSignal>(OnManagersUpdated);
 	}
 
 	/// <summary>Unsubscribes from all signals.</summary>
@@ -37,6 +40,7 @@ public class CargoController : ICargoController, IDisposable
 		signalBus.Unsubscribe<PlanetTransformSignal>(OnPlanetUnlocked);
 		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Unsubscribe<ManagersUpdatedSignal>(OnManagersUpdated);
+		signalBus.Unsubscribe<MothershipUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnPlanetUnlocked(PlanetTransformSignal signal)
@@ -58,7 +62,7 @@ public class CargoController : ICargoController, IDisposable
 		}
 	}
 
-	// Assigned managers can change every ship's speed and cargo
+	// Managers and mothership rooms can change every ship's speed and cargo
 	private void OnManagersUpdated()
 	{
 		foreach (KeyValuePair<int, CargoShipView> pair in ships)
@@ -73,8 +77,18 @@ public class CargoController : ICargoController, IDisposable
 
 	private void ApplyStats(CargoShipView ship, int planetId, float speed, int cargo)
 	{
-		ship.SetShipSpeed(speed * managerController.GetShipSpeedMultiplier(planetId));
-		ship.SetCargoSize(Mathf.RoundToInt(cargo * managerController.GetCargoMultiplier(planetId)));
+		ship.SetShipSpeed(speed * GetShipSpeedMultiplier(planetId));
+		ship.SetCargoSize(Mathf.RoundToInt(cargo * GetCargoMultiplier(planetId)));
+	}
+
+	private float GetShipSpeedMultiplier(int planetId)
+	{
+		return managerController.GetShipSpeedMultiplier(planetId) * mothershipController.GetMultiplier(RoomType.Aeronautical);
+	}
+
+	private float GetCargoMultiplier(int planetId)
+	{
+		return managerController.GetCargoMultiplier(planetId) * mothershipController.GetMultiplier(RoomType.Packaging);
 	}
 
 	private void SpawnCargoShipAndAssign(int planetId)

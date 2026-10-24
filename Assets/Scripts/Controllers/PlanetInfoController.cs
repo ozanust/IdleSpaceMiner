@@ -60,7 +60,7 @@ public class PlanetInfoController : IPlanetInfoController
 			playerModel.UseMoney(price);
 		}
 
-		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Upgrade, Success = canPay, FailMessage = "Not enough money" });
+		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Upgrade, Success = canPay, FailMessage = "Not enough money", Price = price });
 		return canPay;
 	}
 }

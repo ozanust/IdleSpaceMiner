@@ -8,6 +8,7 @@ public class NavBarView : MonoBehaviour
 {
     [Inject] SignalBus signalBus;
     [Inject] IPlayerModel playerModel;
+    [Inject] IManagerController managerController;
 
     // TODO: Make those custom button and use their menu type property
     [SerializeField] private Button resourcesButton;
@@ -30,12 +31,14 @@ public class NavBarView : MonoBehaviour
         TutorialTarget.Mark(productionButton.gameObject, TutorialTargetId.ProductionNavButton);
         TutorialTarget.Mark(projectsButton.gameObject, TutorialTargetId.ProjectsNavButton);
 
-        // Managers open after the Management research
-        managersButton.interactable = playerModel.IsResearchUnlocked(ResearchType.Management);
+        // Managers open after the Management research, and stay open in later galaxies once hired
+        managersButton.interactable = playerModel.IsResearchUnlocked(ResearchType.Management) || managerController.Managers.Count > 0;
 
-        // These menus have no views yet, hide them for the MVP
+        // The scene keeps it locked like the other upcoming menus, selling the galaxy is always available
+        mothershipButton.interactable = true;
+
+        // Boosts have no view yet, hide it for the MVP
         boostsButton.gameObject.SetActive(false);
-        mothershipButton.gameObject.SetActive(false);
 
         signalBus.Subscribe<ResearchCompletedSignal>(OnResearchUnlocked);
     }

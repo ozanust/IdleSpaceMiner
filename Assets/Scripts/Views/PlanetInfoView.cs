@@ -11,6 +11,7 @@ public class PlanetInfoView : MonoBehaviour
 	[Inject] IMiningController miningController;
     [Inject] IPlanetInfoController planetInfoController;
     [Inject] IManagerController managerController;
+    [Inject] IMothershipController mothershipController;
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
 	[Inject] ISpaceModel spaceModel;
@@ -62,6 +63,7 @@ public class PlanetInfoView : MonoBehaviour
 		signalBus.Subscribe<PlanetOpenSignal>(OnPlanetOpen);
 		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Subscribe<ManagersUpdatedSignal>(OnManagersUpdated);
+		signalBus.Subscribe<MothershipUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnDestroy()
@@ -69,6 +71,7 @@ public class PlanetInfoView : MonoBehaviour
 		signalBus.Unsubscribe<PlanetOpenSignal>(OnPlanetOpen);
 		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Unsubscribe<ManagersUpdatedSignal>(OnManagersUpdated);
+		signalBus.Unsubscribe<MothershipUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnPlanetOpen(PlanetOpenSignal signal)
@@ -109,7 +112,7 @@ public class PlanetInfoView : MonoBehaviour
 		}
 	}
 
-	/// <summary>Shows the planet's values including research and manager bonuses.</summary>
+	/// <summary>Shows the planet's values including research, manager and mothership bonuses.</summary>
 	private void Refresh()
 	{
 		PlanetData planetData;
@@ -124,11 +127,11 @@ public class PlanetInfoView : MonoBehaviour
 		miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
 
 		shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-		shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed * managerController.GetShipSpeedMultiplier(openPlanetId)), "mkph");
+		shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed * managerController.GetShipSpeedMultiplier(openPlanetId) * mothershipController.GetMultiplier(RoomType.Aeronautical)), "mkph");
 		shipSpeedUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipSpeedUpdatePrice);
 
 		shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
-		shipCargoText.text = NumberFormatter.Format(Mathf.RoundToInt(planetData.CurrentShipCargo * managerController.GetCargoMultiplier(openPlanetId)));
+		shipCargoText.text = NumberFormatter.Format(Mathf.RoundToInt(planetData.CurrentShipCargo * managerController.GetCargoMultiplier(openPlanetId) * mothershipController.GetMultiplier(RoomType.Packaging)));
 		shipCargoUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipCargoUpdatePrice);
 
 		miningController.TryGetMiningData(openPlanetId, out data);

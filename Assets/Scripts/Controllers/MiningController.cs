@@ -14,12 +14,14 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	private Dictionary<int, TransferResourcesData[]> transferData = new Dictionary<int, TransferResourcesData[]>();
 	private ResourceSettings resourceSettings;
 	private IManagerController managerController;
+	private IMothershipController mothershipController;
 
 	// Management research bonus for all planets
 	private float researchMultiplier = 1f;
 
-	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel, IManagerController managerController)
+	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel, IManagerController managerController, IMothershipController mothershipController)
 	{
+		this.mothershipController = mothershipController;
 		this.managerController = managerController;
 		this.signalBus = signalBus;
 		this.planetSettings = planetSettings;
@@ -152,7 +154,7 @@ public class MiningController : IMiningController, ITickable, IDisposable
 
 	public float GetMiningMultiplier(int planetId)
 	{
-		return researchMultiplier * managerController.GetMiningMultiplier(planetId);
+		return researchMultiplier * managerController.GetMiningMultiplier(planetId) * mothershipController.GetMultiplier(RoomType.Engineering);
 	}
 
 	public float GetValuePerSecond()
