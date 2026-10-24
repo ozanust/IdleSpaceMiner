@@ -29,8 +29,8 @@ public static class PlanetUpgradeFormula
 	}
 
 	/// <summary>Price to upgrade from the given level to the next one.</summary>
-	public static int GetUpgradePrice(PlanetDataSetting setting, int level)
+	public static long GetUpgradePrice(PlanetDataSetting setting, int level)
 	{
-		return Mathf.RoundToInt(setting.PlanetPrice / BaseUpgradePriceDivider * Mathf.Pow(setting.PriceIncreaseMultiplier, level - 1));
+		return (long)System.Math.Round(setting.PlanetPrice / BaseUpgradePriceDivider * System.Math.Pow(setting.PriceIncreaseMultiplier, level - 1));
 	}
 }

@@ -28,7 +28,7 @@ public class PlanetSettings : ScriptableObject
 public class PlanetDataSetting
 {
 	public int PlanetId;
-	public int PlanetPrice;
+	public long PlanetPrice;
 	public PlanetMiningYield[] MiningYieldRatios;
 	public float TotalStartingMiningRate;
 	public float StartingShipSpeed;

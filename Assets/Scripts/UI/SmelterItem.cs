@@ -57,7 +57,7 @@ public class SmelterItem : MonoBehaviour
 		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
 	}
 
-    public void SetSmelterUnlockPrice(int price)
+    public void SetSmelterUnlockPrice(long price)
     {
         smelterUnlockPriceText.text = price.ToString() + "$";
     }

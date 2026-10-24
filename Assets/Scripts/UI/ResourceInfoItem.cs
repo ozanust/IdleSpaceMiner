@@ -22,7 +22,7 @@ public class ResourceInfoItem : MonoBehaviour
         resourceTotalValueText.text = "0";
 	}
 
-    public void UpdateAmount(int resourceAmount, int totalValue)
+    public void UpdateAmount(int resourceAmount, long totalValue)
 	{
         resourceAmountText.text = resourceAmount.ToString();
         resourceTotalValueText.text = totalValue.ToString();

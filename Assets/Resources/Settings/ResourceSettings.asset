@@ -216,7 +216,7 @@ MonoBehaviour:
   - CrafterId: 2
     Price: 100000000
   - CrafterId: 3
-    Price: 2000000000
+    Price: 50000000000
   researchSettings:
   - Name: Telescope 1
     Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}

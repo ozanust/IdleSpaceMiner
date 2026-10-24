@@ -5,7 +5,7 @@ using Zenject;
 
 public class PlayerModel : IPlayerModel
 {
-	private int money;
+	private long money;
 	private PlanetData[] planetData;
 	private Dictionary<ResourceType, int> resources;
 	private Dictionary<AlloyType, int> alloys;
@@ -311,24 +311,24 @@ public class PlayerModel : IPlayerModel
 		return currencies[type];
 	}
 
-	public void AddMoney(int amount)
+	public void AddMoney(long amount)
 	{
 		money += amount;
 		signalBus.Fire<PlayerMoneyUpdatedSignal>();
 	}
 
-	public void UseMoney(int amount)
+	public void UseMoney(long amount)
 	{
 		money -= amount;
 		signalBus.Fire<PlayerMoneyUpdatedSignal>();
 	}
 
-	public bool HasMoney(int amount)
+	public bool HasMoney(long amount)
 	{
 		return money >= amount;
 	}
 
-	public int GetMoney()
+	public long GetMoney()
 	{
 		return money;
 	}

@@ -31,7 +31,7 @@ public class SmeltRecipeItem : MonoBehaviour
 	public Action<AlloyType> OnClick;
 	public Action<ResourceType> OnClickItemRecipe;
 
-	int price;
+	long price;
 
 	public void Init()
 	{

@@ -26,6 +26,11 @@ public class NavBarView : MonoBehaviour
         boostsButton.onClick.AddListener(OnClickBoosts);
         mothershipButton.onClick.AddListener(OnClickMothership);
 
+        // These menus have no views yet, hide them for the MVP
+        managersButton.gameObject.SetActive(false);
+        boostsButton.gameObject.SetActive(false);
+        mothershipButton.gameObject.SetActive(false);
+
         signalBus.Subscribe<ResearchCompletedSignal>(OnResearchUnlocked);
     }
 

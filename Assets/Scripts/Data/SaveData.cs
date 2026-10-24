@@ -18,7 +18,7 @@ public class SaveData
 [Serializable]
 public class PlayerSaveData
 {
-    public int Money;
+    public long Money;
     public List<ResourceSaveEntry> Resources = new List<ResourceSaveEntry>();
     public List<CurrencySaveEntry> Currencies = new List<CurrencySaveEntry>();
     public List<AlloyType> UnlockedAlloys = new List<AlloyType>();

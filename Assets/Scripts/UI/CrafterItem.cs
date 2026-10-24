@@ -57,7 +57,7 @@ public class CrafterItem : MonoBehaviour
         }
 	}
 
-    public void SetSmelterUnlockPrice(int price)
+    public void SetSmelterUnlockPrice(long price)
     {
         smelterUnlockPriceText.text = price.ToString() + "$";
     }

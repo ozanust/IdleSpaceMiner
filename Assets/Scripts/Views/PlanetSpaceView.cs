@@ -25,7 +25,7 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 		planetSpriteRenderer.color = Color.white;
 	}
 
-	public void SetPrice(int price)
+	public void SetPrice(long price)
 	{
 		priceText.text = string.Format("{0}{1}", "$", price.ToString());
 	}

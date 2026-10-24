@@ -27,7 +27,7 @@ public class ResourceSettings : ScriptableObject
 	public CrafterSetting[] CrafterSettings => crafterSettings;
 	public ResearchSettings[] ResearchSettings => researchSettings;
 
-	public int GetResourceValue(ResourceType type)
+	public long GetResourceValue(ResourceType type)
 	{
 		for (int i = 0; i < resourceValueSettings.Length; i++)
 		{
@@ -202,7 +202,7 @@ public class ItemDataSetting
 public class ResourceValueSetting
 {
 	public ResourceType Type;
-	public int Value;
+	public long Value;
 }
 
 [System.Serializable]
@@ -218,7 +218,7 @@ public class AlloySmeltSettings
 	public AlloyType Type;
 	public int ResourceNeeded;
 	public float TimeToSmelt;
-	public int PriceToUnlock;
+	public long PriceToUnlock;
 }
 
 [System.Serializable]
@@ -227,21 +227,21 @@ public class ItemSmeltSettings
 	public ResourceType Type;
 	public ResearchNeededResource[] NeededResources;
 	public float TimeToSmelt;
-	public int PriceToUnlock;
+	public long PriceToUnlock;
 }
 
 [System.Serializable]
 public class SmelterSetting
 {
 	public int SmelterId;
-	public int Price;
+	public long Price;
 }
 
 [System.Serializable]
 public class CrafterSetting
 {
 	public int CrafterId;
-	public int Price;
+	public long Price;
 }
 
 [System.Serializable]

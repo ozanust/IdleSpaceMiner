@@ -20,7 +20,7 @@ public class GameSettings : ScriptableObject
 [System.Serializable]
 public class EconomySettings
 {
-	public int StartingMoney;
+	public long StartingMoney;
 	public int StartingDarkMatter;
 }
 
