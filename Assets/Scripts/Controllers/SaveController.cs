@@ -47,6 +47,7 @@ public class SaveController : ITickable, IDisposable
         signalBus.Subscribe<ResourcesSellSignal>(OnSaveTrigger);
         signalBus.Subscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Subscribe<OnApplicationQuitSignal>(OnApplicationQuit);
+        signalBus.Subscribe<OnApplicationFocusSignal>(OnApplicationFocus);
     }
     
     public void Dispose()
@@ -58,6 +59,7 @@ public class SaveController : ITickable, IDisposable
         signalBus.Unsubscribe<ResourcesSellSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Unsubscribe<OnApplicationQuitSignal>(OnApplicationQuit);
+        signalBus.Unsubscribe<OnApplicationFocusSignal>(OnApplicationFocus);
     }
 
     /// <summary>Suppresses all saves until EndRestore is called.</summary>
@@ -76,6 +78,15 @@ public class SaveController : ITickable, IDisposable
     private void OnApplicationQuit()
     {
         Save();
+    }
+
+    // Mobile OSes often kill backgrounded apps without a quit callback
+    private void OnApplicationFocus(OnApplicationFocusSignal signal)
+    {
+        if (!signal.Focus)
+        {
+            Save();
+        }
     }
 
     /// <summary>Builds and writes the full save snapshot to disk.</summary>
@@ -119,6 +130,7 @@ public class SaveController : ITickable, IDisposable
         data.Mining = BuildMiningSaveData();
         data.Smelting = BuildSmeltingSaveData();
         data.Crafting = BuildCraftingSaveData();
+        data.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
 
         return data;
     }

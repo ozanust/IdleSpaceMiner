@@ -28,4 +28,7 @@ public class EconomySettings
 public class GlobalSettings
 {
 	public int[] AsteroidSpawnTimes;
+	// Mining speed while the game is not running, relative to normal speed
+	public float OfflineMiningMultiplier;
+	public int MaxOfflineSeconds;
 }

@@ -13,6 +13,7 @@ public class SaveData
     public MiningSaveData Mining = new MiningSaveData();
     public SmeltingSaveData Smelting = new SmeltingSaveData();
     public CraftingSaveData Crafting = new CraftingSaveData();
+    public long SavedAtUtcTicks;
 }
 
 [Serializable]

@@ -16,6 +16,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	ISaveService saveService;
 	IMiningController miningController;
 	SaveController saveController;
+	IOfflineProgressController offlineProgressController;
 	AsteroidView asteroidPrototype;
 	MissileView missilePrototype;
 
@@ -33,6 +34,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		ISaveService saveService,
 		IMiningController miningController,
 		SaveController saveController,
+		IOfflineProgressController offlineProgressController,
 		AsteroidView asteroidView,
 		MissileView missileView)
 	{
@@ -44,6 +46,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		this.saveService = saveService;
 		this.miningController = miningController;
 		this.saveController = saveController;
+		this.offlineProgressController = offlineProgressController;
 		asteroidPrototype = asteroidView;
 		missilePrototype = missileView;
 
@@ -68,6 +71,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 			saveController.BeginRestore();
 			RestoreFromSave(save);
 			saveController.EndRestore();
+			offlineProgressController.ApplySinceSave(save);
 		}
 
 		signalBus.Subscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);

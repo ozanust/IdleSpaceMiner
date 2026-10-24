@@ -152,6 +152,58 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 	}
 
+	/// <summary>
+	/// Runs smelters then crafters for the given time, each one in id order,
+	/// so a machine can only use what earlier machines produced (same as Idle Planet Miner).
+	/// </summary>
+	public void SimulateOffline(float seconds)
+	{
+		foreach (var sad in GetOrdered(smeltingData))
+		{
+			float timeLeft = seconds * smeltSpeed;
+			while (sad.IsSmelting || TryStartSmelt(sad))
+			{
+				float remaining = sad.SmeltTime - sad.SmeltedTime;
+				if (timeLeft < remaining)
+				{
+					sad.SmeltedTime += timeLeft;
+					break;
+				}
+
+				timeLeft -= remaining;
+				sad.SmeltedTime = 0;
+				sad.IsSmelting = false;
+				playerModel.AddResource(AlloyToResourceConverter.Convert(sad.Type), 1);
+			}
+		}
+
+		foreach (var cad in GetOrdered(craftingData))
+		{
+			float timeLeft = seconds * craftSpeed;
+			while (cad.IsSmelting || TryStartCraft(cad))
+			{
+				float remaining = cad.SmeltTime - cad.SmeltedTime;
+				if (timeLeft < remaining)
+				{
+					cad.SmeltedTime += timeLeft;
+					break;
+				}
+
+				timeLeft -= remaining;
+				cad.SmeltedTime = 0;
+				cad.IsSmelting = false;
+				playerModel.AddResource(cad.Type, 1);
+			}
+		}
+	}
+
+	private static List<T> GetOrdered<T>(Dictionary<int, T> data)
+	{
+		List<int> ids = new List<int>(data.Keys);
+		ids.Sort();
+		return ids.ConvertAll(id => data[id]);
+	}
+
 	private void OnResearchCompleted(ResearchCompletedSignal signal)
 	{
 		switch (signal.ResearchType)

@@ -4,4 +4,5 @@ public interface IProductionController
 	CrafterAlloyData GetCraftingAlloyData(int smelterId);
 	void TryUnlockSmelter();
 	void TryUnlockCrafter();
+	void SimulateOffline(float seconds);
 }

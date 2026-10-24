@@ -17,3 +17,5 @@ MonoBehaviour:
     StartingDarkMatter: 0
   globalSettings:
     AsteroidSpawnTimes: 780000002c010000
+    OfflineMiningMultiplier: 0.22
+    MaxOfflineSeconds: 7200
