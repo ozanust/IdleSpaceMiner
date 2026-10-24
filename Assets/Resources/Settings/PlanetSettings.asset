@@ -19,7 +19,7 @@ MonoBehaviour:
     - Type: 0
       YieldRatio: 1
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 0.5
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Balor
@@ -32,7 +32,7 @@ MonoBehaviour:
     - Type: 1
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Drasta
@@ -45,7 +45,7 @@ MonoBehaviour:
     - Type: 1
       YieldRatio: 0.5
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Anadius
@@ -58,7 +58,7 @@ MonoBehaviour:
     - Type: 2
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Dholen
@@ -73,7 +73,7 @@ MonoBehaviour:
     - Type: 0
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Verr
@@ -84,7 +84,7 @@ MonoBehaviour:
     - Type: 2
       YieldRatio: 1
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Newton
@@ -99,7 +99,7 @@ MonoBehaviour:
     - Type: 3
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Widow
@@ -112,7 +112,7 @@ MonoBehaviour:
     - Type: 0
       YieldRatio: 0.4
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Acheron
@@ -125,7 +125,7 @@ MonoBehaviour:
     - Type: 4
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Yangtze
@@ -140,7 +140,7 @@ MonoBehaviour:
     - Type: 2
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Solveig
@@ -151,7 +151,7 @@ MonoBehaviour:
     - Type: 4
       YieldRatio: 1
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Imir
@@ -166,7 +166,7 @@ MonoBehaviour:
     - Type: 15
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Relic
@@ -179,7 +179,7 @@ MonoBehaviour:
     - Type: 4
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Nith
@@ -194,7 +194,7 @@ MonoBehaviour:
     - Type: 16
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Batalla
@@ -207,7 +207,7 @@ MonoBehaviour:
     - Type: 15
       YieldRatio: 0.5
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Micah
@@ -218,7 +218,7 @@ MonoBehaviour:
     - Type: 16
       YieldRatio: 1
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
+    StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
     Name: Pranas

@@ -4,7 +4,7 @@ using Zenject;
 public class CargoShipView : MonoBehaviour
 {
 	// Converts ship speed stat (planet settings units) to world units per second
-	private const float WorldSpeedScale = 10f;
+	private const float WorldSpeedScale = 3f;
 
 	SignalBus signalBus;
 
