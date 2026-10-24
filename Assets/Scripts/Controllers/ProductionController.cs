@@ -85,7 +85,10 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 			// Refund used resource if smelting in progress
 			if (sData.IsSmelting)
 			{
-				playerModel.AddResource(AlloyToResourceConverter.ConvertToRaw(sData.Type), GetSmeltResourceNeeded(sData.Type));
+				foreach (ResearchNeededResource ingredient in GetSmeltIngredients(sData.Type))
+				{
+					playerModel.AddResource(ingredient.Type, ingredient.Amount);
+				}
 			}
 		}
 	}
@@ -222,9 +225,28 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 	}
 
-	public int GetSmeltResourceNeeded(AlloyType type)
+	/// <summary>
+	/// What one bar costs: its ore for single ore bars, or the listed ingredients for bars
+	/// made from other bars, reduced by Smelting Efficiency.
+	/// </summary>
+	public ResearchNeededResource[] GetSmeltIngredients(AlloyType type)
 	{
-		return Mathf.CeilToInt(resourceSettings.GetSmeltSetting(type).ResourceNeeded * smeltIngredientMultiplier);
+		AlloySmeltSettings settings = resourceSettings.GetSmeltSetting(type);
+		ResearchNeededResource[] baseIngredients = settings.NeededResources != null && settings.NeededResources.Length > 0
+			? settings.NeededResources
+			: new[] { new ResearchNeededResource { Type = AlloyToResourceConverter.ConvertToRaw(type), Amount = settings.ResourceNeeded } };
+
+		ResearchNeededResource[] ingredients = new ResearchNeededResource[baseIngredients.Length];
+		for (int i = 0; i < baseIngredients.Length; i++)
+		{
+			ingredients[i] = new ResearchNeededResource
+			{
+				Type = baseIngredients[i].Type,
+				Amount = Mathf.CeilToInt(baseIngredients[i].Amount * smeltIngredientMultiplier)
+			};
+		}
+
+		return ingredients;
 	}
 
 	public float GetSmeltTime(AlloyType type)
@@ -237,10 +259,10 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		return resourceSettings.GetItemSmeltSetting(type).TimeToSmelt / craftSpeed;
 	}
 
-	/// <summary>Consumes the raw material for one alloy and marks the smelter as working.</summary>
+	/// <summary>Consumes the ingredients for one alloy and marks the smelter as working.</summary>
 	private bool TryStartSmelt(SmelterAlloyData data)
 	{
-		if (!playerModel.TryUseResource(AlloyToResourceConverter.ConvertToRaw(data.Type), GetSmeltResourceNeeded(data.Type)))
+		if (!playerModel.TryUseResources(GetSmeltIngredients(data.Type)))
 		{
 			return false;
 		}

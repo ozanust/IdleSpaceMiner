@@ -201,3 +201,63 @@ MonoBehaviour:
     Resource: 0
     Research: 0
     Reward: 250000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 10
+    Reward: 100000
+  - Type: 2
+    TargetAmount: 11
+    Resource: 0
+    Research: 0
+    Reward: 150000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 21
+    Research: 0
+    Reward: 200000
+  - Type: 2
+    TargetAmount: 13
+    Resource: 0
+    Research: 0
+    Reward: 300000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 17
+    Research: 0
+    Reward: 250000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 11
+    Reward: 400000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 22
+    Research: 0
+    Reward: 500000
+  - Type: 2
+    TargetAmount: 16
+    Resource: 0
+    Research: 0
+    Reward: 1000000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 18
+    Research: 0
+    Reward: 800000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 19
+    Research: 0
+    Reward: 1000000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 23
+    Research: 0
+    Reward: 2000000
+  - Type: 5
+    TargetAmount: 10000000
+    Resource: 0
+    Research: 0
+    Reward: 2500000

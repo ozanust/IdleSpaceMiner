@@ -76,23 +76,24 @@ public static class ProductionUiBuilder
 		Icon(arrow, 0, 48);
 		arrow.GetComponent<Image>().sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ArrowSpritePath);
 
-		CrafterItem crafter = root.GetComponent<CrafterItem>();
-		if (crafter != null)
+		// Extra ingredient slots: bars like Bronze have two, items like Circuit three
+		RectTransform second = ExtraIngredient(images, source, "SecondSourceResourceImage", 1);
+		// GetComponent returns Unity's "fake null" in the editor, so no ?? here
+		MonoBehaviour card = root.GetComponent<CrafterItem>();
+		if (card == null)
 		{
-			RectTransform second = (RectTransform)images.Find("SecondSourceResourceImage");
-			if (second == null)
-			{
-				second = (RectTransform)Object.Instantiate(source.gameObject, images, false).transform;
-				second.name = "SecondSourceResourceImage";
-				second.SetSiblingIndex(source.GetSiblingIndex() + 1);
-			}
-
-			second.gameObject.SetActive(false);
-			SerializedObject so = new SerializedObject(crafter);
-			so.FindProperty("secondSourceResourceImage").objectReferenceValue = second.GetComponent<Image>();
-			so.FindProperty("arrowImage").objectReferenceValue = arrow;
-			so.ApplyModifiedPropertiesWithoutUndo();
+			card = root.GetComponent<SmelterItem>();
 		}
+		SerializedObject so = new SerializedObject(card);
+		so.FindProperty("secondSourceResourceImage").objectReferenceValue = second.GetComponent<Image>();
+		so.FindProperty("arrowImage").objectReferenceValue = arrow;
+		if (card is CrafterItem)
+		{
+			RectTransform third = ExtraIngredient(images, source, "ThirdSourceResourceImage", 2);
+			so.FindProperty("thirdSourceResourceImage").objectReferenceValue = third.GetComponent<Image>();
+		}
+
+		so.ApplyModifiedPropertiesWithoutUndo();
 
 		TMP_Text noRecipe = unlocked.Find("NoRecipeSelectedText").GetComponent<TMP_Text>();
 		Place(noRecipe.rectTransform, new Vector2(0.5f, 1), new Vector2(0, -80), new Vector2(355, 110));
@@ -155,6 +156,21 @@ public static class ProductionUiBuilder
 		price.fontStyle = FontStyles.Bold;
 	}
 
+	/// <summary>Copy of the first ingredient icon (with its amount text, if any) for another ingredient.</summary>
+	private static RectTransform ExtraIngredient(RectTransform images, RectTransform source, string name, int index)
+	{
+		RectTransform extra = (RectTransform)images.Find(name);
+		if (extra == null)
+		{
+			extra = (RectTransform)Object.Instantiate(source.gameObject, images, false).transform;
+			extra.name = name;
+			extra.SetSiblingIndex(source.GetSiblingIndex() + index);
+		}
+
+		extra.gameObject.SetActive(false);
+		return extra;
+	}
+
 	private static void Icon(RectTransform icon, float x, float size)
 	{
 		icon.anchorMin = icon.anchorMax = icon.pivot = new Vector2(0.5f, 0.5f);
@@ -182,13 +198,15 @@ public static class ProductionUiBuilder
 		lockIcon.GetComponent<Image>().preserveAspect = true;
 
 		RectTransform images = (RectTransform)t.Find("SelectedRecipeImages");
-		Place(images, new Vector2(0.5f, 1), new Vector2(0, -96), new Vector2(420, 150));
+		Place(images, new Vector2(0.5f, 1), new Vector2(0, -84), new Vector2(420, 150));
 		if (images.GetComponent<CanvasGroup>() == null)
 		{
 			images.gameObject.AddComponent<CanvasGroup>();
 		}
 
-		foreach (string name in new[] { "SourceResourceImage", "SecondSourceResourceImage" })
+		ExtraIngredient(images, (RectTransform)images.Find("SecondSourceResourceImage"), "ThirdSourceResourceImage", 1);
+
+		foreach (string name in new[] { "SourceResourceImage", "SecondSourceResourceImage", "ThirdSourceResourceImage" })
 		{
 			RectTransform icon = (RectTransform)images.Find(name);
 			icon.anchorMin = icon.anchorMax = icon.pivot = new Vector2(0.5f, 0.5f);
@@ -243,6 +261,9 @@ public static class ProductionUiBuilder
 		SerializedObject so = new SerializedObject(item);
 		so.FindProperty("arrowImage").objectReferenceValue = arrow;
 		so.FindProperty("lockedFooter").objectReferenceValue = footer.gameObject;
+		Transform thirdSource = images.Find("ThirdSourceResourceImage");
+		so.FindProperty("thirdSourceImage").objectReferenceValue = thirdSource.GetComponent<Image>();
+		so.FindProperty("thirdSourceNeededAmountText").objectReferenceValue = thirdSource.GetComponentInChildren<TMP_Text>(true);
 		so.ApplyModifiedPropertiesWithoutUndo();
 	}
 

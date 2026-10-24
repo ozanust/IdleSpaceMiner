@@ -30,12 +30,8 @@ public class SmeltRecipeItem : MonoBehaviour
 	[Header("Optional")]
 	[SerializeField] private RectTransform arrowImage;
 	[SerializeField] private GameObject lockedFooter;
-
-	// Icon spacing and size in the recipe line, for one and for two ingredients
-	private const float IconSpacing = 115f;
-	private const float IconSize = 90f;
-	private const float TwoIngredientSpacing = 88f;
-	private const float TwoIngredientIconSize = 72f;
+	[SerializeField] private Image thirdSourceImage;
+	[SerializeField] private TMP_Text thirdSourceNeededAmountText;
 
 	private IProductionController productionController;
 	AlloyType targetAlloyType;
@@ -45,7 +41,7 @@ public class SmeltRecipeItem : MonoBehaviour
 
 	long price;
 
-	private bool IsAlloy => resourceType <= ResourceType.AluminumBar;
+	private bool IsAlloy => resourceSettings.GetResourceParentType(resourceType) == MainResourceType.Alloy;
 
 	public void Init()
 	{
@@ -121,9 +117,12 @@ public class SmeltRecipeItem : MonoBehaviour
 		if (IsAlloy)
 		{
 			AlloySmeltSettings settings = resourceSettings.GetSmeltSetting(targetAlloyType);
-			int needed = productionController != null ? productionController.GetSmeltResourceNeeded(targetAlloyType) : settings.ResourceNeeded;
-			ResourceType ore = AlloyToResourceConverter.ConvertToRaw(targetAlloyType);
-			SetIngredients(new[] { new ResearchNeededResource { Type = ore, Amount = needed } });
+			ResearchNeededResource[] ingredients = productionController != null
+				? productionController.GetSmeltIngredients(targetAlloyType)
+				: settings.NeededResources != null && settings.NeededResources.Length > 0
+					? settings.NeededResources
+					: new[] { new ResearchNeededResource { Type = AlloyToResourceConverter.ConvertToRaw(targetAlloyType), Amount = settings.ResourceNeeded } };
+			SetIngredients(ingredients);
 			SetDuration(productionController != null ? productionController.GetSmeltTime(targetAlloyType) : settings.TimeToSmelt);
 		}
 		else
@@ -136,44 +135,17 @@ public class SmeltRecipeItem : MonoBehaviour
 
 	private void SetIngredients(ResearchNeededResource[] ingredients)
 	{
-		sourceImage.sprite = GetIcon(ingredients[0].Type);
-		sourceNeededAmountText.text = NumberFormatter.Format(ingredients[0].Amount);
+		Image[] images = { sourceImage, secondSourceImage, thirdSourceImage };
+		TMP_Text[] amounts = { sourceNeededAmountText, secondSourceNeededAmountText, thirdSourceNeededAmountText };
+		int count = Mathf.Min(ingredients.Length, thirdSourceImage != null ? 3 : 2);
 
-		bool hasSecond = ingredients.Length > 1;
-		secondSourceImage.gameObject.SetActive(hasSecond);
-		if (hasSecond)
+		for (int i = 0; i < count; i++)
 		{
-			secondSourceImage.sprite = GetIcon(ingredients[1].Type);
-			secondSourceNeededAmountText.text = NumberFormatter.Format(ingredients[1].Amount);
+			images[i].sprite = GetIcon(ingredients[i].Type);
+			amounts[i].text = NumberFormatter.Format(ingredients[i].Amount);
 		}
 
-		// Ingredients, arrow and result in one centred line, tighter with two ingredients
-		float spacing = hasSecond ? TwoIngredientSpacing : IconSpacing;
-		float iconSize = hasSecond ? TwoIngredientIconSize : IconSize;
-		float[] slots = hasSecond
-			? new[] { -1.5f, -0.5f, 0.5f, 1.5f }
-			: new[] { -1f, 0f, 1f };
-		Place(sourceImage.rectTransform, slots[0], spacing, iconSize);
-		if (hasSecond)
-		{
-			Place(secondSourceImage.rectTransform, slots[1], spacing, iconSize);
-		}
-
-		if (arrowImage != null)
-		{
-			Place(arrowImage, slots[slots.Length - 2], spacing, 0);
-		}
-
-		Place(targetImage.rectTransform, slots[slots.Length - 1], spacing, iconSize);
-	}
-
-	private static void Place(RectTransform rect, float slot, float spacing, float size)
-	{
-		rect.anchoredPosition = new Vector2(slot * spacing, rect.anchoredPosition.y);
-		if (size > 0)
-		{
-			rect.sizeDelta = new Vector2(size, size);
-		}
+		RecipeLineLayout.Layout(images, count, arrowImage, targetImage.rectTransform);
 	}
 
 	// All ores, bars and items are in the resource data, unlike the per kind lookups

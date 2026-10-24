@@ -26,7 +26,11 @@ public class SmelterItem : MonoBehaviour
 
     [SerializeField] private bool isUnlocked = false;
     [SerializeField] private int smelterId;
-    
+
+    [Header("Optional")]
+    [SerializeField] private Image secondSourceResourceImage;
+    [SerializeField] private RectTransform arrowImage;
+
     private SmelterAlloyData data;
 
 	private void Awake()
@@ -116,12 +120,21 @@ public class SmelterItem : MonoBehaviour
 	{
         if (isUnlocked && smelterId == signal.SmelterId && data == null)
         {
-            ResourceType ore = AlloyToResourceConverter.ConvertToRaw(signal.RecipeType);
-
             noRecipeSelectedText.gameObject.SetActive(false);
             selectedRecipeImagesParent.SetActive(true);
-            sourceResourceImage.sprite = resourceSettings.GetResourceData(ore).Icon;
             targetResourceImage.sprite = resourceSettings.GetResourceData(AlloyToResourceConverter.Convert(signal.RecipeType)).Icon;
+
+            // Bars from ore have one ingredient, bars like Bronze and Steel have two
+            ResearchNeededResource[] ingredients = productionController.GetSmeltIngredients(signal.RecipeType);
+            Image[] images = { sourceResourceImage, secondSourceResourceImage };
+            int count = 0;
+            for (int i = 0; i < ingredients.Length && i < images.Length && images[i] != null; i++)
+            {
+                images[i].sprite = resourceSettings.GetResourceData(ingredients[i].Type).Icon;
+                count++;
+            }
+
+            RecipeLineLayout.Layout(images, count, arrowImage, targetResourceImage.rectTransform);
             data = productionController.GetAlloyData(signal.SmelterId);
             recipeProgressSlider.maxValue = data.SmeltTime;
             recipeProgressSlider.minValue = 0;

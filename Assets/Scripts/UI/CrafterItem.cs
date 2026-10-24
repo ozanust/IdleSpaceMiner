@@ -29,13 +29,8 @@ public class CrafterItem : MonoBehaviour
 
     [Header("Optional")]
     [SerializeField] private Image secondSourceResourceImage;
+    [SerializeField] private Image thirdSourceResourceImage;
     [SerializeField] private RectTransform arrowImage;
-
-    // Icon spacing and size in the recipe line, for one and for two ingredients
-    private const float IconSpacing = 105f;
-    private const float IconSize = 96f;
-    private const float TwoIngredientSpacing = 80f;
-    private const float TwoIngredientIconSize = 70f;
 
     private CrafterAlloyData data;
 
@@ -115,7 +110,6 @@ public class CrafterItem : MonoBehaviour
 
 			noRecipeSelectedText.gameObject.SetActive(false);
 			selectedRecipeImagesParent.SetActive(true);
-			sourceResourceImage.sprite = resourceSettings.GetResourceData(ingredients[0].Type).Icon;
 			targetResourceImage.sprite = resourceSettings.GetResourceData(signal.RecipeType).Icon;
 			LayoutIngredients(ingredients);
 			data = productionController.GetCraftingAlloyData(signal.SmelterId);
@@ -140,42 +134,18 @@ public class CrafterItem : MonoBehaviour
 		}
 	}
 
-    /// <summary>Shows a second ingredient when the item has one, with all icons in one centred line.</summary>
+    /// <summary>Shows up to three ingredients with all icons in one centred line.</summary>
     private void LayoutIngredients(ResearchNeededResource[] ingredients)
     {
-        if (secondSourceResourceImage == null || arrowImage == null)
+        Image[] images = { sourceResourceImage, secondSourceResourceImage, thirdSourceResourceImage };
+        int count = 0;
+        for (int i = 0; i < ingredients.Length && i < images.Length && images[i] != null; i++)
         {
-            return;
+            images[i].sprite = resourceSettings.GetResourceData(ingredients[i].Type).Icon;
+            count++;
         }
 
-        bool hasSecond = ingredients.Length > 1;
-        secondSourceResourceImage.gameObject.SetActive(hasSecond);
-        if (hasSecond)
-        {
-            secondSourceResourceImage.sprite = resourceSettings.GetResourceData(ingredients[1].Type).Icon;
-        }
-
-        // Tighter with two ingredients so the line fits the card
-        float spacing = hasSecond ? TwoIngredientSpacing : IconSpacing;
-        float iconSize = hasSecond ? TwoIngredientIconSize : IconSize;
-        float[] slots = hasSecond ? new[] { -1.5f, -0.5f, 0.5f, 1.5f } : new[] { -1f, 0f, 1f };
-        Place(sourceResourceImage.rectTransform, slots[0], spacing, iconSize);
-        if (hasSecond)
-        {
-            Place(secondSourceResourceImage.rectTransform, slots[1], spacing, iconSize);
-        }
-
-        Place(arrowImage, slots[slots.Length - 2], spacing, 0);
-        Place(targetResourceImage.rectTransform, slots[slots.Length - 1], spacing, iconSize);
-    }
-
-    private static void Place(RectTransform rect, float slot, float spacing, float size)
-    {
-        rect.anchoredPosition = new Vector2(slot * spacing, rect.anchoredPosition.y);
-        if (size > 0)
-        {
-            rect.sizeDelta = new Vector2(size, size);
-        }
+        RecipeLineLayout.Layout(images, count, arrowImage, targetResourceImage.rectTransform);
     }
 
     public void SetInjections(SignalBus signalBus, ResourceSettings resourceSettings, IProductionController productionController, IPlayerModel playerModel)

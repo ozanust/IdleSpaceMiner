@@ -58,6 +58,42 @@ MonoBehaviour:
   - Type: 14
     Name: Glass
     Icon: {fileID: 21300000, guid: 6886c9646d11a8c448f17414ec985b1b, type: 3}
+  - Type: 15
+    Name: Silver
+    Icon: {fileID: 21300000, guid: 78c920dd732c40644931b65c748e70f0, type: 3}
+  - Type: 16
+    Name: Gold
+    Icon: {fileID: 21300000, guid: 8d20b6251162a784e8b16873bf459f75, type: 3}
+  - Type: 17
+    Name: Silver Bar
+    Icon: {fileID: 21300000, guid: d1e6d09567a5ee746809bb69f4237d6e, type: 3}
+  - Type: 18
+    Name: Gold Bar
+    Icon: {fileID: 21300000, guid: c460c5e5fa4f5824a8ec70d90c00a25b, type: 3}
+  - Type: 19
+    Name: Bronze Bar
+    Icon: {fileID: 21300000, guid: 0db66de6cb98ffc4d9550194bdfcfff3, type: 3}
+  - Type: 20
+    Name: Steel Bar
+    Icon: {fileID: 21300000, guid: a614cacb74ab467438c4dcf8296e0d21, type: 3}
+  - Type: 21
+    Name: Circuit
+    Icon: {fileID: 21300000, guid: b216ec3765542d7438630f8d032bc003, type: 3}
+  - Type: 22
+    Name: Lens
+    Icon: {fileID: 21300000, guid: fa1bd74cfe1e53e4e8914e380e5cb536, type: 3}
+  - Type: 23
+    Name: Laser
+    Icon: {fileID: 21300000, guid: 132ba342e07c88f498c656f103d78c86, type: 3}
+  - Type: 24
+    Name: Basic Computer
+    Icon: {fileID: 21300000, guid: 2f81c70bb4b1a094f89930dd42aa6e34, type: 3}
+  - Type: 25
+    Name: Solar Panel
+    Icon: {fileID: 21300000, guid: df2fa138d0121e046a2b1e09f96154c2, type: 3}
+  - Type: 26
+    Name: Laser Torch
+    Icon: {fileID: 21300000, guid: 4d92f25f3c86d1143b459d89e98664cc, type: 3}
   alloyDataSettings:
   - Type: 0
     Name: Copper Bar
@@ -74,6 +110,18 @@ MonoBehaviour:
   - Type: 4
     Name: Aluminum Bar
     Icon: {fileID: 21300000, guid: 39dd0244f54aebf4e85882397bd5d7b2, type: 3}
+  - Type: 5
+    Name: Silver Bar
+    Icon: {fileID: 21300000, guid: d1e6d09567a5ee746809bb69f4237d6e, type: 3}
+  - Type: 6
+    Name: Gold Bar
+    Icon: {fileID: 21300000, guid: c460c5e5fa4f5824a8ec70d90c00a25b, type: 3}
+  - Type: 7
+    Name: Bronze Bar
+    Icon: {fileID: 21300000, guid: 0db66de6cb98ffc4d9550194bdfcfff3, type: 3}
+  - Type: 8
+    Name: Steel Bar
+    Icon: {fileID: 21300000, guid: a614cacb74ab467438c4dcf8296e0d21, type: 3}
   itemDataSettings:
   - Type: 10
     Name: Copper Wire
@@ -105,6 +153,24 @@ MonoBehaviour:
   - Type: 9
     Name: Aluminum Bar
     Icon: {fileID: 21300000, guid: 39dd0244f54aebf4e85882397bd5d7b2, type: 3}
+  - Type: 21
+    Name: Circuit
+    Icon: {fileID: 21300000, guid: b216ec3765542d7438630f8d032bc003, type: 3}
+  - Type: 22
+    Name: Lens
+    Icon: {fileID: 21300000, guid: fa1bd74cfe1e53e4e8914e380e5cb536, type: 3}
+  - Type: 23
+    Name: Laser
+    Icon: {fileID: 21300000, guid: 132ba342e07c88f498c656f103d78c86, type: 3}
+  - Type: 24
+    Name: Basic Computer
+    Icon: {fileID: 21300000, guid: 2f81c70bb4b1a094f89930dd42aa6e34, type: 3}
+  - Type: 25
+    Name: Solar Panel
+    Icon: {fileID: 21300000, guid: df2fa138d0121e046a2b1e09f96154c2, type: 3}
+  - Type: 26
+    Name: Laser Torch
+    Icon: {fileID: 21300000, guid: 4d92f25f3c86d1143b459d89e98664cc, type: 3}
   resourceValueSettings:
   - Type: 0
     Value: 1
@@ -136,34 +202,91 @@ MonoBehaviour:
     Value: 135000
   - Type: 14
     Value: 220000
+  - Type: 15
+    Value: 36
+  - Type: 16
+    Value: 75
+  - Type: 17
+    Value: 60000
+  - Type: 18
+    Value: 120000
+  - Type: 19
+    Value: 234000
+  - Type: 20
+    Value: 340000
+  - Type: 21
+    Value: 620000
+  - Type: 22
+    Value: 1100000
+  - Type: 23
+    Value: 3200000
+  - Type: 24
+    Value: 7600000
+  - Type: 25
+    Value: 12500000
+  - Type: 26
+    Value: 31000000
   resourceTypeSettings:
   - Type: 1
-    SubTypes: 0000000001000000020000000300000004000000
+    SubTypes: 00000000010000000200000003000000040000000f00000010000000
   - Type: 2
-    SubTypes: 0500000006000000070000000800000009000000
+    SubTypes: 050000000600000007000000080000000900000011000000120000001300000014000000
   - Type: 3
-    SubTypes: 0a0000000b0000000c0000000d0000000e000000
+    SubTypes: 0a0000000b0000000c0000000d0000000e00000015000000160000001700000018000000190000001a000000
   alloySmeltTimeSettings:
   - Type: 0
+    NeededResources: []
     ResourceNeeded: 1000
     TimeToSmelt: 20
     PriceToUnlock: 0
   - Type: 1
+    NeededResources: []
     ResourceNeeded: 1000
     TimeToSmelt: 30
     PriceToUnlock: 3000
   - Type: 2
+    NeededResources: []
     ResourceNeeded: 1000
     TimeToSmelt: 40
     PriceToUnlock: 9000
   - Type: 3
+    NeededResources: []
     ResourceNeeded: 1000
     TimeToSmelt: 60
     PriceToUnlock: 25000
   - Type: 4
+    NeededResources: []
     ResourceNeeded: 1000
     TimeToSmelt: 80
     PriceToUnlock: 75000
+  - Type: 5
+    NeededResources: []
+    ResourceNeeded: 1000
+    TimeToSmelt: 120
+    PriceToUnlock: 225000
+  - Type: 6
+    NeededResources: []
+    ResourceNeeded: 1000
+    TimeToSmelt: 180
+    PriceToUnlock: 500000
+  - Type: 7
+    NeededResources:
+    - Type: 17
+      Amount: 2
+    - Type: 5
+      Amount: 10
+    ResourceNeeded: 0
+    TimeToSmelt: 240
+    PriceToUnlock: 1000000
+  - Type: 8
+    NeededResources:
+    - Type: 7
+      Amount: 15
+    - Type: 6
+      Amount: 30
+    ResourceNeeded: 0
+    TimeToSmelt: 480
+    PriceToUnlock: 2000000
   itemSmeltTimeSettings:
   - Type: 10
     NeededResources:
@@ -199,6 +322,60 @@ MonoBehaviour:
       Amount: 10
     TimeToSmelt: 720
     PriceToUnlock: 200000
+  - Type: 21
+    NeededResources:
+    - Type: 8
+      Amount: 5
+    - Type: 9
+      Amount: 5
+    - Type: 10
+      Amount: 10
+    TimeToSmelt: 1200
+    PriceToUnlock: 400000
+  - Type: 22
+    NeededResources:
+    - Type: 14
+      Amount: 1
+    - Type: 17
+      Amount: 5
+    TimeToSmelt: 2400
+    PriceToUnlock: 1000000
+  - Type: 23
+    NeededResources:
+    - Type: 18
+      Amount: 5
+    - Type: 22
+      Amount: 1
+    - Type: 6
+      Amount: 10
+    TimeToSmelt: 3600
+    PriceToUnlock: 2000000
+  - Type: 24
+    NeededResources:
+    - Type: 21
+      Amount: 5
+    - Type: 17
+      Amount: 5
+    TimeToSmelt: 4800
+    PriceToUnlock: 5000000
+  - Type: 25
+    NeededResources:
+    - Type: 21
+      Amount: 5
+    - Type: 14
+      Amount: 10
+    TimeToSmelt: 6000
+    PriceToUnlock: 10000000
+  - Type: 26
+    NeededResources:
+    - Type: 19
+      Amount: 5
+    - Type: 23
+      Amount: 2
+    - Type: 22
+      Amount: 5
+    TimeToSmelt: 7200
+    PriceToUnlock: 20000000
   smelterSettings:
   - SmelterId: 0
     Price: 0

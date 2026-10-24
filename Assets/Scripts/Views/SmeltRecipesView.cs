@@ -75,114 +75,105 @@ public class SmeltRecipesView : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Shows every unlocked recipe plus the next locked one of each kind. The order comes from
+	/// the recipe lists in ResourceSettings, so new bars and items only need data.
+	/// </summary>
 	private void Init()
 	{
-		AlloyType[] types = playerModel.GetUnlockedAlloys();
-		foreach (AlloyType type in types)
+		foreach (AlloyType alloy in playerModel.GetUnlockedAlloys())
 		{
-			if (!alloyTypes.Contains(type))
-			{
-				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
-				items.Add(item);
-				item.SetLockedItemType(AlloyToResourceConverter.Convert(type));
-				item.SetAlloyType(type);
-				item.SetType(SmelterType.Smelter);
-				item.OnClick += OnClickRecipe;
-				item.Unlock();
-				item.Init();
-				alloyTypes.Add(type);
-			}
+			AddSmeltRecipe(alloy, true);
 		}
 
-		if (types[types.Length - 1] < AlloyType.AluminumBar)
+		foreach (ResourceType item in playerModel.GetUnlockedItemRecipes())
 		{
-			AlloyType nextType = types[types.Length - 1] + 1;
-			SmeltRecipeItem nextItem = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-			nextItem.SetInjections(signalBus, playerModel, resourceSettings, productionController);
-				items.Add(nextItem);
-			nextItem.SetAlloyType(nextType);
-			nextItem.SetType(SmelterType.Smelter);
-			nextItem.SetLockedItemType(AlloyToResourceConverter.Convert(nextType));
-			nextItem.OnClick += OnClickRecipe;
-			nextItem.Init();
-			alloyTypes.Add(nextType);
+			AddCraftRecipe(item, true);
 		}
 
-		ResourceType[] restypes = playerModel.GetUnlockedItemRecipes();
-		foreach (ResourceType type in restypes)
-		{
-			if (!craftTypes.Contains(type))
-			{
-				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
-				items.Add(item);
-				item.SetLockedItemType(type);
-				item.SetResourceType(type);
-				item.SetType(SmelterType.Crafter);
-				item.OnClickItemRecipe += OnClickItemRecipe;
-				item.Unlock();
-				item.Init();
-				craftTypes.Add(type);
-			}
-		}
-
-		if (restypes[restypes.Length - 1] < ResourceType.Glass)
-		{
-			ResourceType nextType = restypes[restypes.Length - 1] + 1;
-			SmeltRecipeItem nextCraftItem = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-			nextCraftItem.SetInjections(signalBus, playerModel, resourceSettings, productionController);
-				items.Add(nextCraftItem);
-			nextCraftItem.SetResourceType(nextType);
-			nextCraftItem.SetType(SmelterType.Crafter);
-			nextCraftItem.SetLockedItemType(nextType);
-			nextCraftItem.OnClickItemRecipe += OnClickItemRecipe;
-			nextCraftItem.Init();
-			craftTypes.Add(nextType);
-		}
+		AddNextLockedSmeltRecipe();
+		AddNextLockedCraftRecipe();
 	}
 
 	private void OnRecipeUnlocked(RecipeUnlockedSignal signal)
 	{
-		if (signal.Type == ResourceType.Glass)
+		// The unlocked card updates itself, the next recipe in line becomes visible
+		if (resourceSettings.GetResourceParentType(signal.Type) == MainResourceType.Alloy)
+		{
+			AddNextLockedSmeltRecipe();
+		}
+		else
+		{
+			AddNextLockedCraftRecipe();
+		}
+	}
+
+	private void AddNextLockedSmeltRecipe()
+	{
+		foreach (AlloySmeltSettings recipe in resourceSettings.AlloySmeltSettings)
+		{
+			if (!alloyTypes.Contains(recipe.Type))
+			{
+				AddSmeltRecipe(recipe.Type, false);
+				return;
+			}
+		}
+	}
+
+	private void AddNextLockedCraftRecipe()
+	{
+		foreach (ItemSmeltSettings recipe in resourceSettings.ItemSmeltTimeSettings)
+		{
+			if (!craftTypes.Contains(recipe.Type))
+			{
+				AddCraftRecipe(recipe.Type, false);
+				return;
+			}
+		}
+	}
+
+	private void AddSmeltRecipe(AlloyType alloy, bool unlocked)
+	{
+		if (alloyTypes.Contains(alloy))
 		{
 			return;
 		}
 
-		ResourceType nextType = signal.Type + 1;
-
-		if (nextType < ResourceType.CopperWire && nextType > ResourceType.Aluminum)
+		SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
+		item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+		item.SetType(SmelterType.Smelter);
+		item.SetLockedItemType(AlloyToResourceConverter.Convert(alloy));
+		item.OnClick += OnClickRecipe;
+		if (unlocked)
 		{
-			AlloyType type = ResourceToAlloyConverter.Convert(nextType);
+			item.Unlock();
+		}
 
-			if (!alloyTypes.Contains(type))
-			{
-				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, smeltRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
-				items.Add(item);
-				item.SetAlloyType(type);
-				item.SetType(SmelterType.Smelter);
-				item.SetLockedItemType(nextType);
-				item.OnClick += OnClickRecipe;
-				item.Init();
-				alloyTypes.Add(type);
-			}
-		}
-		else if (nextType >= ResourceType.CopperWire)
+		item.Init();
+		items.Add(item);
+		alloyTypes.Add(alloy);
+	}
+
+	private void AddCraftRecipe(ResourceType resource, bool unlocked)
+	{
+		if (craftTypes.Contains(resource))
 		{
-			if (!craftTypes.Contains(nextType))
-			{
-				SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
-				item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
-				items.Add(item);
-				item.SetResourceType(nextType);
-				item.SetType(SmelterType.Crafter);
-				item.SetLockedItemType(nextType);
-				item.OnClickItemRecipe += OnClickItemRecipe;
-				item.Init();
-				craftTypes.Add(nextType);
-			}
+			return;
 		}
+
+		SmeltRecipeItem item = Instantiate(smeltRecipeItemPrototype, craftRecipeItemsContainer.transform);
+		item.SetInjections(signalBus, playerModel, resourceSettings, productionController);
+		item.SetType(SmelterType.Crafter);
+		item.SetLockedItemType(resource);
+		item.OnClickItemRecipe += OnClickItemRecipe;
+		if (unlocked)
+		{
+			item.Unlock();
+		}
+
+		item.Init();
+		items.Add(item);
+		craftTypes.Add(resource);
 	}
 
 	private void OnClickRecipe(AlloyType alloyType)

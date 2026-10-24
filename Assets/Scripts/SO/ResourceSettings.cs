@@ -216,6 +216,8 @@ public class ResourceTypeSetting
 public class AlloySmeltSettings
 {
 	public AlloyType Type;
+	// Bars made from other bars list them here; otherwise the bar takes ResourceNeeded of its ore
+	public ResearchNeededResource[] NeededResources;
 	public int ResourceNeeded;
 	public float TimeToSmelt;
 	public long PriceToUnlock;
