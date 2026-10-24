@@ -118,6 +118,9 @@ public static class TutorialBuilder
 		so.FindProperty("ring").objectReferenceValue = ring.rectTransform;
 		so.FindProperty("pointer").objectReferenceValue = pointer.rectTransform;
 		so.ApplyModifiedPropertiesWithoutUndo();
+
+		// The view shows it while a step is active
+		root.gameObject.SetActive(false);
 	}
 
 	private static readonly Vector2 Center = new Vector2(0.5f, 0.5f);

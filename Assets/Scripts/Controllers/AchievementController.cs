@@ -99,6 +99,7 @@ public class AchievementController : IAchievementController, IInitializable
 
 		claimed.Add(index);
 		playerModel.AddCurrency(CurrencyType.DarkMatter, (int)gameSettings.Achievements[index].Reward);
+		signalBus.Fire<RewardClaimedSignal>();
 		signalBus.Fire<TaskUpdatedSignal>();
 	}
 

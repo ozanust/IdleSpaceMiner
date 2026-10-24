@@ -29,6 +29,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.BindInterfacesTo<TaskController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<AchievementController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<TutorialController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<AudioController>().AsSingle().NonLazy();
 		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
 	}
 
@@ -80,5 +81,8 @@ public class BindingsInstaller : MonoInstaller
 
 		Container.DeclareSignal<ManagersUpdatedSignal>();
 		Container.DeclareSignal<ManagerAssignRequestSignal>();
+
+		Container.DeclareSignal<PurchaseSignal>();
+		Container.DeclareSignal<RewardClaimedSignal>();
 	}
 }

@@ -358,15 +358,20 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 		if (!planetData[planetIndex].IsUnlocked)
 		{
-			if (playerModel.HasMoney(planetSettings.Settings[planetIndex].PlanetPrice))
+			PlanetDataSetting setting = planetSettings.Settings[planetIndex];
+			bool canBuy = playerModel.HasMoney(setting.PlanetPrice);
+			if (canBuy)
 			{
 				spaceModel.UnlockPlanet(planetIndex);
-				playerModel.UseMoney(planetSettings.Settings[planetIndex].PlanetPrice);
+				playerModel.UseMoney(setting.PlanetPrice);
 			}
-			else
+
+			signalBus.Fire(new PurchaseSignal()
 			{
-				Debug.LogWarning("Insufficient funds!");
-			}
+				Kind = PurchaseKind.Planet,
+				Success = canBuy,
+				FailMessage = $"You need {NumberFormatter.FormatMoney(setting.PlanetPrice)} to buy {setting.Name}"
+			});
 		}
 		else
 		{

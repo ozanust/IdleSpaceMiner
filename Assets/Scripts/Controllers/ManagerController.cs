@@ -100,11 +100,13 @@ public class ManagerController : IManagerController, IInitializable, IDisposable
 		ManagerSchoolSetting setting = GetSchool(school);
 		if (setting == null || !playerModel.TryUseCurrency(CurrencyType.DarkMatter, setting.Cost))
 		{
+			signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = false });
 			return false;
 		}
 
 		hired = Roll(setting);
 		Add(hired);
+		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = true });
 		return true;
 	}
 
@@ -118,10 +120,12 @@ public class ManagerController : IManagerController, IInitializable, IDisposable
 	{
 		if (!playerModel.TryUseCurrency(CurrencyType.DarkMatter, GetNextSlotCost()))
 		{
+			signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = false });
 			return false;
 		}
 
 		Slots++;
+		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = true });
 		Changed();
 		return true;
 	}

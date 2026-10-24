@@ -113,6 +113,7 @@ public class TaskController : ITaskController, IInitializable, ITickable
 
 		claimedTasks.Add(index);
 		playerModel.AddMoney(gameSettings.Tasks[index].Reward);
+		signalBus.Fire<RewardClaimedSignal>();
 		UpdateActiveTasks();
 		signalBus.Fire<TaskUpdatedSignal>();
 	}

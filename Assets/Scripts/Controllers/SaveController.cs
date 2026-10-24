@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 /// <summary>
@@ -28,6 +29,9 @@ public class SaveController : ITickable, IDisposable
     /// Set to true before restoring state from a save file, false once restore is complete.
     /// </summary>
     private bool isRestoring;
+
+    // Set once progress is wiped, so nothing writes the old game back before the scene reloads
+    private bool isReset;
 
     public SaveController(
         ISaveService saveService,
@@ -101,10 +105,18 @@ public class SaveController : ITickable, IDisposable
         }
     }
 
+    /// <summary>Deletes the save and restarts the game scene as a new game.</summary>
+    public void ResetProgress()
+    {
+        isReset = true;
+        saveService.DeleteSave();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     /// <summary>Builds and writes the full save snapshot to disk.</summary>
     public void Save()
     {
-        if (isRestoring)
+        if (isRestoring || isReset)
         {
             return;
         }
@@ -115,7 +127,7 @@ public class SaveController : ITickable, IDisposable
 
     public void Tick()
     {
-        if (isRestoring)
+        if (isRestoring || isReset)
         {
             return;
         }

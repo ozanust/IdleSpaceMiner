@@ -21,9 +21,8 @@ public class PlanetInfoController : IPlanetInfoController
 		PlanetData planetData;
 		if (spaceModel.TryGetPlanetData(planetId, out planetData))
 		{
-			if (playerModel.HasMoney(planetData.TotalMiningRateUpdatePrice))
+			if (TryPay(planetData.TotalMiningRateUpdatePrice))
 			{
-				playerModel.UseMoney(planetData.TotalMiningRateUpdatePrice);
 				spaceModel.UpdatePlanetMiningRate(planetId);
 			}
 		}
@@ -34,9 +33,8 @@ public class PlanetInfoController : IPlanetInfoController
 		PlanetData planetData;
 		if (spaceModel.TryGetPlanetData(planetId, out planetData))
 		{
-			if (playerModel.HasMoney(planetData.ShipSpeedUpdatePrice))
+			if (TryPay(planetData.ShipSpeedUpdatePrice))
 			{
-				playerModel.UseMoney(planetData.ShipSpeedUpdatePrice);
 				spaceModel.UpdatePlanetShipSpeed(planetId);
 			}
 		}
@@ -47,11 +45,22 @@ public class PlanetInfoController : IPlanetInfoController
 		PlanetData planetData;
 		if (spaceModel.TryGetPlanetData(planetId, out planetData))
 		{
-			if (playerModel.HasMoney(planetData.ShipCargoUpdatePrice))
+			if (TryPay(planetData.ShipCargoUpdatePrice))
 			{
-				playerModel.UseMoney(planetData.ShipCargoUpdatePrice);
 				spaceModel.UpdatePlanetCargo(planetId);
 			}
 		}
+	}
+
+	private bool TryPay(long price)
+	{
+		bool canPay = playerModel.HasMoney(price);
+		if (canPay)
+		{
+			playerModel.UseMoney(price);
+		}
+
+		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Upgrade, Success = canPay, FailMessage = "Not enough money" });
+		return canPay;
 	}
 }

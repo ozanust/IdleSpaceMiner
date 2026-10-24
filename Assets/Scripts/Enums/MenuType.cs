@@ -11,5 +11,6 @@ public enum MenuType
 	Boosts,
 	Mothership,
 	Tasks,
-	Achievements
+	Achievements,
+	Settings
 }

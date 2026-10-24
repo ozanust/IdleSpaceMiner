@@ -319,11 +319,14 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 
 		long nextSmelterPrice = nextSmelter.Price;
-		if (playerModel.HasMoney(nextSmelterPrice))
+		bool canBuy = playerModel.HasMoney(nextSmelterPrice);
+		if (canBuy)
 		{
 			playerModel.UnlockSmelter(nextSmelterId);
 			playerModel.UseMoney(nextSmelterPrice);
 		}
+
+		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Production, Success = canBuy, FailMessage = "Not enough money" });
 	}
 
 	public void TryUnlockCrafter()
@@ -336,10 +339,13 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		}
 
 		long nextCrafterPrice = nextCrafter.Price;
-		if (playerModel.HasMoney(nextCrafterPrice))
+		bool canBuy = playerModel.HasMoney(nextCrafterPrice);
+		if (canBuy)
 		{
 			playerModel.UnlockCrafter(nextCrafterId);
 			playerModel.UseMoney(nextCrafterPrice);
 		}
+
+		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Production, Success = canBuy, FailMessage = "Not enough money" });
 	}
 }

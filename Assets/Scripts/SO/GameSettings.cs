@@ -12,12 +12,14 @@ public class GameSettings : ScriptableObject
 	// Rewards are Dark Matter
 	[SerializeField] private TaskSetting[] achievements = DefaultAchievements();
 	[SerializeField] private ManagerSettings managerSettings = new ManagerSettings();
+	[SerializeField] private GameAudioSettings audioSettings = new GameAudioSettings();
 
 	public EconomySettings EconomySettings => economySettings;
 	public GlobalSettings GlobalSettings => globalSettings;
 	public TaskSetting[] Tasks => tasks;
 	public TaskSetting[] Achievements => achievements;
 	public ManagerSettings ManagerSettings => managerSettings;
+	public GameAudioSettings AudioSettings => audioSettings;
 
 	private static TaskSetting[] DefaultAchievements()
 	{
@@ -117,4 +119,21 @@ public class ManagerSchoolSetting
 	public int Cost;
 	public int[] Stars;
 	public float[] Chances;
+}
+
+/// <summary>Volumes, and optional clips that replace the sounds generated in code.</summary>
+[System.Serializable]
+public class GameAudioSettings
+{
+	[Range(0f, 1f)] public float MusicVolume = 0.35f;
+	[Range(0f, 1f)] public float SfxVolume = 0.7f;
+	public AudioClip Music;
+	public SoundClip[] Sounds = new SoundClip[0];
+}
+
+[System.Serializable]
+public class SoundClip
+{
+	public SoundType Type;
+	public AudioClip Clip;
 }
