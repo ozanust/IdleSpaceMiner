@@ -1,18 +1,42 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using Zenject;
 
+/// <summary>
+/// Pinch or mouse wheel to zoom, drag with one finger or the mouse to pan.
+/// The starting view shows the whole map, so it is the zoom-out limit and panning
+/// keeps the camera inside it. Gestures that start on UI are ignored.
+/// </summary>
 public class CameraView : MonoBehaviour
 {
     [SerializeField] private Camera cam;
     [Inject] private IInputService inputService;
 
-    public float zoomSpeed = 10.0f;
-    public float minFOV = 10.0f;
-    public float maxFOV = 60.0f;
+    [Tooltip("Field of view when fully zoomed in")]
+    [SerializeField] private float minFieldOfView = 50f;
+    [Tooltip("Zoom change per mouse wheel step")]
+    [SerializeField] private float scrollZoomStep = 0.1f;
 
-    // Start is called before the first frame update
+    private float maxFieldOfView;
+    private Vector3 startPosition;
+
+    private bool isPointerDown;
+    private bool isDragging;
+    private bool isGestureOnUI;
+    private Vector2 pressPosition;
+    private Vector2 lastPointerPosition;
+
+    private bool isPinching;
+    private float lastPinchDistance;
+    private Vector2 lastPinchCenter;
+
+    private readonly List<RaycastResult> raycastResults = new List<RaycastResult>();
+
+    // Distance from the camera to the plane the planets are on (z = 0)
+    private float PlaneDistance => Mathf.Abs(cam.transform.position.z);
+
     void Start()
     {
         if (cam == null)
@@ -20,7 +44,48 @@ public class CameraView : MonoBehaviour
             cam = Camera.main;
         }
 
+        maxFieldOfView = cam.fieldOfView;
+        startPosition = cam.transform.position;
         inputService.OnScroll += OnScroll;
+    }
+
+    private void OnDestroy()
+    {
+        inputService.OnScroll -= OnScroll;
+    }
+
+    private void Update()
+    {
+        if (Input.touchCount >= 2)
+        {
+            HandlePinch(Input.GetTouch(0), Input.GetTouch(1));
+        }
+        else if (Input.touchCount == 1)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            // Lifting one finger of a pinch shouldn't turn into a drag
+            if (isPinching)
+            {
+                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                {
+                    isPinching = false;
+                }
+
+                return;
+            }
+
+            HandlePointer(touch.position, touch.phase == TouchPhase.Began, touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled);
+        }
+        else if (Input.touchSupported)
+        {
+            isPinching = false;
+            ResetPointer();
+        }
+        else
+        {
+            HandlePointer(Input.mousePosition, Input.GetMouseButtonDown(0), Input.GetMouseButtonUp(0));
+        }
     }
 
     /// <summary>
@@ -29,15 +94,153 @@ public class CameraView : MonoBehaviour
     /// <param name="scrollAxis">Determines the movement axis of mouse wheel, 1 for forward, -1 for backward.</param>
     private void OnScroll(float scrollAxis)
 	{
-        float newFOV = cam.fieldOfView - (scrollAxis * zoomSpeed);
+        if (IsOverUI(Input.mousePosition))
+        {
+            return;
+        }
 
-        // Clamp the field of view to stay within the defined min and max values
-        newFOV = Mathf.Clamp(newFOV, minFOV, maxFOV);
+        float factor = scrollAxis > 0 ? 1f - scrollZoomStep : 1f + scrollZoomStep;
+        ZoomAround(Input.mousePosition, factor);
+    }
 
-        LeanTween.value(gameObject, cam.fieldOfView, newFOV, 0.3f)
-            .setOnUpdate((float value) =>
+    private void HandlePointer(Vector2 position, bool down, bool up)
+    {
+        if (down)
+        {
+            isPointerDown = true;
+            isDragging = false;
+            isGestureOnUI = IsOverUI(position);
+            pressPosition = position;
+            lastPointerPosition = position;
+            return;
+        }
+
+        if (!isPointerDown)
+        {
+            return;
+        }
+
+        if (!isGestureOnUI)
+        {
+            // Small movements are taps, so planets and asteroids stay clickable
+            if (!isDragging && (position - pressPosition).magnitude > GetDragThreshold())
             {
-                cam.fieldOfView = value;
-            }).setEase(LeanTweenType.easeOutSine);
+                isDragging = true;
+            }
+
+            if (isDragging)
+            {
+                Pan(position - lastPointerPosition);
+            }
+        }
+
+        lastPointerPosition = position;
+
+        if (up)
+        {
+            ResetPointer();
+        }
+    }
+
+    private void HandlePinch(Touch first, Touch second)
+    {
+        Vector2 center = (first.position + second.position) / 2f;
+        float distance = Vector2.Distance(first.position, second.position);
+
+        if (!isPinching || first.phase == TouchPhase.Began || second.phase == TouchPhase.Began)
+        {
+            isPinching = true;
+            ResetPointer();
+            isGestureOnUI = IsOverUI(first.position) || IsOverUI(second.position);
+            lastPinchDistance = distance;
+            lastPinchCenter = center;
+            return;
+        }
+
+        if (!isGestureOnUI && distance > 0f)
+        {
+            ZoomAround(center, lastPinchDistance / distance);
+            Pan(center - lastPinchCenter);
+        }
+
+        lastPinchDistance = distance;
+        lastPinchCenter = center;
+    }
+
+    private void ResetPointer()
+    {
+        isPointerDown = false;
+        isDragging = false;
+        isGestureOnUI = false;
+    }
+
+    /// <summary>Moves the camera so the map follows the finger.</summary>
+    private void Pan(Vector2 screenDelta)
+    {
+        Vector3 move = -(Vector3)screenDelta * GetWorldUnitsPerPixel(cam.fieldOfView);
+        cam.transform.position += move;
+        ClampPosition();
+    }
+
+    /// <summary>Scales the visible area by factor (below 1 zooms in) while keeping the point under the screen position in place.</summary>
+    private void ZoomAround(Vector2 screenPosition, float factor)
+    {
+        float halfHeight = PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad) * factor;
+        float newFieldOfView = Mathf.Clamp(2f * Mathf.Atan(halfHeight / PlaneDistance) * Mathf.Rad2Deg, minFieldOfView, maxFieldOfView);
+
+        Vector2 fromCenter = screenPosition - new Vector2(Screen.width, Screen.height) * 0.5f;
+        float unitsBefore = GetWorldUnitsPerPixel(cam.fieldOfView);
+        float unitsAfter = GetWorldUnitsPerPixel(newFieldOfView);
+
+        cam.fieldOfView = newFieldOfView;
+        cam.transform.position += (Vector3)(fromCenter * (unitsBefore - unitsAfter));
+        ClampPosition();
+    }
+
+    /// <summary>Keeps the visible area inside the starting (fully zoomed out) view.</summary>
+    private void ClampPosition()
+    {
+        float maxHalfHeight = PlaneDistance * Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
+        float halfHeight = PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float limitY = Mathf.Max(0f, maxHalfHeight - halfHeight);
+        float limitX = limitY * cam.aspect;
+
+        Vector3 offset = cam.transform.position - startPosition;
+        offset.x = Mathf.Clamp(offset.x, -limitX, limitX);
+        offset.y = Mathf.Clamp(offset.y, -limitY, limitY);
+        cam.transform.position = startPosition + offset;
+    }
+
+    private float GetWorldUnitsPerPixel(float fieldOfView)
+    {
+        return 2f * PlaneDistance * Mathf.Tan(fieldOfView * 0.5f * Mathf.Deg2Rad) / Screen.height;
+    }
+
+    private float GetDragThreshold()
+    {
+        return EventSystem.current != null ? EventSystem.current.pixelDragThreshold : 10f;
+    }
+
+    /// <summary>True when the position is over a UI element (planets don't count, they're clickable world objects).</summary>
+    private bool IsOverUI(Vector2 screenPosition)
+    {
+        if (EventSystem.current == null)
+        {
+            return false;
+        }
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current) { position = screenPosition };
+        raycastResults.Clear();
+        EventSystem.current.RaycastAll(pointerData, raycastResults);
+
+        foreach (RaycastResult result in raycastResults)
+        {
+            if (result.module is GraphicRaycaster)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

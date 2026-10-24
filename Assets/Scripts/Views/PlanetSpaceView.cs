@@ -49,6 +49,11 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
+		if (PointerUtility.IsDrag(eventData))
+		{
+			return;
+		}
+
 		OnClick?.Invoke(index);
 	}
 }
