@@ -70,3 +70,11 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Paid Asset Store UI pack and sprites cropped from it: the repo is public and the
+# Asset Store license doesn't allow redistribution. Import the pack, then run
+# Tools > UI > Apply Sci-Fi Theme to regenerate the crops.
+/[Aa]ssets/Sci-Fi Game UI 8/
+/[Aa]ssets/Sci-Fi Game UI 8.meta
+/[Aa]ssets/GFX/Sprites/UI/SciFi/
+/[Aa]ssets/GFX/Sprites/UI/SciFi.meta
