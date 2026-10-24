@@ -10,5 +10,6 @@ public enum MenuType
 	Managers,
 	Boosts,
 	Mothership,
-	Tasks
+	Tasks,
+	Achievements
 }

@@ -89,7 +89,7 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 			return;
 		}
 
-		float miningSeconds = seconds * gameSettings.GlobalSettings.OfflineMiningMultiplier * miningController.MiningRateMultiplier;
+		float miningSeconds = seconds * gameSettings.GlobalSettings.OfflineMiningMultiplier;
 
 		foreach (PlanetData planet in planets)
 		{
@@ -101,7 +101,7 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 
 			foreach (PlanetMiningYield yield in setting.MiningYieldRatios)
 			{
-				int amount = Mathf.FloorToInt(planet.CurrentTotalMiningRate * yield.YieldRatio * miningSeconds);
+				int amount = Mathf.FloorToInt(planet.CurrentTotalMiningRate * miningController.GetMiningMultiplier(planet.PlanetIndex) * yield.YieldRatio * miningSeconds);
 				if (amount > 0)
 				{
 					playerModel.AddResource(yield.Type, amount);

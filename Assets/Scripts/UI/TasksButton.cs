@@ -2,14 +2,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-/// <summary>HUD button that opens the tasks window, with a badge when a task can be claimed.</summary>
+/// <summary>HUD button that opens a goal list window (tasks or achievements), with a badge when something can be claimed.</summary>
 public class TasksButton : MonoBehaviour
 {
 	[Inject] SignalBus signalBus;
 	[Inject] ITaskController taskController;
+	[Inject] IAchievementController achievementController;
 
 	[SerializeField] private Button button;
 	[SerializeField] private GameObject claimableBadge;
+	[SerializeField] private MenuType type = MenuType.Tasks;
+
+	private IClaimableList List => type == MenuType.Achievements ? (IClaimableList)achievementController : taskController;
 
 	private void Awake()
 	{
@@ -29,11 +33,11 @@ public class TasksButton : MonoBehaviour
 
 	private void OnClick()
 	{
-		signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Tasks });
+		signalBus.Fire(new MenuOpenSignal() { Type = type });
 	}
 
 	private void OnTaskUpdated()
 	{
-		claimableBadge.SetActive(taskController.HasClaimableTask());
+		claimableBadge.SetActive(List.HasClaimableEntry());
 	}
 }

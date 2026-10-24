@@ -16,7 +16,7 @@ public static class PlanetPanelBuilder
 	private const string RowSpritePath = "Assets/Sci-Fi Game UI 8/MAIN/PNG/Horizontal tab bar/Tab button default.png";
 	private const string DividerSpritePath = "Assets/GFX/Sprites/UI/SciFi/ui_progress.png";
 
-	private const float PanelHeight = 1200f;
+	private const float PanelHeight = 1330f;
 	private const float Margin = 60f;
 	private const float ContentWidth = 960f;
 	private const float ResourceRowHeight = 76f;
@@ -107,6 +107,7 @@ public static class PlanetPanelBuilder
 
 		BuildHeader(view, panel);
 		BuildResources(panel);
+		BuildManager(view, panel);
 		BuildUpgrades(panel);
 	}
 
@@ -184,10 +185,54 @@ public static class PlanetPanelBuilder
 		tmp.color = MutedColor;
 	}
 
+	/// <summary>Row with the assigned manager and a button that opens the managers window in assign mode.</summary>
+	private static void BuildManager(PlanetInfoView view, RectTransform panel)
+	{
+		RectTransform row = GetOrCreate(panel, "ManagerRow");
+		PlaceSection(row, -700, 110);
+		SetSprite(row.GetComponent<Image>(), AssetDatabase.LoadAssetAtPath<Sprite>(RowSpritePath));
+
+		RectTransform label = GetOrCreateText(row, "ManagerTitle");
+		PlaceTop(label, new Vector2(36, -12), new Vector2(400, 40));
+		TMP_Text labelText = label.GetComponent<TMP_Text>();
+		labelText.text = "MANAGER";
+		labelText.fontSize = 26;
+		labelText.characterSpacing = 4;
+		labelText.alignment = TextAlignmentOptions.Left;
+		labelText.color = MutedColor;
+
+		RectTransform managerText = GetOrCreateText(row, "ManagerText");
+		PlaceTop(managerText, new Vector2(36, -54), new Vector2(560, 44));
+		TMP_Text text = managerText.GetComponent<TMP_Text>();
+		text.text = "No manager assigned";
+		text.fontSize = 32;
+		text.alignment = TextAlignmentOptions.Left;
+		text.textWrappingMode = TextWrappingModes.NoWrap;
+		text.overflowMode = TextOverflowModes.Ellipsis;
+		text.color = TextColor;
+		TMP_Text fontSource = panel.Find("PlanetName").GetComponent<TMP_Text>();
+		labelText.font = text.font = fontSource.font;
+
+		Transform oldButton = row.Find("ManagerButton");
+		if (oldButton != null)
+		{
+			Object.DestroyImmediate(oldButton.gameObject);
+		}
+
+		Transform canvas = Object.FindFirstObjectByType<NavBarView>(FindObjectsInactive.Include).transform.parent;
+		Button button = TasksWindowBuilder.CloneButton(canvas.Find(TasksWindowBuilder.ClaimButtonTemplatePath), row, "ManagerButton", "Assign");
+		Place((RectTransform)button.transform, new Vector2(-20, 0), new Vector2(260, 84), new Vector2(1, 0.5f));
+
+		SerializedObject so = new SerializedObject(view);
+		so.FindProperty("managerText").objectReferenceValue = text;
+		so.FindProperty("managerButton").objectReferenceValue = button;
+		so.ApplyModifiedPropertiesWithoutUndo();
+	}
+
 	private static void BuildUpgrades(RectTransform panel)
 	{
 		RectTransform section = (RectTransform)panel.Find("UpdatePanel");
-		PlaceSection(section, -700, 56 + 3 * UpgradeRowHeight + 2 * 12);
+		PlaceSection(section, -830, 56 + 3 * UpgradeRowHeight + 2 * 12);
 		section.GetComponent<Image>().color = Color.clear;
 
 		VerticalLayoutGroup layout = section.GetComponent<VerticalLayoutGroup>();

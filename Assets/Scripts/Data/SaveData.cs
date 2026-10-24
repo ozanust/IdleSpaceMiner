@@ -15,6 +15,11 @@ public class SaveData
     public CraftingSaveData Crafting = new CraftingSaveData();
     public long SavedAtUtcTicks;
     public List<int> ClaimedTasks = new List<int>();
+    public List<int> ClaimedAchievements = new List<int>();
+    public List<ManagerData> Managers = new List<ManagerData>();
+    public int ManagerSlots;
+    public int ManagersHired;
+    public bool FreeManagerGranted;
 }
 
 [Serializable]

@@ -1,15 +1,16 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Zenject;
 using UnityEngine.UI;
 
+/// <summary>Planet panel: image and name, ores mined, assigned manager and the three upgrades.</summary>
 public class PlanetInfoView : MonoBehaviour
 {
 	[Inject] PlanetSettings planetSettings;
 	[Inject] IMiningController miningController;
     [Inject] IPlanetInfoController planetInfoController;
+    [Inject] IManagerController managerController;
     [Inject] SignalBus signalBus;
     [Inject] ResourceSettings resourceSettings;
 	[Inject] ISpaceModel spaceModel;
@@ -37,6 +38,10 @@ public class PlanetInfoView : MonoBehaviour
 	[SerializeField] private TMP_Text shipCargoUpdatePriceText;
 	[SerializeField] private Button shipCargoUpdateButton;
 
+	[Header("Optional")]
+	[SerializeField] private TMP_Text managerText;
+	[SerializeField] private Button managerButton;
+
 	private Dictionary<ResourceType, MiningInfoItem> infoItems = new Dictionary<ResourceType, MiningInfoItem>();
 
 	private MiningData data;
@@ -48,120 +53,124 @@ public class PlanetInfoView : MonoBehaviour
 		miningRateUpdateButton.onClick.AddListener(OnMiningRateUpdateButtonClick);
 		shipSpeedUpdateButton.onClick.AddListener(OnShipSpeedUpdateButtonClick);
 		shipCargoUpdateButton.onClick.AddListener(OnShipCargoUpdateButtonClick);
+		if (managerButton != null)
+		{
+			managerButton.onClick.AddListener(OnManagerButtonClick);
+		}
+
 		signalBus.Subscribe<PlanetOpenSignal>(OnPlanetOpen);
 		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+		signalBus.Subscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnDestroy()
 	{
 		signalBus.Unsubscribe<PlanetOpenSignal>(OnPlanetOpen);
 		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+		signalBus.Unsubscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnPlanetOpen(PlanetOpenSignal signal)
 	{
-		if (openPlanetId == signal.PlanetId) 
+		if (openPlanetId == signal.PlanetId)
 		{
 			return;
 		}
 
 		CloseView();
 
-		MiningData tempData;
-		if (miningController.TryGetMiningData(signal.PlanetId, out tempData))
-		{
-			data = tempData;
-			ActivateMiningDataTypeViews(data.MineDatas);
-		}
-
 		PlanetDataSetting settings;
-		if (data != null && planetSettings.TryGetPlanetSetting(signal.PlanetId, out settings))
-		{
-			planetNameText.text = settings.Name;
-			planetImage.sprite = settings.Icon;
-			openPlanetId = signal.PlanetId;
-		}
-		else
+		if (!miningController.TryGetMiningData(signal.PlanetId, out data) || !planetSettings.TryGetPlanetSetting(signal.PlanetId, out settings))
 		{
 			return;
 		}
 
-		PlanetData planetData;
-		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
-		{
-			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate * miningController.MiningRateMultiplier), "sec");
-			miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
-
-			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-			shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed), "mkph");
-			shipSpeedUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipSpeedUpdatePrice);
-
-			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
-			shipCargoText.text = NumberFormatter.Format(planetData.CurrentShipCargo);
-			shipCargoUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipCargoUpdatePrice);
-		}
-
+		openPlanetId = signal.PlanetId;
+		planetNameText.text = settings.Name;
+		planetImage.sprite = settings.Icon;
+		Refresh();
 		panel.SetActive(true);
-	}
-
-	private void ActivateMiningDataTypeViews(ResourceMiningData[] mineDatas)
-	{
-		foreach (ResourceMiningData pmd in mineDatas)
-		{
-			if (!infoItems.ContainsKey(pmd.Type))
-			{
-				MiningInfoItem item = Instantiate(miningInfoItemPrototype, miningInfoPanel.transform);
-				ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
-				item.Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * miningController.MiningRateMultiplier * pmd.Ratio, pmd.MinedAmount);
-				infoItems.Add(pmd.Type, item);
-			}
-			else
-			{
-				ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
-				infoItems[pmd.Type].Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, data.TotalMineRate * miningController.MiningRateMultiplier * pmd.Ratio, pmd.MinedAmount);
-			}
-		}
-	}
-
-	private void UpdateMiningDataTypeViews(ResourceMiningData[] mineDatas)
-	{
-		foreach (ResourceMiningData pmd in mineDatas)
-		{
-			ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
-			infoItems[pmd.Type].UpdateMiningRate(data.TotalMineRate * miningController.MiningRateMultiplier * pmd.Ratio);
-		}
 	}
 
 	private void OnPlanetUpdated(PlanetUpdatedSignal signal)
 	{
-		if (signal.PlanetId != openPlanetId)
+		if (signal.PlanetId == openPlanetId)
+		{
+			Refresh();
+		}
+	}
+
+	private void OnManagersUpdated()
+	{
+		if (openPlanetId >= 0)
+		{
+			Refresh();
+		}
+	}
+
+	/// <summary>Shows the planet's values including research and manager bonuses.</summary>
+	private void Refresh()
+	{
+		PlanetData planetData;
+		if (!spaceModel.TryGetPlanetData(openPlanetId, out planetData))
 		{
 			return;
 		}
 
-		PlanetData planetData;
-		if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
+		float mining = miningController.GetMiningMultiplier(openPlanetId);
+		miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
+		miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate * mining), "sec");
+		miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
+
+		shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
+		shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed * managerController.GetShipSpeedMultiplier(openPlanetId)), "mkph");
+		shipSpeedUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipSpeedUpdatePrice);
+
+		shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
+		shipCargoText.text = NumberFormatter.Format(Mathf.RoundToInt(planetData.CurrentShipCargo * managerController.GetCargoMultiplier(openPlanetId)));
+		shipCargoUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipCargoUpdatePrice);
+
+		miningController.TryGetMiningData(openPlanetId, out data);
+		foreach (ResourceMiningData pmd in data.MineDatas)
 		{
-			miningRateLevelText.text = string.Format("{0} {1}", "Lv.", planetData.MiningRateLevel);
-			miningRateText.text = string.Format("{0} / {1}", NumberFormatter.Format(planetData.CurrentTotalMiningRate * miningController.MiningRateMultiplier), "sec");
-			miningRateUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.TotalMiningRateUpdatePrice);
+			ResourceDataSetting resData = resourceSettings.GetResourceData(pmd.Type);
+			float rate = data.TotalMineRate * mining * pmd.Ratio;
+			if (!infoItems.ContainsKey(pmd.Type))
+			{
+				infoItems.Add(pmd.Type, Instantiate(miningInfoItemPrototype, miningInfoPanel.transform));
+			}
 
-			shipSpeedLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipSpeedLevel);
-			shipSpeedText.text = string.Format("{0} {1}", NumberFormatter.Format(planetData.CurrentShipSpeed), "mkph");
-			shipSpeedUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipSpeedUpdatePrice);
-
-			shipCargoLevelText.text = string.Format("{0} {1}", "Lv.", planetData.ShipCargoLevel);
-			shipCargoText.text = NumberFormatter.Format(planetData.CurrentShipCargo);
-			shipCargoUpdatePriceText.text = NumberFormatter.FormatMoney(planetData.ShipCargoUpdatePrice);
+			infoItems[pmd.Type].Initialize(pmd, resData.Icon, resData.Name, pmd.Ratio, rate, pmd.MinedAmount);
 		}
 
-		MiningData tempData;
-		if (miningController.TryGetMiningData(signal.PlanetId, out tempData))
+		RefreshManager();
+	}
+
+	private void RefreshManager()
+	{
+		if (managerText == null)
 		{
-			data = tempData;
-			UpdateMiningDataTypeViews(data.MineDatas);
+			return;
 		}
+
+		ManagerData manager = managerController.GetPlanetManager(openPlanetId);
+		managerText.text = manager != null
+			? $"{manager.Stars} Star  {managerController.GetPrimaryText(manager)}"
+			: "No manager assigned";
+
+		if (managerButton != null)
+		{
+			TMP_Text label = managerButton.GetComponentInChildren<TMP_Text>(true);
+			if (label != null)
+			{
+				label.text = manager != null ? "Change" : "Assign";
+			}
+		}
+	}
+
+	private void OnManagerButtonClick()
+	{
+		signalBus.Fire(new ManagerAssignRequestSignal() { PlanetId = openPlanetId });
 	}
 
 	private void OnMiningRateUpdateButtonClick()

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>One row in the tasks window: description, reward, progress and a claim button.</summary>
+/// <summary>One row in a goal list window (tasks, achievements): description, reward, progress and a claim button.</summary>
 public class TaskItem : MonoBehaviour
 {
 	[SerializeField] private TMP_Text descriptionText;
@@ -11,33 +11,40 @@ public class TaskItem : MonoBehaviour
 	[SerializeField] private Slider progressSlider;
 	[SerializeField] private Button claimButton;
 
-	private ITaskController taskController;
-	private int taskIndex;
+	private IClaimableList list;
+	private int index;
+	private TMP_Text claimLabel;
 
-	public int TaskIndex => taskIndex;
+	public int TaskIndex => index;
 
-	public void Init(ITaskController taskController, int taskIndex)
+	public void Init(IClaimableList list, int index)
 	{
-		this.taskController = taskController;
-		this.taskIndex = taskIndex;
+		this.list = list;
+		this.index = index;
+		claimLabel = claimButton.GetComponentInChildren<TMP_Text>(true);
 
 		claimButton.onClick.RemoveAllListeners();
 		claimButton.onClick.AddListener(OnClickClaim);
 
-		descriptionText.text = taskController.GetTaskDescription(taskIndex);
-		rewardText.text = "Reward: " + NumberFormatter.FormatMoney(taskController.GetTaskReward(taskIndex));
+		descriptionText.text = list.GetDescription(index);
+		rewardText.text = list.GetRewardText(index);
 		Refresh();
 	}
 
 	public void Refresh()
 	{
-		progressText.text = taskController.GetTaskProgressText(taskIndex);
-		progressSlider.value = taskController.GetTaskProgressRatio(taskIndex);
-		claimButton.interactable = taskController.IsTaskCompleted(taskIndex);
+		bool claimed = list.IsClaimed(index);
+		progressText.text = list.GetProgressText(index);
+		progressSlider.value = list.GetProgressRatio(index);
+		claimButton.interactable = !claimed && list.IsCompleted(index);
+		if (claimLabel != null)
+		{
+			claimLabel.text = claimed ? "Claimed" : "Claim";
+		}
 	}
 
 	private void OnClickClaim()
 	{
-		taskController.ClaimTask(taskIndex);
+		list.Claim(index);
 	}
 }

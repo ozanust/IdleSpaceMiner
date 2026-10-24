@@ -7,6 +7,7 @@ using Zenject;
 public class NavBarView : MonoBehaviour
 {
     [Inject] SignalBus signalBus;
+    [Inject] IPlayerModel playerModel;
 
     // TODO: Make those custom button and use their menu type property
     [SerializeField] private Button resourcesButton;
@@ -26,8 +27,10 @@ public class NavBarView : MonoBehaviour
         boostsButton.onClick.AddListener(OnClickBoosts);
         mothershipButton.onClick.AddListener(OnClickMothership);
 
+        // Managers open after the Management research
+        managersButton.interactable = playerModel.IsResearchUnlocked(ResearchType.Management);
+
         // These menus have no views yet, hide them for the MVP
-        managersButton.gameObject.SetActive(false);
         boostsButton.gameObject.SetActive(false);
         mothershipButton.gameObject.SetActive(false);
 

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Builds the tasks window and its HUD button in GameScene from the existing UI:
+/// Builds the tasks and achievements windows and their HUD buttons in GameScene from the existing UI:
 /// the window is a copy of the research window, rows use the mining panel background,
 /// the claim button is a copy of ResearchButton and the HUD button a copy of a nav bar button.
 /// Running it again replaces what it built before.
@@ -15,21 +15,23 @@ public static class TasksWindowBuilder
 	private const string ScenePath = "Assets/Scenes/GameScene.unity";
 	private const string WindowName = "TasksView";
 	private const string HudButtonName = "TasksButton";
+	private const string AchievementsWindowName = "AchievementsView";
+	private const string AchievementsButtonName = "AchievementsButton";
 	private const string LegacyPanelName = "TaskPanel";
 
 	private const string WindowTemplatePath = "ResearchView";
-	private const string ClaimButtonTemplatePath = "ResearchInfoView/Panel/ResearchButton";
-	private const string BadgeTemplatePath = "ResearchInfoView/Panel/CloseButton";
-	private const string RowBackgroundTemplatePath = "PlanetInfoView/Panel/MiningInfoPanel";
-	private const string TextTemplatePath = "CurrenciesView/CurrencyField/CurrencyAmountText";
-	private const string SliderTemplateRoot = "ResourcesView";
-	private const string SliderTemplateName = "SellAmountSlider";
+	internal const string ClaimButtonTemplatePath = "ResearchInfoView/Panel/ResearchButton";
+	internal const string BadgeTemplatePath = "ResearchInfoView/Panel/CloseButton";
+	internal const string RowBackgroundTemplatePath = "PlanetInfoView/Panel/MiningInfoPanel";
+	internal const string TextTemplatePath = "CurrenciesView/CurrencyField/CurrencyAmountText";
+	internal const string SliderTemplateRoot = "ResourcesView";
+	internal const string SliderTemplateName = "SellAmountSlider";
 
 	private const float RowHeight = 220f;
-	private const float RowPadding = 32f;
-	private static readonly Color RewardColor = new Color(0.6f, 1f, 0.6f, 1f);
+	internal const float RowPadding = 32f;
+	internal static readonly Color RewardColor = new Color(0.6f, 1f, 0.6f, 1f);
 
-	[MenuItem("Tools/UI/Build Tasks Window")]
+	[MenuItem("Tools/UI/Build Tasks And Achievements Windows")]
 	public static void BuildInOpenScene()
 	{
 		Build();
@@ -48,7 +50,7 @@ public static class TasksWindowBuilder
 	{
 		Transform canvas = Object.FindFirstObjectByType<NavBarView>(FindObjectsInactive.Include).transform.parent;
 
-		foreach (string name in new[] { WindowName, HudButtonName, LegacyPanelName })
+		foreach (string name in new[] { WindowName, HudButtonName, AchievementsWindowName, AchievementsButtonName, LegacyPanelName })
 		{
 			Transform old = canvas.Find(name);
 			if (old != null)
@@ -59,26 +61,54 @@ public static class TasksWindowBuilder
 
 		TMP_Text textTemplate = canvas.Find(TextTemplatePath).GetComponent<TMP_Text>();
 
-		BuildWindow(canvas, textTemplate);
-		BuildHudButton(canvas);
+		BuildWindow(canvas, textTemplate, MenuType.Tasks, WindowName, "Tasks", "All tasks completed");
+		BuildHudButton(canvas, MenuType.Tasks, HudButtonName, "Tasks", -280);
+		BuildWindow(canvas, textTemplate, MenuType.Achievements, AchievementsWindowName, "Achievements", "No achievements");
+		BuildHudButton(canvas, MenuType.Achievements, AchievementsButtonName, "Goals", -400);
 	}
 
-	private static void BuildWindow(Transform canvas, TMP_Text textTemplate)
+	private static void BuildWindow(Transform canvas, TMP_Text textTemplate, MenuType type, string windowName, string title, string emptyText)
 	{
-		// Same frame, title bar, close button and scroll area as the research window
+		Transform panel;
+		Button closeButton;
+		ScrollRect scroll;
+		GameObject window = CreateListWindow(canvas, windowName, title, out panel, out closeButton, out scroll);
+		RectTransform content = scroll.content;
+
+		TaskItem prototype = BuildRow(canvas, content, textTemplate);
+
+		TMP_Text allCompletedText = CreateText("AllCompletedText", scroll.transform, textTemplate, 40, Color.white, TextAlignmentOptions.Center);
+		Stretch(allCompletedText.rectTransform);
+		allCompletedText.text = emptyText;
+		allCompletedText.gameObject.SetActive(false);
+
+		TasksView view = window.AddComponent<TasksView>();
+		SerializedObject so = new SerializedObject(view);
+		so.FindProperty("panel").objectReferenceValue = panel.gameObject;
+		so.FindProperty("closeButton").objectReferenceValue = closeButton;
+		so.FindProperty("itemContainer").objectReferenceValue = content;
+		so.FindProperty("itemPrototype").objectReferenceValue = prototype;
+		so.FindProperty("allCompletedText").objectReferenceValue = allCompletedText;
+		so.FindProperty("type").enumValueIndex = (int)type;
+		so.ApplyModifiedPropertiesWithoutUndo();
+	}
+
+	/// <summary>Copies the research window: frame, title bar, close button and a vertical list in its scroll area.</summary>
+	internal static GameObject CreateListWindow(Transform canvas, string windowName, string title, out Transform panel, out Button closeButton, out ScrollRect scroll)
+	{
 		GameObject window = Object.Instantiate(canvas.Find(WindowTemplatePath).gameObject, canvas, false);
-		window.name = WindowName;
+		window.name = windowName;
 		window.transform.SetSiblingIndex(canvas.GetComponentInChildren<NavBarView>(true).transform.GetSiblingIndex());
 		Object.DestroyImmediate(window.GetComponent<ResearchView>());
 
-		Transform panel = window.transform.Find("Panel");
+		panel = window.transform.Find("Panel");
 		panel.gameObject.SetActive(false);
-		panel.Find("TitleBG/ViewTitle").GetComponent<TMP_Text>().text = "Tasks";
-		Button closeButton = panel.Find("TitleBG/CloseButton").GetComponent<Button>();
+		panel.Find("TitleBG/ViewTitle").GetComponent<TMP_Text>().text = title;
+		closeButton = panel.Find("TitleBG/CloseButton").GetComponent<Button>();
 		closeButton.onClick = new Button.ButtonClickedEvent();
 
-		ScrollRect scroll = panel.GetComponentInChildren<ScrollRect>(true);
-		scroll.name = "TasksLayout";
+		scroll = panel.GetComponentInChildren<ScrollRect>(true);
+		scroll.name = "ListLayout";
 		scroll.horizontal = false;
 		if (scroll.horizontalScrollbar != null)
 		{
@@ -120,22 +150,7 @@ public static class TasksWindowBuilder
 
 		fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
 		fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-		TaskItem prototype = BuildRow(canvas, content, textTemplate);
-
-		TMP_Text allCompletedText = CreateText("AllCompletedText", scroll.transform, textTemplate, 40, Color.white, TextAlignmentOptions.Center);
-		Stretch(allCompletedText.rectTransform);
-		allCompletedText.text = "All tasks completed";
-		allCompletedText.gameObject.SetActive(false);
-
-		TasksView view = window.AddComponent<TasksView>();
-		SerializedObject so = new SerializedObject(view);
-		so.FindProperty("panel").objectReferenceValue = panel.gameObject;
-		so.FindProperty("closeButton").objectReferenceValue = closeButton;
-		so.FindProperty("itemContainer").objectReferenceValue = content;
-		so.FindProperty("itemPrototype").objectReferenceValue = prototype;
-		so.FindProperty("allCompletedText").objectReferenceValue = allCompletedText;
-		so.ApplyModifiedPropertiesWithoutUndo();
+		return window;
 	}
 
 	private static TaskItem BuildRow(Transform canvas, Transform content, TMP_Text textTemplate)
@@ -193,18 +208,18 @@ public static class TasksWindowBuilder
 		return item;
 	}
 
-	private static void BuildHudButton(Transform canvas)
+	private static void BuildHudButton(Transform canvas, MenuType type, string name, string label, float y)
 	{
 		// Same look as the nav bar buttons, on the right edge below the top-right planet
 		Transform navButton = canvas.GetComponentInChildren<NavBarView>(true).GetComponentInChildren<Button>(true).transform;
-		Button button = CloneButton(navButton, canvas, HudButtonName, "Tasks");
+		Button button = CloneButton(navButton, canvas, name, label);
 		button.transform.SetSiblingIndex(canvas.Find("CurrenciesView").GetSiblingIndex() + 1);
 		foreach (LayoutElement element in button.GetComponents<LayoutElement>())
 		{
 			Object.DestroyImmediate(element);
 		}
 
-		SetRect((RectTransform)button.transform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(-20, -280), new Vector2(160, 100));
+		SetRect((RectTransform)button.transform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(-20, y), new Vector2(160, 100));
 
 		Image badgeTemplate = canvas.Find(BadgeTemplatePath).GetComponent<Image>();
 		GameObject badge = new GameObject("ClaimableBadge", typeof(RectTransform), typeof(Image));
@@ -222,10 +237,11 @@ public static class TasksWindowBuilder
 		SerializedObject so = new SerializedObject(tasksButton);
 		so.FindProperty("button").objectReferenceValue = button;
 		so.FindProperty("claimableBadge").objectReferenceValue = badge;
+		so.FindProperty("type").enumValueIndex = (int)type;
 		so.ApplyModifiedPropertiesWithoutUndo();
 	}
 
-	private static TMP_Text CreateText(string name, Transform parent, TMP_Text template, float size, Color color, TextAlignmentOptions alignment)
+	internal static TMP_Text CreateText(string name, Transform parent, TMP_Text template, float size, Color color, TextAlignmentOptions alignment)
 	{
 		GameObject go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
 		go.layer = parent.gameObject.layer;
@@ -243,7 +259,7 @@ public static class TasksWindowBuilder
 		return text;
 	}
 
-	private static Button CloneButton(Transform template, Transform parent, string name, string label)
+	internal static Button CloneButton(Transform template, Transform parent, string name, string label)
 	{
 		GameObject go = Object.Instantiate(template.gameObject, parent, false);
 		go.name = name;
@@ -255,7 +271,7 @@ public static class TasksWindowBuilder
 		return button;
 	}
 
-	private static Slider CloneSlider(Transform template, Transform parent)
+	internal static Slider CloneSlider(Transform template, Transform parent)
 	{
 		GameObject go = Object.Instantiate(template.gameObject, parent, false);
 		go.name = "ProgressSlider";
@@ -286,7 +302,7 @@ public static class TasksWindowBuilder
 		return slider;
 	}
 
-	private static Transform FindDeep(Transform root, string name)
+	internal static Transform FindDeep(Transform root, string name)
 	{
 		foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
 		{
@@ -299,7 +315,7 @@ public static class TasksWindowBuilder
 		return null;
 	}
 
-	private static void Stretch(RectTransform rect)
+	internal static void Stretch(RectTransform rect)
 	{
 		rect.anchorMin = Vector2.zero;
 		rect.anchorMax = Vector2.one;
@@ -307,7 +323,7 @@ public static class TasksWindowBuilder
 		rect.offsetMax = Vector2.zero;
 	}
 
-	private static void SetRect(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size)
+	internal static void SetRect(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size)
 	{
 		rect.anchorMin = anchorMin;
 		rect.anchorMax = anchorMax;

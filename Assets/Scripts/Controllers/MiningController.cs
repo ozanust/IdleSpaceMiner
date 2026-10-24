@@ -13,11 +13,14 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	private Dictionary<int, MiningData> mineData = new Dictionary<int, MiningData>();
 	private Dictionary<int, TransferResourcesData[]> transferData = new Dictionary<int, TransferResourcesData[]>();
 	private ResourceSettings resourceSettings;
+	private IManagerController managerController;
 
-	public float MiningRateMultiplier { get; private set; } = 1f;
+	// Management research bonus for all planets
+	private float researchMultiplier = 1f;
 
-	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel)
+	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel, IManagerController managerController)
 	{
+		this.managerController = managerController;
 		this.signalBus = signalBus;
 		this.planetSettings = planetSettings;
 		this.resourceSettings = resourceSettings;
@@ -128,11 +131,13 @@ public class MiningController : IMiningController, ITickable, IDisposable
 			return;
 		}
 
-		foreach (MiningData md in mineData.Values)
+		foreach (KeyValuePair<int, MiningData> planet in mineData)
 		{
+			MiningData md = planet.Value;
+			float multiplier = GetMiningMultiplier(planet.Key);
 			for (int i = 0; i < md.MineDatas.Length; i++)
 			{
-				md.MineDatas[i].MinedAmount += md.TotalMineRate * MiningRateMultiplier * md.MineDatas[i].Ratio * Time.deltaTime;
+				md.MineDatas[i].MinedAmount += md.TotalMineRate * multiplier * md.MineDatas[i].Ratio * Time.deltaTime;
 			}
 		}
 	}
@@ -141,18 +146,24 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	{
 		if (signal.ResearchType == ResearchType.Management)
 		{
-			MiningRateMultiplier = 1.1f;
+			researchMultiplier = 1.1f;
 		}
+	}
+
+	public float GetMiningMultiplier(int planetId)
+	{
+		return researchMultiplier * managerController.GetMiningMultiplier(planetId);
 	}
 
 	public float GetValuePerSecond()
 	{
 		float total = 0f;
-		foreach (MiningData md in mineData.Values)
+		foreach (KeyValuePair<int, MiningData> planet in mineData)
 		{
+			MiningData md = planet.Value;
 			foreach (ResourceMiningData resource in md.MineDatas)
 			{
-				total += md.TotalMineRate * MiningRateMultiplier * resource.Ratio * resourceSettings.GetResourceValue(resource.Type);
+				total += md.TotalMineRate * GetMiningMultiplier(planet.Key) * resource.Ratio * resourceSettings.GetResourceValue(resource.Type);
 			}
 		}
 

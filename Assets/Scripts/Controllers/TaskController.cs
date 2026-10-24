@@ -12,10 +12,9 @@ public class TaskController : ITaskController, IInitializable, ITickable
 	private const int MaxActiveTasks = 4;
 
 	private readonly IPlayerModel playerModel;
-	private readonly ISpaceModel spaceModel;
 	private readonly ISaveService saveService;
 	private readonly GameSettings gameSettings;
-	private readonly ResourceSettings resourceSettings;
+	private readonly IGoalProgressService goals;
 	private readonly SignalBus signalBus;
 
 	private readonly HashSet<int> claimedTasks = new HashSet<int>();
@@ -26,17 +25,15 @@ public class TaskController : ITaskController, IInitializable, ITickable
 
 	public TaskController(
 		IPlayerModel playerModel,
-		ISpaceModel spaceModel,
 		ISaveService saveService,
 		GameSettings gameSettings,
-		ResourceSettings resourceSettings,
+		IGoalProgressService goals,
 		SignalBus signalBus)
 	{
 		this.playerModel = playerModel;
-		this.spaceModel = spaceModel;
 		this.saveService = saveService;
 		this.gameSettings = gameSettings;
-		this.resourceSettings = resourceSettings;
+		this.goals = goals;
 		this.signalBus = signalBus;
 	}
 
@@ -71,7 +68,7 @@ public class TaskController : ITaskController, IInitializable, ITickable
 		signalBus.Fire<TaskUpdatedSignal>();
 	}
 
-	public IReadOnlyList<int> GetActiveTasks()
+	public IReadOnlyList<int> GetVisibleEntries()
 	{
 		return activeTasks;
 	}
@@ -83,11 +80,11 @@ public class TaskController : ITaskController, IInitializable, ITickable
 		return result;
 	}
 
-	public bool HasClaimableTask()
+	public bool HasClaimableEntry()
 	{
 		foreach (int index in activeTasks)
 		{
-			if (IsTaskCompleted(index))
+			if (IsCompleted(index))
 			{
 				return true;
 			}
@@ -96,15 +93,20 @@ public class TaskController : ITaskController, IInitializable, ITickable
 		return false;
 	}
 
-	public bool IsTaskCompleted(int index)
+	public bool IsCompleted(int index)
 	{
-		TaskSetting task = gameSettings.Tasks[index];
-		return GetProgress(task) >= task.TargetAmount;
+		return goals.IsCompleted(gameSettings.Tasks[index]);
 	}
 
-	public void ClaimTask(int index)
+	// Claimed tasks leave the list, so a visible task is never claimed
+	public bool IsClaimed(int index)
 	{
-		if (!activeTasks.Contains(index) || !IsTaskCompleted(index))
+		return claimedTasks.Contains(index);
+	}
+
+	public void Claim(int index)
+	{
+		if (!activeTasks.Contains(index) || !IsCompleted(index))
 		{
 			return;
 		}
@@ -115,48 +117,24 @@ public class TaskController : ITaskController, IInitializable, ITickable
 		signalBus.Fire<TaskUpdatedSignal>();
 	}
 
-	public long GetTaskReward(int index)
+	public string GetDescription(int index)
 	{
-		return gameSettings.Tasks[index].Reward;
+		return goals.GetDescription(gameSettings.Tasks[index]);
 	}
 
-	public string GetTaskDescription(int index)
+	public string GetRewardText(int index)
 	{
-		TaskSetting task = gameSettings.Tasks[index];
-		switch (task.Type)
-		{
-			case TaskType.UpgradePlanets:
-				return $"Upgrade planets {task.TargetAmount} times";
-			case TaskType.HaveResource:
-				return $"Collect {NumberFormatter.Format(task.TargetAmount)} {GetResourceName(task.Resource)}";
-			case TaskType.UnlockPlanets:
-				return $"Unlock {task.TargetAmount} planets";
-			case TaskType.Research:
-				return $"Research '{resourceSettings.GetResearchSetting(task.Research).Name}'";
-			case TaskType.HaveSmelters:
-				return $"Build {task.TargetAmount} smelters";
-			case TaskType.HaveMoney:
-				return $"Have {NumberFormatter.FormatMoney(task.TargetAmount)}";
-			case TaskType.DestroyAsteroids:
-				return task.TargetAmount == 1 ? "Mine an asteroid" : $"Mine {task.TargetAmount} asteroids";
-			case TaskType.HaveCrafters:
-				return $"Build {task.TargetAmount} crafters";
-			default:
-				return task.Type.ToString();
-		}
+		return "Reward: " + NumberFormatter.FormatMoney(gameSettings.Tasks[index].Reward);
 	}
 
-	public string GetTaskProgressText(int index)
+	public string GetProgressText(int index)
 	{
-		TaskSetting task = gameSettings.Tasks[index];
-		long progress = System.Math.Min(GetProgress(task), task.TargetAmount);
-		return $"{NumberFormatter.Format(progress)} / {NumberFormatter.Format(task.TargetAmount)}";
+		return goals.GetProgressText(gameSettings.Tasks[index]);
 	}
 
-	public float GetTaskProgressRatio(int index)
+	public float GetProgressRatio(int index)
 	{
-		TaskSetting task = gameSettings.Tasks[index];
-		return Mathf.Clamp01((float)GetProgress(task) / task.TargetAmount);
+		return goals.GetProgressRatio(gameSettings.Tasks[index]);
 	}
 
 	/// <summary>Active tasks are the first unclaimed ones, in the order they are defined.</summary>
@@ -170,79 +148,5 @@ public class TaskController : ITaskController, IInitializable, ITickable
 				activeTasks.Add(i);
 			}
 		}
-	}
-
-	private long GetProgress(TaskSetting task)
-	{
-		switch (task.Type)
-		{
-			case TaskType.UpgradePlanets:
-				return GetPlanetUpgradeCount();
-			case TaskType.HaveResource:
-				return playerModel.GetResource(task.Resource);
-			case TaskType.UnlockPlanets:
-				return GetUnlockedPlanetCount();
-			case TaskType.Research:
-				return playerModel.IsResearchUnlocked(task.Research) ? task.TargetAmount : 0;
-			case TaskType.HaveSmelters:
-				// Smelter 0 comes with the Smelter research, ids are unlocked in order
-				return playerModel.IsResearchUnlocked(ResearchType.Smelter) ? playerModel.GetLastUnlockedSmelterId() + 1 : 0;
-			case TaskType.HaveMoney:
-				return playerModel.GetMoney();
-			case TaskType.DestroyAsteroids:
-				return playerModel.AsteroidsDestroyed;
-			case TaskType.HaveCrafters:
-				// Crafter 0 comes with the Crafter research, ids are unlocked in order
-				return playerModel.IsResearchUnlocked(ResearchType.Crafter) ? playerModel.GetLastUnlockedCrafterId() + 1 : 0;
-			default:
-				return 0;
-		}
-	}
-
-	private int GetUnlockedPlanetCount()
-	{
-		int count = 0;
-		PlanetData[] planets = spaceModel.GetPlanetsData();
-		if (planets == null)
-		{
-			return 0;
-		}
-
-		foreach (PlanetData planet in planets)
-		{
-			if (planet.IsUnlocked)
-			{
-				count++;
-			}
-		}
-
-		return count;
-	}
-
-	private int GetPlanetUpgradeCount()
-	{
-		int count = 0;
-		PlanetData[] planets = spaceModel.GetPlanetsData();
-		if (planets == null)
-		{
-			return 0;
-		}
-
-		foreach (PlanetData planet in planets)
-		{
-			if (planet.IsUnlocked)
-			{
-				// Each stat starts at level 1 when the planet is unlocked
-				count += planet.MiningRateLevel + planet.ShipSpeedLevel + planet.ShipCargoLevel - 3;
-			}
-		}
-
-		return count;
-	}
-
-	private string GetResourceName(ResourceType type)
-	{
-		ResourceDataSetting data = resourceSettings.GetResourceData(type);
-		return data != null ? data.Name : type.ToString();
 	}
 }

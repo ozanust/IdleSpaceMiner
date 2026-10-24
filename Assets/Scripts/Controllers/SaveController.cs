@@ -16,6 +16,8 @@ public class SaveController : ITickable, IDisposable
     private readonly ISpaceModel spaceModel;
     private readonly IMiningController miningController;
     private readonly ITaskController taskController;
+    private readonly IAchievementController achievementController;
+    private readonly IManagerController managerController;
     private readonly SignalBus signalBus;
 
     private float autoSaveTimer;
@@ -32,6 +34,8 @@ public class SaveController : ITickable, IDisposable
         ISpaceModel spaceModel,
         IMiningController miningController,
         ITaskController taskController,
+        IAchievementController achievementController,
+        IManagerController managerController,
         SignalBus signalBus)
     {
         this.saveService = saveService;
@@ -39,6 +43,8 @@ public class SaveController : ITickable, IDisposable
         this.spaceModel = spaceModel;
         this.miningController = miningController;
         this.taskController = taskController;
+        this.achievementController = achievementController;
+        this.managerController = managerController;
         this.signalBus = signalBus;
         
         //saveService.DeleteSave();
@@ -135,6 +141,11 @@ public class SaveController : ITickable, IDisposable
         data.Crafting = BuildCraftingSaveData();
         data.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
         data.ClaimedTasks = new List<int>(taskController.GetClaimedTasks());
+        data.ClaimedAchievements = new List<int>(achievementController.GetClaimedAchievements());
+        data.Managers = new List<ManagerData>(managerController.Managers);
+        data.ManagerSlots = managerController.Slots;
+        data.ManagersHired = managerController.TotalHired;
+        data.FreeManagerGranted = managerController.FreeManagerGranted;
 
         return data;
     }

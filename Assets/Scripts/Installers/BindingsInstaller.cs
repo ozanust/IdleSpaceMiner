@@ -24,7 +24,10 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind(typeof(IProductionController), typeof(ITickable)).To<ProductionController>().AsSingle().NonLazy();
 		Container.Bind(typeof(IOfflineProgressController), typeof(ITickable)).To<OfflineProgressController>().AsSingle();
 		Container.Bind(typeof(ISpaceController), typeof(ITickable)).To<SpaceController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<ManagerController>().AsSingle().NonLazy();
+		Container.Bind<IGoalProgressService>().To<GoalProgressService>().AsSingle();
 		Container.BindInterfacesTo<TaskController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<AchievementController>().AsSingle().NonLazy();
 		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
 	}
 
@@ -73,5 +76,8 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<AsteroidDestroyedSignal>();
 
 		Container.DeclareSignal<TaskUpdatedSignal>();
+
+		Container.DeclareSignal<ManagersUpdatedSignal>();
+		Container.DeclareSignal<ManagerAssignRequestSignal>();
 	}
 }

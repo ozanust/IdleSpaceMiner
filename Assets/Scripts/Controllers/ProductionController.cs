@@ -16,9 +16,15 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	float smeltSpeed = 1;
 	float craftSpeed = 1;
 	float smeltIngredientMultiplier = 1;
+	private IManagerController managerController;
 
-	public ProductionController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings)
+	// Research speed combined with the managers' global smelt and craft bonuses
+	private float EffectiveSmeltSpeed => smeltSpeed * managerController.SmeltSpeedMultiplier;
+	private float EffectiveCraftSpeed => craftSpeed * managerController.CraftSpeedMultiplier;
+
+	public ProductionController(SignalBus signalBus, IPlayerModel playerModel, ResourceSettings resourceSettings, IManagerController managerController)
 	{
+		this.managerController = managerController;
 		this.signalBus = signalBus;
 		this.playerModel = playerModel;
 		this.resourceSettings = resourceSettings;
@@ -121,7 +127,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 				continue;
 			}
 
-			sad.SmeltedTime += Time.deltaTime * smeltSpeed;
+			sad.SmeltedTime += Time.deltaTime * EffectiveSmeltSpeed;
 			if (sad.SmeltedTime >= sad.SmeltTime)
 			{
 				sad.SmeltedTime = 0;
@@ -143,7 +149,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 				continue;
 			}
 
-			cad.SmeltedTime += Time.deltaTime * craftSpeed;
+			cad.SmeltedTime += Time.deltaTime * EffectiveCraftSpeed;
 			if (cad.SmeltedTime >= cad.SmeltTime)
 			{
 				cad.SmeltedTime = 0;
@@ -163,7 +169,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 	{
 		foreach (var sad in GetOrdered(smeltingData))
 		{
-			float timeLeft = seconds * smeltSpeed;
+			float timeLeft = seconds * EffectiveSmeltSpeed;
 			while (sad.IsSmelting || TryStartSmelt(sad))
 			{
 				float remaining = sad.SmeltTime - sad.SmeltedTime;
@@ -182,7 +188,7 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 
 		foreach (var cad in GetOrdered(craftingData))
 		{
-			float timeLeft = seconds * craftSpeed;
+			float timeLeft = seconds * EffectiveCraftSpeed;
 			while (cad.IsSmelting || TryStartCraft(cad))
 			{
 				float remaining = cad.SmeltTime - cad.SmeltedTime;
@@ -251,12 +257,12 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 
 	public float GetSmeltTime(AlloyType type)
 	{
-		return resourceSettings.GetSmeltSetting(type).TimeToSmelt / smeltSpeed;
+		return resourceSettings.GetSmeltSetting(type).TimeToSmelt / EffectiveSmeltSpeed;
 	}
 
 	public float GetCraftTime(ResourceType type)
 	{
-		return resourceSettings.GetItemSmeltSetting(type).TimeToSmelt / craftSpeed;
+		return resourceSettings.GetItemSmeltSetting(type).TimeToSmelt / EffectiveCraftSpeed;
 	}
 
 	/// <summary>Consumes the ingredients for one alloy and marks the smelter as working.</summary>

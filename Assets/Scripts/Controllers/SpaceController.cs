@@ -73,6 +73,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		{
 			spaceModel.InitializePlanetData(GetSampleData());
 			playerModel.AddMoney(gameSettings.EconomySettings.StartingMoney);
+			playerModel.AddCurrency(CurrencyType.DarkMatter, gameSettings.EconomySettings.StartingDarkMatter);
 		}
 		else
 		{

@@ -12,11 +12,13 @@ public class CargoController : ICargoController, IDisposable
 	private ISpaceModel spaceModel;
 	private CargoShipView cargoShipPrototype;
 	private DiContainer container;
+	private IManagerController managerController;
 
 	private Dictionary<int, CargoShipView> ships = new Dictionary<int, CargoShipView>();
 
-    public CargoController(DiContainer container, SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel)
+    public CargoController(DiContainer container, SignalBus signalBus, CargoShipView cargoShipPrototype, PlanetSettings planetSettings, ISpaceModel spaceModel, IManagerController managerController)
 	{
+		this.managerController = managerController;
 		this.signalBus = signalBus;
 		this.cargoShipPrototype = cargoShipPrototype;
 		this.planetSettings = planetSettings;
@@ -26,6 +28,7 @@ public class CargoController : ICargoController, IDisposable
 		this.cargoShipPrototype.gameObject.SetActive(false);
 		this.signalBus.Subscribe<PlanetTransformSignal>(OnPlanetUnlocked);
 		this.signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+		this.signalBus.Subscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 	}
 
 	/// <summary>Unsubscribes from all signals.</summary>
@@ -33,6 +36,7 @@ public class CargoController : ICargoController, IDisposable
 	{
 		signalBus.Unsubscribe<PlanetTransformSignal>(OnPlanetUnlocked);
 		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
+		signalBus.Unsubscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnPlanetUnlocked(PlanetTransformSignal signal)
@@ -49,10 +53,28 @@ public class CargoController : ICargoController, IDisposable
 			PlanetData planetData;
 			if (spaceModel.TryGetPlanetData(signal.PlanetId, out planetData))
 			{
-				ship.SetShipSpeed(planetData.CurrentShipSpeed);
-				ship.SetCargoSize(planetData.CurrentShipCargo);
+				ApplyStats(ship, signal.PlanetId, planetData.CurrentShipSpeed, planetData.CurrentShipCargo);
 			}
 		}
+	}
+
+	// Assigned managers can change every ship's speed and cargo
+	private void OnManagersUpdated()
+	{
+		foreach (KeyValuePair<int, CargoShipView> pair in ships)
+		{
+			PlanetData planetData;
+			if (spaceModel.TryGetPlanetData(pair.Key, out planetData))
+			{
+				ApplyStats(pair.Value, pair.Key, planetData.CurrentShipSpeed, planetData.CurrentShipCargo);
+			}
+		}
+	}
+
+	private void ApplyStats(CargoShipView ship, int planetId, float speed, int cargo)
+	{
+		ship.SetShipSpeed(speed * managerController.GetShipSpeedMultiplier(planetId));
+		ship.SetCargoSize(Mathf.RoundToInt(cargo * managerController.GetCargoMultiplier(planetId)));
 	}
 
 	private void SpawnCargoShipAndAssign(int planetId)
@@ -65,8 +87,7 @@ public class CargoController : ICargoController, IDisposable
 
 		if (spaceModel.TryGetPlanetData(planetId, out data) && planetSettings.TryGetPlanetSetting(planetId, out setting) && spaceModel.TryGetPlanetTransform(planetId, out planetTransform))
 		{
-			ship.SetShipSpeed(PlanetUpgradeFormula.GetShipSpeed(setting, data.ShipSpeedLevel));
-			ship.SetCargoSize(PlanetUpgradeFormula.GetShipCargo(setting, data.ShipCargoLevel));
+			ApplyStats(ship, planetId, PlanetUpgradeFormula.GetShipSpeed(setting, data.ShipSpeedLevel), PlanetUpgradeFormula.GetShipCargo(setting, data.ShipCargoLevel));
 			ship.SetTargetPlanet(planetTransform, planetId);
 			ship.gameObject.SetActive(true);
 

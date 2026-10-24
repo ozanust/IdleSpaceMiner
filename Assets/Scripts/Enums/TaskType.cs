@@ -7,5 +7,7 @@ public enum TaskType
 	HaveSmelters = 4,
 	HaveMoney = 5,
 	DestroyAsteroids = 6,
-	HaveCrafters = 7
+	HaveCrafters = 7,
+	ResearchCount = 8,
+	HireManagers = 9
 }

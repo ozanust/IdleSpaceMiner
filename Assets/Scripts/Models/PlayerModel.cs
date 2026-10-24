@@ -257,6 +257,7 @@ public class PlayerModel : IPlayerModel
 		}
 
 		signalBus.Fire<PlayerModelUpdatedSignal>();
+		FireCurrencySignal(type);
 	}
 
 	public bool TryUseCurrency(CurrencyType type, int amount)
@@ -278,6 +279,7 @@ public class PlayerModel : IPlayerModel
 
 		currencies[type] -= amount;
 		signalBus.Fire<PlayerModelUpdatedSignal>();
+		FireCurrencySignal(type);
 		return true;
 	}
 
@@ -294,6 +296,14 @@ public class PlayerModel : IPlayerModel
 		}
 
 		return currencies[type] >= amount;
+	}
+
+	private void FireCurrencySignal(CurrencyType type)
+	{
+		if (type == CurrencyType.DarkMatter)
+		{
+			signalBus.Fire<PlayerDarkMatterUpdatedSignal>();
+		}
 	}
 
 	public int GetCurrency(CurrencyType type)

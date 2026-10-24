@@ -4,11 +4,12 @@ using UnityEngine.UI;
 using Zenject;
 using TMPro;
 
-/// <summary>Window listing the active tasks, opened from the tasks button on the HUD.</summary>
+/// <summary>Window listing goals with rewards: the active tasks or all achievements, depending on type.</summary>
 public class TasksView : MonoBehaviour
 {
 	[Inject] SignalBus signalBus;
 	[Inject] ITaskController taskController;
+	[Inject] IAchievementController achievementController;
 
 	[SerializeField] private GameObject panel;
 	[SerializeField] private Button closeButton;
@@ -17,7 +18,9 @@ public class TasksView : MonoBehaviour
 	[SerializeField] private TMP_Text allCompletedText;
 
 	private readonly List<TaskItem> items = new List<TaskItem>();
-	private MenuType type = MenuType.Tasks;
+	[SerializeField] private MenuType type = MenuType.Tasks;
+
+	private IClaimableList List => type == MenuType.Achievements ? (IClaimableList)achievementController : taskController;
 
 	private void Awake()
 	{
@@ -61,7 +64,7 @@ public class TasksView : MonoBehaviour
 
 	private void Refresh()
 	{
-		IReadOnlyList<int> activeTasks = taskController.GetActiveTasks();
+		IReadOnlyList<int> activeTasks = List.GetVisibleEntries();
 
 		if (!IsShowing(activeTasks))
 		{
@@ -107,7 +110,7 @@ public class TasksView : MonoBehaviour
 		{
 			TaskItem item = Instantiate(itemPrototype, itemContainer);
 			item.gameObject.SetActive(true);
-			item.Init(taskController, taskIndex);
+			item.Init(List, taskIndex);
 			items.Add(item);
 		}
 	}
