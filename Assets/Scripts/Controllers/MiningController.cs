@@ -16,6 +16,13 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	private IManagerController managerController;
 	private IMothershipController mothershipController;
 
+	// Rising icon and "+12" where a cargo ship unloads at the mothership
+	private const float DeliveryTextSize = 12f;
+	private const float DeliveryIconSize = 1.1f;
+	private const float DeliveryRowHeight = 1.35f;
+	private static readonly Vector3 DeliveryTextOffset = new Vector3(0f, 0.6f, 0f);
+	private static readonly Color DeliveryTextColor = new Color(1f, 0.88f, 0.55f);
+
 	// Management research bonus for all planets
 	private float researchMultiplier = 1f;
 
@@ -116,13 +123,31 @@ public class MiningController : IMiningController, ITickable, IDisposable
 
 	private void OnCargoArrivedMothership(CargoShipMothershipArrivalSignal signal)
 	{
-		if (transferData.ContainsKey(signal.PlanetId))
+		TransferResourcesData[] resourcesData;
+		if (!transferData.TryGetValue(signal.PlanetId, out resourcesData))
 		{
-			TransferResourcesData[] resourcesData = transferData[signal.PlanetId];
-			for (int i = 0; i < resourcesData.Length; i++)
+			return;
+		}
+
+		// Delivered cargo is no longer in transit, or saves would count it twice
+		transferData.Remove(signal.PlanetId);
+
+		// One icon and amount row per resource, stacked upwards
+		int row = 0;
+		for (int i = 0; i < resourcesData.Length; i++)
+		{
+			if (resourcesData[i].Amount <= 0)
 			{
-				playerModel.AddResource(resourcesData[i].Type, resourcesData[i].Amount);
+				continue;
 			}
+
+			playerModel.AddResource(resourcesData[i].Type, resourcesData[i].Amount);
+
+			ResourceDataSetting resource = resourceSettings.GetResourceData(resourcesData[i].Type);
+			Vector3 position = signal.Position + DeliveryTextOffset + Vector3.up * (row * DeliveryRowHeight);
+			FloatingTextView.SpawnWithIcon(resource != null ? resource.Icon : null, $"+{NumberFormatter.Format(resourcesData[i].Amount)}",
+				position, DeliveryTextColor, DeliveryTextSize, DeliveryIconSize);
+			row++;
 		}
 	}
 

@@ -145,7 +145,7 @@ public class CargoShipView : MonoBehaviour
 		{
 			returning = false;
 			currentTarget = targetPlanet.position;
-			signalBus.Fire(new CargoShipMothershipArrivalSignal() { PlanetId = targetPlanetId });
+			signalBus.Fire(new CargoShipMothershipArrivalSignal() { PlanetId = targetPlanetId, Position = transform.position });
 		}
 	}
 
