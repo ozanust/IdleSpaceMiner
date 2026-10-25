@@ -32,11 +32,26 @@ public class SpaceView : MonoBehaviour
 	private void Start()
 	{
 		Application.targetFrameRate = 60;
+		CreateBackdrop();
 
 		if (!isViewInitialized)
 		{
 			InitializePlanets(planetSettings);
 			spaceController.OnRegister();
+		}
+	}
+
+	// Animated stars and meteors, drawn by the camera that renders the background layer
+	private void CreateBackdrop()
+	{
+		int backgroundLayer = LayerMask.NameToLayer("BG");
+		foreach (Camera camera in Camera.allCameras)
+		{
+			if (camera != Camera.main && (camera.cullingMask & (1 << backgroundLayer)) != 0)
+			{
+				SpaceBackdropView.Create(camera);
+				return;
+			}
 		}
 	}
 
