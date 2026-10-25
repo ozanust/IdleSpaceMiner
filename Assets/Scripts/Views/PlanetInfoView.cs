@@ -64,6 +64,7 @@ public class PlanetInfoView : MonoBehaviour
 		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Subscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 		signalBus.Subscribe<MothershipUpdatedSignal>(OnManagersUpdated);
+		signalBus.Subscribe<BoostsUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnDestroy()
@@ -72,6 +73,7 @@ public class PlanetInfoView : MonoBehaviour
 		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Unsubscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 		signalBus.Unsubscribe<MothershipUpdatedSignal>(OnManagersUpdated);
+		signalBus.Unsubscribe<BoostsUpdatedSignal>(OnManagersUpdated);
 	}
 
 	private void OnPlanetOpen(PlanetOpenSignal signal)

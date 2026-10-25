@@ -96,7 +96,7 @@ public static class TutorialBuilder
 		hintText.enableAutoSizing = true;
 		hintText.fontSizeMin = 26;
 		hintText.fontSizeMax = 38;
-		hintText.text = "Welcome, Commander! Tap Balor to buy your first planet.";
+		hintText.text = "Welcome, Commander! Tap Cindral to buy your first planet.";
 
 		Button continueButton = TasksWindowBuilder.CloneButton(canvas.Find(TasksWindowBuilder.ClaimButtonTemplatePath), hint, "ContinueButton", "Continue");
 		TasksWindowBuilder.SetRect((RectTransform)continueButton.transform, new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(-34, 22), new Vector2(240, 72));

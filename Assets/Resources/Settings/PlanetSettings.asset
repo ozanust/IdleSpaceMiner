@@ -22,7 +22,7 @@ MonoBehaviour:
     StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Balor
+    Name: Cindral
     Icon: {fileID: 21300000, guid: b47cb3c22b539494f9ed190d4653e990, type: 3}
   - PlanetId: 1
     PlanetPrice: 200
@@ -35,7 +35,7 @@ MonoBehaviour:
     StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Drasta
+    Name: Duneva
     Icon: {fileID: 21300000, guid: 494e65733ca358a48a58c6249e472c19, type: 3}
   - PlanetId: 2
     PlanetPrice: 500
@@ -48,7 +48,7 @@ MonoBehaviour:
     StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Anadius
+    Name: Kogrin
     Icon: {fileID: 21300000, guid: 182389edbef1e9040b972fe0b6df3de8, type: 3}
   - PlanetId: 3
     PlanetPrice: 1250
@@ -61,7 +61,7 @@ MonoBehaviour:
     StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Dholen
+    Name: Umbrax
     Icon: {fileID: 21300000, guid: 168e8cf7f114b76419969d169090f3b9, type: 3}
   - PlanetId: 4
     PlanetPrice: 5000
@@ -76,7 +76,7 @@ MonoBehaviour:
     StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Verr
+    Name: Virelle
     Icon: {fileID: 21300000, guid: 2f62998cc48e3ff43a6d770910fad58d, type: 3}
   - PlanetId: 5
     PlanetPrice: 9000
@@ -87,7 +87,7 @@ MonoBehaviour:
     StartingShipSpeed: 1
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Newton
+    Name: Thalassa
     Icon: {fileID: 21300000, guid: 75be41fc91a87ec4faa621bbbb9ecb83, type: 3}
   - PlanetId: 6
     PlanetPrice: 15000
@@ -99,10 +99,10 @@ MonoBehaviour:
     - Type: 3
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 1.5
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Widow
+    Name: Glacia
     Icon: {fileID: 21300000, guid: 37802406f0682cf468cf454462983965, type: 3}
   - PlanetId: 7
     PlanetPrice: 25000
@@ -112,10 +112,10 @@ MonoBehaviour:
     - Type: 0
       YieldRatio: 0.4
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 1.8
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Acheron
+    Name: Nyxara
     Icon: {fileID: 21300000, guid: 23e2235d38ae2b34794f54c8a0a70bf2, type: 3}
   - PlanetId: 8
     PlanetPrice: 40000
@@ -125,10 +125,10 @@ MonoBehaviour:
     - Type: 4
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 1.8
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Yangtze
+    Name: Opaline
     Icon: {fileID: 21300000, guid: 991ece1380903b14eab87c9da182720e, type: 3}
   - PlanetId: 9
     PlanetPrice: 75000
@@ -140,10 +140,10 @@ MonoBehaviour:
     - Type: 2
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 1.8
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Solveig
+    Name: Mareth
     Icon: {fileID: 21300000, guid: 75be41fc91a87ec4faa621bbbb9ecb83, type: 3}
   - PlanetId: 10
     PlanetPrice: 150000
@@ -151,10 +151,10 @@ MonoBehaviour:
     - Type: 4
       YieldRatio: 1
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 2.2
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Imir
+    Name: Rimeholt
     Icon: {fileID: 21300000, guid: 37802406f0682cf468cf454462983965, type: 3}
   - PlanetId: 11
     PlanetPrice: 250000
@@ -166,10 +166,10 @@ MonoBehaviour:
     - Type: 15
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 2.2
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Relic
+    Name: Voidra
     Icon: {fileID: 21300000, guid: 168e8cf7f114b76419969d169090f3b9, type: 3}
   - PlanetId: 12
     PlanetPrice: 400000
@@ -179,10 +179,10 @@ MonoBehaviour:
     - Type: 4
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 2.4
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Nith
+    Name: Lumen
     Icon: {fileID: 21300000, guid: 991ece1380903b14eab87c9da182720e, type: 3}
   - PlanetId: 13
     PlanetPrice: 800000
@@ -194,10 +194,10 @@ MonoBehaviour:
     - Type: 16
       YieldRatio: 0.2
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 2.9
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Batalla
+    Name: Ferrox
     Icon: {fileID: 21300000, guid: 182389edbef1e9040b972fe0b6df3de8, type: 3}
   - PlanetId: 14
     PlanetPrice: 1500000
@@ -207,10 +207,10 @@ MonoBehaviour:
     - Type: 15
       YieldRatio: 0.5
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 2.8
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Micah
+    Name: Siroc
     Icon: {fileID: 21300000, guid: 494e65733ca358a48a58c6249e472c19, type: 3}
   - PlanetId: 15
     PlanetPrice: 3000000
@@ -218,8 +218,8 @@ MonoBehaviour:
     - Type: 16
       YieldRatio: 1
     TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 1
+    StartingShipSpeed: 2.9
     StartingShipCargo: 5
     PriceIncreaseMultiplier: 1.3
-    Name: Pranas
+    Name: Pyrrhos
     Icon: {fileID: 21300000, guid: b47cb3c22b539494f9ed190d4653e990, type: 3}

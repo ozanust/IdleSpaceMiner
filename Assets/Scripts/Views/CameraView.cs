@@ -18,6 +18,8 @@ public class CameraView : MonoBehaviour
     [SerializeField] private float minFieldOfView = 50f;
     [Tooltip("Zoom change per mouse wheel step")]
     [SerializeField] private float scrollZoomStep = 0.1f;
+    [Tooltip("Space kept around the outermost visible planets when panning")]
+    [SerializeField] private float panMargin = 6f;
 
     private float maxFieldOfView;
     private Vector3 startPosition;
@@ -34,6 +36,12 @@ public class CameraView : MonoBehaviour
 
     private readonly List<RaycastResult> raycastResults = new List<RaycastResult>();
 
+    // Planets decide how far the camera may pan, hidden ones don't count until a telescope reveals them
+    private PlanetSpaceView[] planets;
+    private Rect panArea;
+    private float nextPanAreaUpdate;
+    private const float PanAreaUpdateInterval = 0.5f;
+
     // Distance from the camera to the plane the planets are on (z = 0)
     private float PlaneDistance => Mathf.Abs(cam.transform.position.z);
 
@@ -46,6 +54,7 @@ public class CameraView : MonoBehaviour
 
         maxFieldOfView = cam.fieldOfView;
         startPosition = cam.transform.position;
+        planets = FindObjectsByType<PlanetSpaceView>(FindObjectsInactive.Include);
         inputService.OnScroll += OnScroll;
     }
 
@@ -198,17 +207,54 @@ public class CameraView : MonoBehaviour
     }
 
     /// <summary>Keeps the visible area inside the starting (fully zoomed out) view.</summary>
+    /// <summary>Keeps the view inside the area around the visible planets, at least the starting view.</summary>
     private void ClampPosition()
     {
-        float maxHalfHeight = PlaneDistance * Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
-        float halfHeight = PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
-        float limitY = Mathf.Max(0f, maxHalfHeight - halfHeight);
-        float limitX = limitY * cam.aspect;
+        if (Time.unscaledTime >= nextPanAreaUpdate)
+        {
+            nextPanAreaUpdate = Time.unscaledTime + PanAreaUpdateInterval;
+            UpdatePanArea();
+        }
 
-        Vector3 offset = cam.transform.position - startPosition;
-        offset.x = Mathf.Clamp(offset.x, -limitX, limitX);
-        offset.y = Mathf.Clamp(offset.y, -limitY, limitY);
-        cam.transform.position = startPosition + offset;
+        float halfHeight = PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float halfWidth = halfHeight * cam.aspect;
+
+        Vector3 position = cam.transform.position;
+        position.x = ClampAxis(position.x, panArea.xMin + halfWidth, panArea.xMax - halfWidth);
+        position.y = ClampAxis(position.y, panArea.yMin + halfHeight, panArea.yMax - halfHeight);
+        cam.transform.position = position;
+    }
+
+    // Centres the view when the area is narrower than it
+    private static float ClampAxis(float value, float min, float max)
+    {
+        return min > max ? (min + max) * 0.5f : Mathf.Clamp(value, min, max);
+    }
+
+    private void UpdatePanArea()
+    {
+        // The fully zoomed out starting view is always reachable
+        float maxHalfHeight = PlaneDistance * Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
+        float maxHalfWidth = maxHalfHeight * cam.aspect;
+        Rect area = Rect.MinMaxRect(startPosition.x - maxHalfWidth, startPosition.y - maxHalfHeight, startPosition.x + maxHalfWidth, startPosition.y + maxHalfHeight);
+
+        foreach (PlanetSpaceView planet in planets)
+        {
+            SpriteRenderer sprite = planet != null ? planet.GetComponent<SpriteRenderer>() : null;
+            if (sprite == null || !sprite.enabled)
+            {
+                continue;
+            }
+
+            Vector3 p = planet.transform.position;
+            float reach = sprite.bounds.extents.x + panMargin;
+            area.xMin = Mathf.Min(area.xMin, p.x - reach);
+            area.xMax = Mathf.Max(area.xMax, p.x + reach);
+            area.yMin = Mathf.Min(area.yMin, p.y - reach);
+            area.yMax = Mathf.Max(area.yMax, p.y + reach);
+        }
+
+        panArea = area;
     }
 
     private float GetWorldUnitsPerPixel(float fieldOfView)

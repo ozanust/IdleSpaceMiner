@@ -18,6 +18,7 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 	private readonly ISaveService saveService;
 	private readonly ResourceSettings resourceSettings;
 	private readonly ITaskController taskController;
+	private readonly PlanetSettings planetSettings;
 
 	private readonly List<Step> steps = new List<Step>();
 	private int stepIndex;
@@ -43,8 +44,9 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 	}
 
 	public TutorialController(SignalBus signalBus, IPlayerModel playerModel, ISpaceModel spaceModel, ISaveService saveService,
-		ResourceSettings resourceSettings, ITaskController taskController)
+		ResourceSettings resourceSettings, ITaskController taskController, PlanetSettings planetSettings)
 	{
+		this.planetSettings = planetSettings;
 		this.signalBus = signalBus;
 		this.playerModel = playerModel;
 		this.spaceModel = spaceModel;
@@ -79,13 +81,18 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 
 	private void BuildSteps()
 	{
-		Add("Welcome, Commander! Tap Balor to buy your first planet.",
+		// Names and prices come from the settings, so renaming planets keeps the hints right
+		string first = planetSettings.Settings[0].Name;
+		string second = planetSettings.Settings[1].Name;
+		string secondPrice = NumberFormatter.FormatMoney(planetSettings.Settings[1].PlanetPrice);
+
+		Add($"Welcome, Commander! Tap {first} to buy your first planet.",
 			() => IsUnlocked(0), TutorialTargetId.FirstPlanet);
 
-		Add("Balor is yours. Tap it to see what it mines.",
+		Add($"{first} is yours. Tap it to see what it mines.",
 			() => planetOpened || GetMiningLevel(0) >= 2, TutorialTargetId.FirstPlanet);
 
-		Add("Upgrade the mining rate so Balor mines faster.",
+		Add($"Upgrade the mining rate so {first} mines faster.",
 			() => GetMiningLevel(0) >= 2, TutorialTargetId.MiningUpgradeButton, TutorialTargetId.FirstPlanet);
 
 		Add("Your cargo ship flies the ore to your mothership. Wait for the first delivery.",
@@ -95,7 +102,7 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 			() => sold || IsUnlocked(1),
 			TutorialTargetId.SellButton, TutorialTargetId.CopperResource, TutorialTargetId.ResourcesNavButton);
 
-		Add("Save up $200, then tap Drasta to buy your next planet.",
+		Add($"Save up {secondPrice}, then tap {second} to buy your next planet.",
 			() => IsUnlocked(1), TutorialTargetId.ResourcesCloseButton, TutorialTargetId.SecondPlanet);
 
 		Add("Tasks give you rewards. Tap to see them.",

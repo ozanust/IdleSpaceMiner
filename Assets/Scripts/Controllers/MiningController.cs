@@ -15,6 +15,7 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	private ResourceSettings resourceSettings;
 	private IManagerController managerController;
 	private IMothershipController mothershipController;
+	private IBoostController boostController;
 
 	// Rising icon and "+12" where a cargo ship unloads at the mothership
 	private const float DeliveryTextSize = 12f;
@@ -26,8 +27,9 @@ public class MiningController : IMiningController, ITickable, IDisposable
 	// Management research bonus for all planets
 	private float researchMultiplier = 1f;
 
-	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel, IManagerController managerController, IMothershipController mothershipController)
+	public MiningController(SignalBus signalBus, PlanetSettings planetSettings, ResourceSettings resourceSettings, IPlayerModel playerModel, ISpaceModel spaceModel, IManagerController managerController, IMothershipController mothershipController, IBoostController boostController)
 	{
+		this.boostController = boostController;
 		this.mothershipController = mothershipController;
 		this.managerController = managerController;
 		this.signalBus = signalBus;
@@ -179,7 +181,7 @@ public class MiningController : IMiningController, ITickable, IDisposable
 
 	public float GetMiningMultiplier(int planetId)
 	{
-		return researchMultiplier * managerController.GetMiningMultiplier(planetId) * mothershipController.GetMultiplier(RoomType.Engineering);
+		return researchMultiplier * managerController.GetMiningMultiplier(planetId) * mothershipController.GetMultiplier(RoomType.Engineering) * boostController.MiningMultiplier;
 	}
 
 	public float GetValuePerSecond()

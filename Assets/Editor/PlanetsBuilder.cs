@@ -3,8 +3,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Adds the planets revealed by telescopes (Telescope 1: Verr, Newton, Widow, Telescope 2: Acheron, Yangtze,
-/// Solveig, Telescope 3: Imir, Relic, Nith, Telescope 4: Batalla, Micah, Pranas) to GameScene as Planet.prefab
+/// Adds the planets revealed by telescopes (Telescope 1: Virelle, Thalassa, Glacia, Telescope 2: Nyxara, Opaline,
+/// Mareth, Telescope 3: Rimeholt, Voidra, Lumen, Telescope 4: Ferrox, Siroc, Pyrrhos) to GameScene as Planet.prefab
 /// instances, styled like the existing planets, and registers them in SpaceView in planet id order.
 /// Running it again only moves planets that already exist back to their default position.
 /// </summary>
@@ -16,24 +16,24 @@ public static class PlanetsBuilder
 	// World positions around the mothership at (0, 0), inside the default camera view
 	private static readonly (string name, Vector3 position)[] NewPlanets =
 	{
-		("Planet (4)", new Vector3(-11f, -5f, 0f)),    // Verr
-		("Planet (5)", new Vector3(11.5f, 6f, 0f)),    // Newton
-		("Planet (6)", new Vector3(-9.5f, -19f, 0f)),  // Widow
-		("Planet (7)", new Vector3(-1.5f, 20f, 0f)),   // Acheron, Telescope 2
-		("Planet (8)", new Vector3(2.5f, 9.5f, 0f)),   // Yangtze
-		("Planet (9)", new Vector3(-0.5f, -20.5f, 0f)), // Solveig
-		("Planet (10)", new Vector3(-6f, 4f, 0f)),      // Imir, Telescope 3
-		("Planet (11)", new Vector3(6f, -5f, 0f)),      // Relic
-		("Planet (12)", new Vector3(5f, 15f, 0f)),      // Nith
-		("Planet (13)", new Vector3(-6f, -12f, 0f)),    // Batalla, Telescope 4
-		("Planet (14)", new Vector3(12f, -7.5f, 0f)),   // Micah
-		("Planet (15)", new Vector3(-3f, -5.5f, 0f)),   // Pranas
+		("Planet (4)", new Vector3(-11f, -5f, 0f)),    // Virelle
+		("Planet (5)", new Vector3(11.5f, 6f, 0f)),    // Thalassa
+		("Planet (6)", new Vector3(-9.5f, -19f, 0f)),  // Glacia
+		("Planet (7)", new Vector3(-1.5f, 20f, 0f)),   // Nyxara, Telescope 2
+		("Planet (8)", new Vector3(2.5f, 9.5f, 0f)),   // Opaline
+		("Planet (9)", new Vector3(-0.5f, -20.5f, 0f)), // Mareth
+		("Planet (10)", new Vector3(-6f, 4f, 0f)),      // Rimeholt, Telescope 3
+		("Planet (11)", new Vector3(6f, -5f, 0f)),      // Voidra
+		("Planet (12)", new Vector3(5f, 15f, 0f)),      // Lumen
+		("Planet (13)", new Vector3(-6f, -12f, 0f)),    // Ferrox, Telescope 4
+		("Planet (14)", new Vector3(12f, -7.5f, 0f)),   // Siroc
+		("Planet (15)", new Vector3(-3f, -5.5f, 0f)),   // Pyrrhos
 	};
 
 	// Existing planets that sat outside the default camera view
 	private static readonly (string name, Vector3 position)[] MovedPlanets =
 	{
-		("Planet (2)", new Vector3(1.5f, -13.5f, 0f)), // Anadius, was behind the nav bar
+		("Planet (2)", new Vector3(1.5f, -13.5f, 0f)), // Kogrin, was behind the nav bar
 	};
 
 	[MenuItem("Tools/Planets/Add Telescope Planets")]

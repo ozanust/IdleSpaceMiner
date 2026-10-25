@@ -22,6 +22,7 @@ public class SaveController : ITickable, IDisposable
     private readonly ITutorialController tutorialController;
     private readonly IMothershipController mothershipController;
     private readonly GameSettings gameSettings;
+    private readonly IBoostController boostController;
     private readonly SignalBus signalBus;
 
     private float autoSaveTimer;
@@ -46,6 +47,7 @@ public class SaveController : ITickable, IDisposable
         ITutorialController tutorialController,
         IMothershipController mothershipController,
         GameSettings gameSettings,
+        IBoostController boostController,
         SignalBus signalBus)
     {
         this.saveService = saveService;
@@ -58,6 +60,7 @@ public class SaveController : ITickable, IDisposable
         this.tutorialController = tutorialController;
         this.mothershipController = mothershipController;
         this.gameSettings = gameSettings;
+        this.boostController = boostController;
         this.signalBus = signalBus;
         
         //saveService.DeleteSave();
@@ -157,6 +160,7 @@ public class SaveController : ITickable, IDisposable
         next.TutorialStep = current.TutorialStep;
         next.Rooms = current.Rooms;
         next.GalaxiesSold = current.GalaxiesSold;
+        next.MineBoostEndUtcTicks = current.MineBoostEndUtcTicks;
         next.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
 
         isReset = true;
@@ -216,6 +220,7 @@ public class SaveController : ITickable, IDisposable
         data.Rooms = mothershipController.GetRoomSaveEntries();
         data.GalaxiesSold = mothershipController.GalaxiesSold;
         data.GalaxyValue = mothershipController.GetGalaxyValue();
+        data.MineBoostEndUtcTicks = boostController.MineBoostEndUtcTicks;
 
         return data;
     }

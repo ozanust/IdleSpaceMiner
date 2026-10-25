@@ -25,6 +25,12 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind(typeof(IOfflineProgressController), typeof(ITickable)).To<OfflineProgressController>().AsSingle();
 		Container.Bind(typeof(ISpaceController), typeof(ITickable)).To<SpaceController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<MothershipController>().AsSingle().NonLazy();
+#if GOOGLE_MOBILE_ADS
+		Container.BindInterfacesTo<AdMobRewardedAdService>().AsSingle().NonLazy();
+#else
+		Container.Bind<IRewardedAdService>().To<SimulatedRewardedAdService>().AsSingle();
+#endif
+		Container.BindInterfacesTo<BoostController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<ManagerController>().AsSingle().NonLazy();
 		Container.Bind<IGoalProgressService>().To<GoalProgressService>().AsSingle();
 		Container.BindInterfacesTo<TaskController>().AsSingle().NonLazy();
@@ -87,5 +93,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<RewardClaimedSignal>();
 		Container.DeclareSignal<GalaxySoldSignal>();
 		Container.DeclareSignal<MothershipUpdatedSignal>();
+		Container.DeclareSignal<BoostsUpdatedSignal>();
+		Container.DeclareSignal<RewardGrantedSignal>();
 	}
 }

@@ -25,6 +25,8 @@ public class SaveData
     public int GalaxiesSold;
     // Money spent on planets and their upgrades in the current galaxy
     public long GalaxyValue;
+    // When the ad Mine Boost runs out, in UTC ticks
+    public long MineBoostEndUtcTicks;
 }
 
 [Serializable]

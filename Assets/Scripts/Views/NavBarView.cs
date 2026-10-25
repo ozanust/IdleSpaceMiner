@@ -37,8 +37,8 @@ public class NavBarView : MonoBehaviour
         // The scene keeps it locked like the other upcoming menus, selling the galaxy is always available
         mothershipButton.interactable = true;
 
-        // Boosts have no view yet, hide it for the MVP
-        boostsButton.gameObject.SetActive(false);
+        // Locked in the scene like the other upcoming menus, ad boosts are always available
+        boostsButton.interactable = true;
 
         signalBus.Subscribe<ResearchCompletedSignal>(OnResearchUnlocked);
     }

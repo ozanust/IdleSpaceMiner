@@ -14,6 +14,7 @@ public class GameSettings : ScriptableObject
 	[SerializeField] private ManagerSettings managerSettings = new ManagerSettings();
 	[SerializeField] private GameAudioSettings audioSettings = new GameAudioSettings();
 	[SerializeField] private PrestigeSettings prestigeSettings = new PrestigeSettings();
+	[SerializeField] private AdRewardSettings adRewardSettings = new AdRewardSettings();
 
 	public EconomySettings EconomySettings => economySettings;
 	public GlobalSettings GlobalSettings => globalSettings;
@@ -22,6 +23,7 @@ public class GameSettings : ScriptableObject
 	public ManagerSettings ManagerSettings => managerSettings;
 	public GameAudioSettings AudioSettings => audioSettings;
 	public PrestigeSettings PrestigeSettings => prestigeSettings;
+	public AdRewardSettings AdRewardSettings => adRewardSettings;
 
 	private static TaskSetting[] DefaultAchievements()
 	{
@@ -171,4 +173,26 @@ public class RoomSetting
 	public float CostMultiplier = 1.8f;
 	public float BonusPerLevel;
 	public int MaxLevel = 10;
+}
+
+/// <summary>Rewarded ads: the AdMob ad units and what watching an ad gives, as in Idle Planet Miner.</summary>
+[System.Serializable]
+public class AdRewardSettings
+{
+	[Header("AdMob rewarded ad units, Google's test units by default")]
+	public string AndroidRewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917";
+	public string IosRewardedAdUnitId = "ca-app-pub-3940256099942544/1712485313";
+
+	[Header("Mine Boost: watching an ad speeds up mining on all planets")]
+	public float MineBoostMultiplier = 1.2f;
+	public float MineBoostMinutes = 60f;
+
+	[Header("Ark: a reward that shows up every few minutes")]
+	public float ArkMinMinutes = 6f;
+	public float ArkMaxMinutes = 13f;
+	[Range(0f, 1f)] public float ArkDarkMatterChance = 0.3f;
+	public int ArkDarkMatter = 5;
+	// Cash is a share of the galaxy value, but at least this many seconds of mining income
+	public float ArkCashShareOfGalaxyValue = 0.025f;
+	public float ArkMinIncomeSeconds = 120f;
 }

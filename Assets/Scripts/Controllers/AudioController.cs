@@ -88,6 +88,7 @@ public class AudioController : IAudioController, IInitializable, ITickable, IDis
 		signalBus.Subscribe<PurchaseSignal>(OnPurchase);
 		signalBus.Subscribe<ResourcesSellSignal>(OnSell);
 		signalBus.Subscribe<RewardClaimedSignal>(OnClaim);
+		signalBus.Subscribe<RewardGrantedSignal>(OnClaim);
 		signalBus.Subscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 		signalBus.Subscribe<ResearchCompletedSignal>(OnResearchCompleted);
 	}
@@ -97,6 +98,7 @@ public class AudioController : IAudioController, IInitializable, ITickable, IDis
 		signalBus.Unsubscribe<PurchaseSignal>(OnPurchase);
 		signalBus.Unsubscribe<ResourcesSellSignal>(OnSell);
 		signalBus.Unsubscribe<RewardClaimedSignal>(OnClaim);
+		signalBus.Unsubscribe<RewardGrantedSignal>(OnClaim);
 		signalBus.Unsubscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 		signalBus.Unsubscribe<ResearchCompletedSignal>(OnResearchCompleted);
 

@@ -15,5 +15,6 @@ public enum PurchaseKind
 	Upgrade,
 	Production,
 	Manager,
-	Room
+	Room,
+	Ad
 }
