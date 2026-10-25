@@ -94,6 +94,9 @@ public class SmelterSaveData
 {
     public int Id;
     public AlloyType TargetAlloy;
+    // A batch that had already taken its ingredients, and how many seconds of it were done
+    public bool InProgress;
+    public float Progress;
 }
 
 [Serializable]
@@ -101,6 +104,8 @@ public class CrafterSaveData
 {
     public int Id;
     public ResourceType TargetResource;
+    public bool InProgress;
+    public float Progress;
 }
 
 [Serializable]

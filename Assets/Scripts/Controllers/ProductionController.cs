@@ -66,6 +66,14 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		SmelterAlloyData newData = new SmelterAlloyData(signal.SmelterId, signal.RecipeType, settings.TimeToSmelt);
 		smeltingData.Add(signal.SmelterId, newData);
 
+		// A batch restored from a save already took its ingredients, so it carries on instead
+		if (signal.InProgress)
+		{
+			newData.IsSmelting = true;
+			newData.SmeltedTime = signal.Progress;
+			return;
+		}
+
 		TryStartSmelt(newData);
 	}
 
@@ -80,6 +88,13 @@ public class ProductionController : IProductionController, ITickable, IDisposabl
 		ItemSmeltSettings settings = resourceSettings.GetItemSmeltSetting(signal.RecipeType);
 		CrafterAlloyData newData = new CrafterAlloyData(signal.SmelterId, signal.RecipeType, settings.TimeToSmelt);
 		craftingData.Add(signal.SmelterId, newData);
+
+		if (signal.InProgress)
+		{
+			newData.IsSmelting = true;
+			newData.SmeltedTime = signal.Progress;
+			return;
+		}
 
 		TryStartCraft(newData);
 	}

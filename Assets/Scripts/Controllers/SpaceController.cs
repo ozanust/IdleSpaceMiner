@@ -170,7 +170,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 			foreach (var data in save.Smelting.SmeltEntries)
 			{
 				//playerModel.AddWorkingSmelter(data.Id, data.TargetAlloy);
-				signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = data.TargetAlloy, SmelterId = data.Id });
+				signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = data.TargetAlloy, SmelterId = data.Id, InProgress = data.InProgress, Progress = data.Progress });
 			}
 		}
 		
@@ -180,7 +180,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 			foreach (var data in save.Crafting.CraftEntries)
 			{
 				//playerModel.AddWorkingCrafter(data.Id, data.TargetResource);
-				signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = data.TargetResource, SmelterId = data.Id });
+				signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = data.TargetResource, SmelterId = data.Id, InProgress = data.InProgress, Progress = data.Progress });
 			}
 		}
 	}

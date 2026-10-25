@@ -41,6 +41,8 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 		public Func<bool> IsDone;
 		// The step waits hidden until this is true
 		public Func<bool> IsReady = () => true;
+		// For steps whose hint changes along the way, otherwise Info is shown
+		public Func<TutorialStepInfo> GetInfo;
 	}
 
 	public TutorialController(SignalBus signalBus, IPlayerModel playerModel, ISpaceModel spaceModel, ISaveService saveService,
@@ -108,11 +110,19 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 		Add("Tasks give you rewards. Tap to see them.",
 			() => tasksOpened || taskController.GetClaimedTasks().Length > 0, TutorialTargetId.TasksButton);
 
-		// Waits until the player can afford the Smelter, mining enough ore takes a while
+		// The Smelter needs the Asteroid Miner first, as in Idle Planet Miner. One step covers both so saved
+		// step numbers stay the same; each part waits until the player can afford it
 		Step smelter = Add("You have enough ore to research the Smelter. Open Projects!",
 			() => playerModel.IsResearchUnlocked(ResearchType.Smelter),
 			TutorialTargetId.ResearchButton, TutorialTargetId.SmelterResearch, TutorialTargetId.ProjectsNavButton);
-		smelter.IsReady = () => playerModel.HasResources(resourceSettings.GetResearchSetting(ResearchType.Smelter).NeededResources);
+		TutorialStepInfo asteroidMiner = new TutorialStepInfo
+		{
+			Text = "Research the Asteroid Miner in Projects. It catches passing asteroids and leads to the Smelter.",
+			Targets = new[] { TutorialTargetId.ResearchButton, TutorialTargetId.AsteroidMinerResearch, TutorialTargetId.ProjectsNavButton }
+		};
+		smelter.GetInfo = () => playerModel.IsResearchUnlocked(ResearchType.AsteroidMiner) ? smelter.Info : asteroidMiner;
+		smelter.IsReady = () => playerModel.HasResources(resourceSettings.GetResearchSetting(
+			playerModel.IsResearchUnlocked(ResearchType.AsteroidMiner) ? ResearchType.Smelter : ResearchType.AsteroidMiner).NeededResources);
 
 		Add("Build a smelter in Production and smelt copper ore into bars. Bars sell for more!",
 			() => recipeAdded || HasAny(MainResourceType.Alloy),
@@ -159,7 +169,8 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 			Advance();
 		}
 
-		CurrentStep = stepIndex < steps.Count && steps[stepIndex].IsReady() ? steps[stepIndex].Info : null;
+		Step current = stepIndex < steps.Count ? steps[stepIndex] : null;
+		CurrentStep = current != null && current.IsReady() ? (current.GetInfo != null ? current.GetInfo() : current.Info) : null;
 	}
 
 	private void Advance()

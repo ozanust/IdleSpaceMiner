@@ -16,6 +16,7 @@ public class SaveController : ITickable, IDisposable
     private readonly IPlayerModel playerModel;
     private readonly ISpaceModel spaceModel;
     private readonly IMiningController miningController;
+    private readonly IProductionController productionController;
     private readonly ITaskController taskController;
     private readonly IAchievementController achievementController;
     private readonly IManagerController managerController;
@@ -41,6 +42,7 @@ public class SaveController : ITickable, IDisposable
         IPlayerModel playerModel,
         ISpaceModel spaceModel,
         IMiningController miningController,
+        IProductionController productionController,
         ITaskController taskController,
         IAchievementController achievementController,
         IManagerController managerController,
@@ -54,6 +56,7 @@ public class SaveController : ITickable, IDisposable
         this.playerModel = playerModel;
         this.spaceModel = spaceModel;
         this.miningController = miningController;
+        this.productionController = productionController;
         this.taskController = taskController;
         this.achievementController = achievementController;
         this.managerController = managerController;
@@ -344,6 +347,9 @@ public class SaveController : ITickable, IDisposable
             SmelterSaveData data = new SmelterSaveData();
             data.Id = smelter.Key;
             data.TargetAlloy = smelter.Value;
+            SmelterAlloyData progress = productionController.GetAlloyData(smelter.Key);
+            data.InProgress = progress != null && progress.IsSmelting;
+            data.Progress = progress != null ? progress.SmeltedTime : 0f;
             smeltingData.SmeltEntries.Add(data);
         }
         
@@ -359,6 +365,9 @@ public class SaveController : ITickable, IDisposable
             CrafterSaveData data = new CrafterSaveData();
             data.Id = crafter.Key;
             data.TargetResource = crafter.Value;
+            CrafterAlloyData progress = productionController.GetCraftingAlloyData(crafter.Key);
+            data.InProgress = progress != null && progress.IsSmelting;
+            data.Progress = progress != null ? progress.SmeltedTime : 0f;
             craftingSaveData.CraftEntries.Add(data);
         }
         

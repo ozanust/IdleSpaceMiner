@@ -15,5 +15,6 @@ public enum TutorialTargetId
 	ProductionNavButton,
 	SmelterUnlockButton,
 	SmelterRecipeButton,
-	CopperBarRecipe
+	CopperBarRecipe,
+	AsteroidMinerResearch
 }

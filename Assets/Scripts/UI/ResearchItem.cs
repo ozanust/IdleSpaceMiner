@@ -25,6 +25,10 @@ public class ResearchItem : MonoBehaviour
 		{
 			TutorialTarget.Mark(button.gameObject, TutorialTargetId.SmelterResearch);
 		}
+		else if (type == ResearchType.AsteroidMiner)
+		{
+			TutorialTarget.Mark(button.gameObject, TutorialTargetId.AsteroidMinerResearch);
+		}
 	}
 
 	private void Start()
