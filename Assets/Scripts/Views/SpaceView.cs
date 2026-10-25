@@ -88,6 +88,7 @@ public class SpaceView : MonoBehaviour
 			planets[i].SetIndex(setting.PlanetId);
 			planets[i].SetPrice(setting.PlanetPrice);
 			planets[i].SetPlanetIcon(setting.Icon);
+			PlanetDecorView.Attach(planets[i].gameObject);
 		}
 
 		TutorialTarget.Mark(planets[0].gameObject, TutorialTargetId.FirstPlanet);
