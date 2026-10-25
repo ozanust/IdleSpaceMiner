@@ -22,6 +22,8 @@ public class CameraView : MonoBehaviour
     [SerializeField] private float panMargin = 6f;
 
     private float maxFieldOfView;
+    // Camera distance at the start; zooming out further than the starting view pulls the camera back
+    private float startDistance;
     private Vector3 startPosition;
 
     private bool isPointerDown;
@@ -53,6 +55,7 @@ public class CameraView : MonoBehaviour
         }
 
         maxFieldOfView = cam.fieldOfView;
+        startDistance = PlaneDistance;
         startPosition = cam.transform.position;
         planets = FindObjectsByType<PlanetSpaceView>(FindObjectsInactive.Include);
         inputService.OnScroll += OnScroll;
@@ -186,7 +189,7 @@ public class CameraView : MonoBehaviour
     /// <summary>Moves the camera so the map follows the finger.</summary>
     private void Pan(Vector2 screenDelta)
     {
-        Vector3 move = -(Vector3)screenDelta * GetWorldUnitsPerPixel(cam.fieldOfView);
+        Vector3 move = -(Vector3)screenDelta * GetWorldUnitsPerPixel(VisibleHalfHeight);
         cam.transform.position += move;
         ClampPosition();
     }
@@ -194,19 +197,48 @@ public class CameraView : MonoBehaviour
     /// <summary>Scales the visible area by factor (below 1 zooms in) while keeping the point under the screen position in place.</summary>
     private void ZoomAround(Vector2 screenPosition, float factor)
     {
-        float halfHeight = PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad) * factor;
-        float newFieldOfView = Mathf.Clamp(2f * Mathf.Atan(halfHeight / PlaneDistance) * Mathf.Rad2Deg, minFieldOfView, maxFieldOfView);
+        float minHalfHeight = startDistance * Mathf.Tan(minFieldOfView * 0.5f * Mathf.Deg2Rad);
+        float before = VisibleHalfHeight;
+        float after = Mathf.Clamp(before * factor, minHalfHeight, GetMaxHalfHeight());
 
         Vector2 fromCenter = screenPosition - new Vector2(Screen.width, Screen.height) * 0.5f;
-        float unitsBefore = GetWorldUnitsPerPixel(cam.fieldOfView);
-        float unitsAfter = GetWorldUnitsPerPixel(newFieldOfView);
-
-        cam.fieldOfView = newFieldOfView;
-        cam.transform.position += (Vector3)(fromCenter * (unitsBefore - unitsAfter));
+        SetVisibleHalfHeight(after);
+        cam.transform.position += (Vector3)(fromCenter * (GetWorldUnitsPerPixel(before) - GetWorldUnitsPerPixel(after)));
         ClampPosition();
     }
 
-    /// <summary>Keeps the visible area inside the starting (fully zoomed out) view.</summary>
+    // Half the height of the visible part of the planet plane
+    private float VisibleHalfHeight => PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+
+    /// <summary>
+    /// Up to the starting view this narrows or widens the field of view as before; past it the field of
+    /// view stays at the start and the camera moves back, which avoids the stretching of a very wide view.
+    /// </summary>
+    private void SetVisibleHalfHeight(float halfHeight)
+    {
+        float startHalfHeight = startDistance * Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
+        Vector3 position = cam.transform.position;
+        if (halfHeight <= startHalfHeight)
+        {
+            position.z = -startDistance;
+            cam.fieldOfView = 2f * Mathf.Atan(halfHeight / startDistance) * Mathf.Rad2Deg;
+        }
+        else
+        {
+            cam.fieldOfView = maxFieldOfView;
+            position.z = -halfHeight / Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
+        }
+
+        cam.transform.position = position;
+    }
+
+    // Fully zoomed out shows every visible planet
+    private float GetMaxHalfHeight()
+    {
+        UpdatePanArea();
+        return Mathf.Max(panArea.height * 0.5f, panArea.width * 0.5f / cam.aspect);
+    }
+
     /// <summary>Keeps the view inside the area around the visible planets, at least the starting view.</summary>
     private void ClampPosition()
     {
@@ -216,7 +248,7 @@ public class CameraView : MonoBehaviour
             UpdatePanArea();
         }
 
-        float halfHeight = PlaneDistance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float halfHeight = VisibleHalfHeight;
         float halfWidth = halfHeight * cam.aspect;
 
         Vector3 position = cam.transform.position;
@@ -234,7 +266,7 @@ public class CameraView : MonoBehaviour
     private void UpdatePanArea()
     {
         // The fully zoomed out starting view is always reachable
-        float maxHalfHeight = PlaneDistance * Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
+        float maxHalfHeight = startDistance * Mathf.Tan(maxFieldOfView * 0.5f * Mathf.Deg2Rad);
         float maxHalfWidth = maxHalfHeight * cam.aspect;
         Rect area = Rect.MinMaxRect(startPosition.x - maxHalfWidth, startPosition.y - maxHalfHeight, startPosition.x + maxHalfWidth, startPosition.y + maxHalfHeight);
 
@@ -257,9 +289,9 @@ public class CameraView : MonoBehaviour
         panArea = area;
     }
 
-    private float GetWorldUnitsPerPixel(float fieldOfView)
+    private static float GetWorldUnitsPerPixel(float halfHeight)
     {
-        return 2f * PlaneDistance * Mathf.Tan(fieldOfView * 0.5f * Mathf.Deg2Rad) / Screen.height;
+        return 2f * halfHeight / Screen.height;
     }
 
     private float GetDragThreshold()
