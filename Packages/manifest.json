@@ -11,6 +11,8 @@
   ],
   "dependencies": {
     "com.google.ads.mobile": "11.5.0",
+    "com.google.firebase.analytics": "file:Firebase/com.google.firebase.analytics-14.1.0.tgz",
+    "com.google.firebase.app": "file:Firebase/com.google.firebase.app-14.1.0.tgz",
     "com.unity.adaptiveperformance.google.android": "6.0.0",
     "com.unity.adaptiveperformance.samsung.android": "5.0.0",
     "com.unity.ai.navigation": "2.0.11",

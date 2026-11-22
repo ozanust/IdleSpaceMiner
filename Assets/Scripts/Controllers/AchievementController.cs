@@ -12,6 +12,7 @@ public class AchievementController : IAchievementController, IInitializable
 	private readonly GameSettings gameSettings;
 	private readonly IGoalProgressService goals;
 	private readonly SignalBus signalBus;
+	[Inject] private IAnalyticsService analytics;
 
 	private readonly HashSet<int> claimed = new HashSet<int>();
 	private readonly List<int> visible = new List<int>();
@@ -99,6 +100,13 @@ public class AchievementController : IAchievementController, IInitializable
 
 		claimed.Add(index);
 		playerModel.AddCurrency(CurrencyType.DarkMatter, (int)gameSettings.Achievements[index].Reward);
+		TaskSetting goal = gameSettings.Achievements[index];
+		analytics.EarnDarkMatter(goal.Reward, "achievement");
+		analytics.LogEvent("achievement_claimed", new AnalyticsParams()
+			.Add("achievement_index", index)
+			.Add("goal_type", goal.Type.ToString())
+			.Add("target", goal.TargetAmount)
+			.Add("claimed_total", claimed.Count));
 		signalBus.Fire<RewardClaimedSignal>();
 		signalBus.Fire<TaskUpdatedSignal>();
 	}

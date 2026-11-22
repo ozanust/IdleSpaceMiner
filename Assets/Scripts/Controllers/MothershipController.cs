@@ -16,6 +16,7 @@ public class MothershipController : IMothershipController, IInitializable, IDisp
 	private readonly PlanetSettings planetSettings;
 	private readonly ISaveService saveService;
 	private readonly PrestigeSettings settings;
+	[Inject] private IAnalyticsService analytics;
 
 	private readonly Dictionary<RoomType, int> levels = new Dictionary<RoomType, int>();
 
@@ -184,6 +185,12 @@ public class MothershipController : IMothershipController, IInitializable, IDisp
 		if (canBuy)
 		{
 			levels[type] = GetRoomLevel(type) + 1;
+			analytics.SpendDarkMatter(cost, "room_" + type.ToString().ToLowerInvariant());
+			analytics.LogEvent("room_upgraded", new AnalyticsParams()
+				.Add("room", type.ToString())
+				.Add("level", levels[type])
+				.Add("cost", cost)
+				.Add("galaxies_sold", GalaxiesSold));
 			signalBus.Fire<MothershipUpdatedSignal>();
 		}
 

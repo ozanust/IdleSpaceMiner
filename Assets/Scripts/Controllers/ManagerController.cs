@@ -15,6 +15,7 @@ public class ManagerController : IManagerController, IInitializable, IDisposable
 	private readonly ISaveService saveService;
 	private readonly GameSettings gameSettings;
 	private readonly SignalBus signalBus;
+	[Inject] private IAnalyticsService analytics;
 
 	private readonly List<ManagerData> managers = new List<ManagerData>();
 	private int nextId;
@@ -106,6 +107,11 @@ public class ManagerController : IManagerController, IInitializable, IDisposable
 
 		hired = Roll(setting);
 		Add(hired);
+		analytics.SpendDarkMatter(setting.Cost, "manager_" + school.ToString().ToLowerInvariant());
+		analytics.LogEvent("manager_hired", new AnalyticsParams()
+			.Add("school", school.ToString())
+			.Add("stars", hired.Stars)
+			.Add("total_hired", TotalHired));
 		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = true });
 		return true;
 	}
@@ -118,13 +124,16 @@ public class ManagerController : IManagerController, IInitializable, IDisposable
 
 	public bool TryBuySlot()
 	{
-		if (!playerModel.TryUseCurrency(CurrencyType.DarkMatter, GetNextSlotCost()))
+		int cost = GetNextSlotCost();
+		if (!playerModel.TryUseCurrency(CurrencyType.DarkMatter, cost))
 		{
 			signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = false });
 			return false;
 		}
 
 		Slots++;
+		analytics.SpendDarkMatter(cost, "manager_slot");
+		analytics.LogEvent("manager_slot_bought", AnalyticsParams.With("slots", Slots));
 		signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Manager, Success = true });
 		Changed();
 		return true;
@@ -192,6 +201,7 @@ public class ManagerController : IManagerController, IInitializable, IDisposable
 		}
 
 		manager.Stars++;
+		analytics.LogEvent("manager_promoted", AnalyticsParams.With("stars", manager.Stars));
 		// The secondary skill is rolled when a manager reaches 3 stars
 		if (manager.Secondary == ManagerSecondary.None && manager.Stars >= 3)
 		{

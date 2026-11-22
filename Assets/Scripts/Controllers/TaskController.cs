@@ -16,6 +16,7 @@ public class TaskController : ITaskController, IInitializable, ITickable
 	private readonly GameSettings gameSettings;
 	private readonly IGoalProgressService goals;
 	private readonly SignalBus signalBus;
+	[Inject] private IAnalyticsService analytics;
 
 	private readonly HashSet<int> claimedTasks = new HashSet<int>();
 	private readonly List<int> activeTasks = new List<int>();
@@ -113,6 +114,11 @@ public class TaskController : ITaskController, IInitializable, ITickable
 
 		claimedTasks.Add(index);
 		playerModel.AddMoney(gameSettings.Tasks[index].Reward);
+		analytics.LogEvent("task_claimed", new AnalyticsParams()
+			.Add("task_index", index)
+			.Add("task_type", gameSettings.Tasks[index].Type.ToString())
+			.Add("reward", gameSettings.Tasks[index].Reward)
+			.Add("claimed_total", claimedTasks.Count));
 		signalBus.Fire<RewardClaimedSignal>();
 		UpdateActiveTasks();
 		signalBus.Fire<TaskUpdatedSignal>();

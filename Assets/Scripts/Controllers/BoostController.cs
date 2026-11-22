@@ -18,6 +18,7 @@ public class BoostController : IBoostController, IInitializable, ITickable
 	private readonly ISaveService saveService;
 	private readonly IAudioController audioController;
 	private readonly AdRewardSettings settings;
+	[Inject] private IAnalyticsService analytics;
 
 	private long mineBoostEndUtcTicks;
 	private bool wasMineBoostActive;
@@ -81,7 +82,7 @@ public class BoostController : IBoostController, IInitializable, ITickable
 
 	public void WatchMineBoostAd()
 	{
-		ShowAd(() =>
+		ShowAd("mine_boost", () =>
 		{
 			// A new ad gives a full boost again, it doesn't add up
 			mineBoostEndUtcTicks = DateTime.UtcNow.AddMinutes(settings.MineBoostMinutes).Ticks;
@@ -97,7 +98,7 @@ public class BoostController : IBoostController, IInitializable, ITickable
 			return;
 		}
 
-		ShowAd(() =>
+		ShowAd("ark", () =>
 		{
 			IsArkAvailable = false;
 			ScheduleArk();
@@ -105,12 +106,14 @@ public class BoostController : IBoostController, IInitializable, ITickable
 			if (UnityEngine.Random.value < settings.ArkDarkMatterChance)
 			{
 				playerModel.AddCurrency(CurrencyType.DarkMatter, settings.ArkDarkMatter);
+				analytics.EarnDarkMatter(settings.ArkDarkMatter, "ark");
 				signalBus.Fire(new RewardGrantedSignal() { Message = $"+{settings.ArkDarkMatter} Dark Matter" });
 			}
 			else
 			{
 				long cash = GetArkCash();
 				playerModel.AddMoney(cash);
+				analytics.LogEvent("ark_cash", AnalyticsParams.With("value", cash));
 				signalBus.Fire(new RewardGrantedSignal() { Message = "+" + NumberFormatter.FormatMoney(cash) });
 			}
 		});
@@ -124,19 +127,22 @@ public class BoostController : IBoostController, IInitializable, ITickable
 		return Math.Max(10L, (long)Math.Round(Math.Max(fromValue, fromIncome)));
 	}
 
-	private void ShowAd(Action onRewarded)
+	private void ShowAd(string placement, Action onRewarded)
 	{
 		if (!IsAdReady)
 		{
+			analytics.LogEvent("ad_unavailable", AnalyticsParams.With("placement", placement));
 			signalBus.Fire(new PurchaseSignal() { Kind = PurchaseKind.Ad, Success = false, FailMessage = "No ad available right now, try again soon" });
 			return;
 		}
 
 		waitingForAd = true;
 		signalBus.Fire<BoostsUpdatedSignal>();
+		analytics.LogEvent("ad_requested", AnalyticsParams.With("placement", placement));
 		adService.Show(earned =>
 		{
 			waitingForAd = false;
+			analytics.LogEvent(earned ? "ad_rewarded" : "ad_closed_early", AnalyticsParams.With("placement", placement));
 			if (earned)
 			{
 				onRewarded();

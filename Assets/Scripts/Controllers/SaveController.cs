@@ -25,6 +25,7 @@ public class SaveController : ITickable, IDisposable
     private readonly GameSettings gameSettings;
     private readonly IBoostController boostController;
     private readonly SignalBus signalBus;
+    [Inject] private IAnalyticsService analytics;
 
     private float autoSaveTimer;
 
@@ -122,6 +123,7 @@ public class SaveController : ITickable, IDisposable
     /// <summary>Deletes the save and restarts the game scene as a new game.</summary>
     public void ResetProgress()
     {
+        analytics.LogEvent("progress_reset", AnalyticsParams.With("galaxies_sold", mothershipController.GalaxiesSold));
         isReset = true;
         saveService.DeleteSave();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

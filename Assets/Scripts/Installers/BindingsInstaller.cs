@@ -38,6 +38,8 @@ public class BindingsInstaller : MonoInstaller
 		Container.BindInterfacesTo<TutorialController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<AudioController>().AsSingle().NonLazy();
 		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<FirebaseAnalyticsService>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<AnalyticsController>().AsSingle().NonLazy();
 	}
 
 	void InstallSignals()

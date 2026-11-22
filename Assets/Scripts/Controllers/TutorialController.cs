@@ -19,6 +19,7 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 	private readonly ResourceSettings resourceSettings;
 	private readonly ITaskController taskController;
 	private readonly PlanetSettings planetSettings;
+	[Inject] private IAnalyticsService analytics;
 
 	private readonly List<Step> steps = new List<Step>();
 	private int stepIndex;
@@ -65,6 +66,13 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 		if (save != null)
 		{
 			stepIndex = Mathf.Clamp(save.TutorialStep, 0, steps.Count);
+		}
+
+		// Once per install, the start of Firebase's tutorial funnel
+		if (stepIndex == 0 && PlayerPrefs.GetInt("analytics_tutorial_begun", 0) == 0)
+		{
+			PlayerPrefs.SetInt("analytics_tutorial_begun", 1);
+			analytics.LogEvent("tutorial_begin");
 		}
 
 		signalBus.Subscribe<PlanetOpenSignal>(OnPlanetOpen);
@@ -184,6 +192,12 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 	private void Advance()
 	{
 		stepIndex++;
+		analytics.LogEvent("tutorial_step", new AnalyticsParams().Add("step", stepIndex).Add("steps", steps.Count));
+		if (stepIndex == steps.Count)
+		{
+			analytics.LogEvent("tutorial_complete", AnalyticsParams.With("skipped", 0));
+		}
+
 		planetOpened = false;
 		sold = false;
 		tasksOpened = false;
@@ -199,6 +213,11 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 
 	public void Skip()
 	{
+		if (stepIndex < steps.Count)
+		{
+			analytics.LogEvent("tutorial_complete", new AnalyticsParams().Add("skipped", 1).Add("step", stepIndex));
+		}
+
 		stepIndex = steps.Count;
 		CurrentStep = null;
 	}

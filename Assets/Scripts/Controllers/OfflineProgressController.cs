@@ -19,6 +19,7 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 	private readonly IMiningController miningController;
 	private readonly PlanetSettings planetSettings;
 	private readonly GameSettings gameSettings;
+	[Inject] private IAnalyticsService analytics;
 
 	// Null until the first tick, so slow scene loading isn't counted as offline time
 	private DateTime? lastTickUtc;
@@ -77,6 +78,11 @@ public class OfflineProgressController : IOfflineProgressController, ITickable
 
 		MineOffline(seconds);
 		productionController.SimulateOffline(seconds);
+		// How long players stay away, and how often they hit the cap
+		analytics.LogEvent("offline_progress", new AnalyticsParams()
+			.Add("minutes_away", Math.Round(elapsedSeconds / 60.0, 1))
+			.Add("minutes_credited", Math.Round(seconds / 60.0, 1))
+			.Add("capped", elapsedSeconds > gameSettings.GlobalSettings.MaxOfflineSeconds));
 
 		Debug.Log($"[OfflineProgress] Applied {seconds:F0}s of offline progress (away {elapsedSeconds:F0}s)");
 	}
