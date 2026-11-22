@@ -36,6 +36,10 @@ public class ResourcesView : MonoBehaviour
 		oreButton.onClick.AddListener(OnOreSelected);
 		alloyButton.onClick.AddListener(OnAlloySelected);
 		itemButton.onClick.AddListener(OnItemSelected);
+
+		// Show which list the window starts on
+		int startTab = oreResourcesLayout.gameObject.activeSelf ? 0 : alloyResourcesLayout.gameObject.activeSelf ? 1 : 2;
+		TabButton.Select(startTab, oreButton, alloyButton, itemButton);
 	}
 
 	private void Start()
@@ -143,6 +147,7 @@ public class ResourcesView : MonoBehaviour
 		alloyResourcesLayout.gameObject.SetActive(isAlloy);
 		itemResourcesLayout.gameObject.SetActive(isItem);
 		panelTitle.text = isOre ? "Ores" : isAlloy ? "Alloys" : isItem ? "Items" : "";
+		TabButton.Select(isOre ? 0 : isAlloy ? 1 : 2, oreButton, alloyButton, itemButton);
 		signalBus.Fire(new ResourceDeselectedToSellSignal() { Type = currentResourceSelection });
 	}
 

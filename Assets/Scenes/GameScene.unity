@@ -2369,6 +2369,7 @@ GameObject:
   - component: {fileID: 115070191}
   - component: {fileID: 115070190}
   - component: {fileID: 115070193}
+  - component: {fileID: 115070194}
   m_Layer: 5
   m_Name: SmeltButton
   m_TagString: Untagged
@@ -2498,6 +2499,32 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &115070194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115070188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254ce86734084944293d561060688ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButton
+  normalSprite: {fileID: -5684127001400078883, guid: f959a5af51115673823318958d47710e, type: 3}
+  normalState:
+    m_HighlightedSprite: {fileID: -4385143855802296654, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -4041711257218735477, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  selectedSprite: {fileID: -4610865162984515140, guid: f959a5af51115673823318958d47710e, type: 3}
+  selectedState:
+    m_HighlightedSprite: {fileID: -3384276681833992208, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -7996906057486916537, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  normalLabelColor: {r: 0.62, g: 0.78, b: 0.88, a: 1}
+  selectedLabelColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &144527216
 GameObject:
   m_ObjectHideFlags: 0
@@ -11886,6 +11913,7 @@ GameObject:
   - component: {fileID: 593078055}
   - component: {fileID: 593078054}
   - component: {fileID: 593078057}
+  - component: {fileID: 593078058}
   m_Layer: 5
   m_Name: ItemButton
   m_TagString: Untagged
@@ -12015,6 +12043,32 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &593078058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593078052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254ce86734084944293d561060688ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButton
+  normalSprite: {fileID: -5684127001400078883, guid: f959a5af51115673823318958d47710e, type: 3}
+  normalState:
+    m_HighlightedSprite: {fileID: -4385143855802296654, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -4041711257218735477, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  selectedSprite: {fileID: -4610865162984515140, guid: f959a5af51115673823318958d47710e, type: 3}
+  selectedState:
+    m_HighlightedSprite: {fileID: -3384276681833992208, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -7996906057486916537, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  normalLabelColor: {r: 0.62, g: 0.78, b: 0.88, a: 1}
+  selectedLabelColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &596691906
 GameObject:
   m_ObjectHideFlags: 0
@@ -25177,6 +25231,7 @@ GameObject:
   - component: {fileID: 1121059658}
   - component: {fileID: 1121059657}
   - component: {fileID: 1121059660}
+  - component: {fileID: 1121059661}
   m_Layer: 5
   m_Name: CraftButton
   m_TagString: Untagged
@@ -25306,6 +25361,32 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1121059661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121059655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254ce86734084944293d561060688ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButton
+  normalSprite: {fileID: -5684127001400078883, guid: f959a5af51115673823318958d47710e, type: 3}
+  normalState:
+    m_HighlightedSprite: {fileID: -4385143855802296654, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -4041711257218735477, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  selectedSprite: {fileID: -4610865162984515140, guid: f959a5af51115673823318958d47710e, type: 3}
+  selectedState:
+    m_HighlightedSprite: {fileID: -3384276681833992208, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -7996906057486916537, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  normalLabelColor: {r: 0.62, g: 0.78, b: 0.88, a: 1}
+  selectedLabelColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &1130039101
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31206,6 +31287,7 @@ GameObject:
   - component: {fileID: 1407837543}
   - component: {fileID: 1407837542}
   - component: {fileID: 1407837545}
+  - component: {fileID: 1407837546}
   m_Layer: 5
   m_Name: AlloyButton
   m_TagString: Untagged
@@ -31335,6 +31417,32 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1407837546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407837540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254ce86734084944293d561060688ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButton
+  normalSprite: {fileID: -5684127001400078883, guid: f959a5af51115673823318958d47710e, type: 3}
+  normalState:
+    m_HighlightedSprite: {fileID: -4385143855802296654, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -4041711257218735477, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  selectedSprite: {fileID: -4610865162984515140, guid: f959a5af51115673823318958d47710e, type: 3}
+  selectedState:
+    m_HighlightedSprite: {fileID: -3384276681833992208, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -7996906057486916537, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  normalLabelColor: {r: 0.62, g: 0.78, b: 0.88, a: 1}
+  selectedLabelColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1408392645
 GameObject:
   m_ObjectHideFlags: 0
@@ -36839,6 +36947,7 @@ GameObject:
   - component: {fileID: 1668095445}
   - component: {fileID: 1668095444}
   - component: {fileID: 1668095447}
+  - component: {fileID: 1668095448}
   m_Layer: 5
   m_Name: OreButton
   m_TagString: Untagged
@@ -36968,6 +37077,32 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1668095448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668095442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254ce86734084944293d561060688ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButton
+  normalSprite: {fileID: -5684127001400078883, guid: f959a5af51115673823318958d47710e, type: 3}
+  normalState:
+    m_HighlightedSprite: {fileID: -4385143855802296654, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -4041711257218735477, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  selectedSprite: {fileID: -4610865162984515140, guid: f959a5af51115673823318958d47710e, type: 3}
+  selectedState:
+    m_HighlightedSprite: {fileID: -3384276681833992208, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_PressedSprite: {fileID: -7996906057486916537, guid: f959a5af51115673823318958d47710e, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 376620364262619031, guid: 5b2a27c0625556da932780458115b9ba, type: 3}
+  normalLabelColor: {r: 0.62, g: 0.78, b: 0.88, a: 1}
+  selectedLabelColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1668666251
 GameObject:
   m_ObjectHideFlags: 0

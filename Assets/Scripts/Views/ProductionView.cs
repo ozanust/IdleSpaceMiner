@@ -41,6 +41,7 @@ public class ProductionView : MonoBehaviour
 		smeltButton.onClick.AddListener(OnSmeltSelected);
 		craftButton.onClick.AddListener(OnCraftSelected);
 		closeButton.onClick.AddListener(CloseView);
+		TabButton.Select(craftLayout.activeSelf ? 1 : 0, smeltButton, craftButton);
 	}
 
 	private void OnDestroy()
@@ -110,11 +111,13 @@ public class ProductionView : MonoBehaviour
 	{
 		smeltLayout.SetActive(true);
 		craftLayout.SetActive(false);
+		TabButton.Select(0, smeltButton, craftButton);
 	}
 
 	private void OnCraftSelected()
 	{
 		smeltLayout.SetActive(false);
 		craftLayout.SetActive(true);
+		TabButton.Select(1, smeltButton, craftButton);
 	}
 }

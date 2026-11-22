@@ -330,6 +330,10 @@ public static class OrbitalThemeApplier
 		{
 			bool isViewTab = parent != null && parent.name == "ViewButtons";
 			SetButton(button, image, isViewTab ? "Secondary" : "Primary");
+			if (isViewTab)
+			{
+				StyleTab(button);
+			}
 		}
 		else if (IsRow(image) || RowSprites.Contains(sprite))
 		{
@@ -388,6 +392,29 @@ public static class OrbitalThemeApplier
 		};
 		button.spriteState = state;
 		Record(button);
+	}
+
+	/// <summary>Sub-category tabs show the bright button art while selected.</summary>
+	private static void StyleTab(Button button)
+	{
+		TabButton tab = button.GetComponent<TabButton>();
+		if (tab == null)
+		{
+			tab = button.gameObject.AddComponent<TabButton>();
+		}
+
+		tab.SetSprites(S("Button_Secondary_Normal"), FamilyState("Secondary"), S("Button_Primary_Normal"), FamilyState("Primary"));
+		Record(tab);
+	}
+
+	private static SpriteState FamilyState(string family)
+	{
+		return new SpriteState
+		{
+			highlightedSprite = S("Button_" + family + "_Highlighted"),
+			pressedSprite = S("Button_" + family + "_Pressed"),
+			disabledSprite = S("Button_Disabled")
+		};
 	}
 
 	private static void StyleButtonLabel(Button button)
