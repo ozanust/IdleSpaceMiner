@@ -15,6 +15,7 @@ public class GameSettings : ScriptableObject
 	[SerializeField] private GameAudioSettings audioSettings = new GameAudioSettings();
 	[SerializeField] private PrestigeSettings prestigeSettings = new PrestigeSettings();
 	[SerializeField] private AdRewardSettings adRewardSettings = new AdRewardSettings();
+	[SerializeField] private FxSettings fxSettings = new FxSettings();
 
 	public EconomySettings EconomySettings => economySettings;
 	public GlobalSettings GlobalSettings => globalSettings;
@@ -24,6 +25,7 @@ public class GameSettings : ScriptableObject
 	public GameAudioSettings AudioSettings => audioSettings;
 	public PrestigeSettings PrestigeSettings => prestigeSettings;
 	public AdRewardSettings AdRewardSettings => adRewardSettings;
+	public FxSettings FxSettings => fxSettings;
 
 	private static TaskSetting[] DefaultAchievements()
 	{
@@ -195,4 +197,16 @@ public class AdRewardSettings
 	// Cash is a share of the galaxy value, but at least this many seconds of mining income
 	public float ArkCashShareOfGalaxyValue = 0.025f;
 	public float ArkMinIncomeSeconds = 120f;
+}
+
+/// <summary>Effect frames and asteroid art, filled in by Tools > UI > Apply Orbital Theme.</summary>
+[System.Serializable]
+public class FxSettings
+{
+	public Sprite[] ImpactFrames = new Sprite[0];
+	public Sprite[] ScanFrames = new Sprite[0];
+	public Sprite LootGlint;
+	public Sprite[] AsteroidSprites = new Sprite[0];
+	// World size of an asteroid, the art is scaled to it
+	public float AsteroidSize = 2.6f;
 }

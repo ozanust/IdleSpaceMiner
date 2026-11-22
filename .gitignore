@@ -78,3 +78,10 @@ crashlytics-build.properties
 /[Aa]ssets/Sci-Fi Game UI 8.meta
 /[Aa]ssets/GFX/Sprites/UI/SciFi/
 /[Aa]ssets/GFX/Sprites/UI/SciFi.meta
+# Orbital Mobile Idle Kit (third-party art, not redistributable in this public repo)
+/[Aa]ssets/OrbitalMobile/
+/[Aa]ssets/OrbitalMobile.meta
+/[Aa]ssets/OrbitalUI/
+/[Aa]ssets/OrbitalUI.meta
+/[Aa]ssets/GFX/Sprites/UI/Orbital/
+/[Aa]ssets/GFX/Sprites/UI/Orbital.meta

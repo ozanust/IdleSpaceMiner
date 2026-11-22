@@ -6,16 +6,16 @@ using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
 
 /// <summary>
-/// Creates the Exo 2 TextMeshPro font assets (SemiBold is used for bold text), makes Exo 2
+/// Creates the Rajdhani TextMeshPro font assets (SemiBold for normal text, Bold for bold), makes Rajdhani
 /// the TMP default and switches every text in the game's scenes and prefabs to it.
 /// </summary>
 public static class GameFontApplier
 {
-	private const string FontFolder = "Assets/Fonts/Exo2";
-	private const string RegularFontPath = FontFolder + "/Exo2-Regular.ttf";
-	private const string SemiBoldFontPath = FontFolder + "/Exo2-SemiBold.ttf";
-	private const string RegularAssetPath = FontFolder + "/Exo2-Regular SDF.asset";
-	private const string SemiBoldAssetPath = FontFolder + "/Exo2-SemiBold SDF.asset";
+	private const string FontFolder = "Assets/Fonts/Rajdhani";
+	private const string RegularFontPath = FontFolder + "/Rajdhani-SemiBold.ttf";
+	private const string BoldFontPath = FontFolder + "/Rajdhani-Bold.ttf";
+	private const string RegularAssetPath = FontFolder + "/Rajdhani-SemiBold SDF.asset";
+	private const string BoldAssetPath = FontFolder + "/Rajdhani-Bold SDF.asset";
 
 	private static readonly string[] Scenes =
 	{
@@ -31,10 +31,10 @@ public static class GameFontApplier
 	public static void Apply()
 	{
 		TMP_FontAsset regular = GetOrCreateFontAsset(RegularFontPath, RegularAssetPath);
-		TMP_FontAsset semiBold = GetOrCreateFontAsset(SemiBoldFontPath, SemiBoldAssetPath);
+		TMP_FontAsset bold = GetOrCreateFontAsset(BoldFontPath, BoldAssetPath);
 
-		// Bold text uses the SemiBold font instead of faux bold
-		regular.fontWeightTable[7].regularTypeface = semiBold;
+		// Bold text uses the Bold font instead of faux bold
+		regular.fontWeightTable[7].regularTypeface = bold;
 		EditorUtility.SetDirty(regular);
 
 		SetDefaultFont(regular);

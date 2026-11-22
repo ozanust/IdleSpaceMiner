@@ -10,6 +10,7 @@ public class SpaceView : MonoBehaviour
 	[Inject] SignalBus signalBus;
 	[Inject] IPlayerModel playerModel;
 	[Inject] PlanetSettings planetSettings;
+	[Inject] GameSettings gameSettings;
  
 	[SerializeField] private PlanetSpaceView[] planets;
 
@@ -68,11 +69,18 @@ public class SpaceView : MonoBehaviour
 	private void OnPlanetUnraveled(PlanetUnraveledSignal signal)
 	{
 		planets[signal.PlanetId].Unravel();
+		// A scan ripple shows where a telescope found the planet
+		FxPlayer.Play(gameSettings.FxSettings.ScanFrames, planets[signal.PlanetId].transform.position, 10f, 0.14f, 0.35f);
 	}
 
 	private void OnPlanetUnlocked(PlanetUnlockedSignal signal)
 	{
 		planets[signal.PlanetId].Unlock();
+		if (gameSettings.FxSettings.LootGlint != null)
+		{
+			FxPlayer.Play(gameSettings.FxSettings.LootGlint, planets[signal.PlanetId].transform.position, 7f);
+		}
+
 		signalBus.Fire(new PlanetTransformSignal()
 		{
 			PlanetId = signal.PlanetId,

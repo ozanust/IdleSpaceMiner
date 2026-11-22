@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d219b1f824c38b74d980c38b2ab350e3
+guid: 2851c80bf1c49c34da16ba2648f5ac1f
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Exo 2
+  - Rajdhani
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

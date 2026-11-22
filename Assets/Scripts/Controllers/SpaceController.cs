@@ -275,6 +275,8 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 	private void OnAsteroidDestroyed(AsteroidDestroyedSignal signal)
 	{
+		FxPlayer.Play(gameSettings.FxSettings.ImpactFrames, signal.Position, gameSettings.FxSettings.AsteroidSize * 2f);
+
 		ResourceData[] rewards = spaceModel.GetAsteroidRewards(signal.AsteroidId).Rewards;
 		foreach (ResourceData rd in rewards)
 		{
@@ -396,6 +398,12 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 				asteroidNumber += 1;
 				int id = asteroidNumber;
 				asteroid.Init(signalBus, id);
+				FxSettings fx = gameSettings.FxSettings;
+				if (fx.AsteroidSprites.Length > 0)
+				{
+					asteroid.SetArt(fx.AsteroidSprites[Random.Range(0, fx.AsteroidSprites.Length)], fx.AsteroidSize);
+				}
+
 				asteroid.OnClick.AddListener(OnClickAsteroid);
 				asteroid.gameObject.SetActive(true);
 
