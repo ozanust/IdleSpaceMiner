@@ -37,6 +37,13 @@ public class SettingsView : MonoBehaviour
 
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
+		// Opening another window closes this one
+		if (MenuTypes.ClosesFor(signal.Type, MenuType.Settings))
+		{
+			panel.SetActive(false);
+			return;
+		}
+
 		if (signal.Type == MenuType.Settings)
 		{
 			panel.SetActive(!panel.activeInHierarchy);

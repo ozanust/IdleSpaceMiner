@@ -58,6 +58,13 @@ public class ResearchInfoView : MonoBehaviour
 
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
+		// Opening another window closes this one
+		if (MenuTypes.ClosesFor(signal.Type, type))
+		{
+			panel.SetActive(false);
+			return;
+		}
+
 		if (signal.Type == type)
 		{
 			panel.SetActive(true);

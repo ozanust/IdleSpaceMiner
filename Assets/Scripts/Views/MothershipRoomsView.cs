@@ -62,6 +62,13 @@ public class MothershipRoomsView : MonoBehaviour
 
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
+		// Opening another window closes this one
+		if (MenuTypes.ClosesFor(signal.Type, MenuType.Mothership))
+		{
+			panel.SetActive(false);
+			return;
+		}
+
 		if (signal.Type == MenuType.Mothership)
 		{
 			panel.SetActive(!panel.activeInHierarchy);

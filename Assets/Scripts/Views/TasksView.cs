@@ -42,6 +42,13 @@ public class TasksView : MonoBehaviour
 
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
+		// Opening another window closes this one
+		if (MenuTypes.ClosesFor(signal.Type, type))
+		{
+			panel.SetActive(false);
+			return;
+		}
+
 		if (signal.Type == type)
 		{
 			panel.SetActive(!panel.activeInHierarchy);

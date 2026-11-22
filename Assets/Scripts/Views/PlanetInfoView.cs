@@ -61,6 +61,7 @@ public class PlanetInfoView : MonoBehaviour
 		}
 
 		signalBus.Subscribe<PlanetOpenSignal>(OnPlanetOpen);
+		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Subscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Subscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 		signalBus.Subscribe<MothershipUpdatedSignal>(OnManagersUpdated);
@@ -70,6 +71,7 @@ public class PlanetInfoView : MonoBehaviour
 	private void OnDestroy()
 	{
 		signalBus.Unsubscribe<PlanetOpenSignal>(OnPlanetOpen);
+		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
 		signalBus.Unsubscribe<PlanetUpdatedSignal>(OnPlanetUpdated);
 		signalBus.Unsubscribe<ManagersUpdatedSignal>(OnManagersUpdated);
 		signalBus.Unsubscribe<MothershipUpdatedSignal>(OnManagersUpdated);
@@ -96,6 +98,17 @@ public class PlanetInfoView : MonoBehaviour
 		planetImage.sprite = settings.Icon;
 		Refresh();
 		panel.SetActive(true);
+
+		// Other windows close, as when a menu window opens
+		signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Planet });
+	}
+
+	private void OnMenuOpen(MenuOpenSignal signal)
+	{
+		if (MenuTypes.ClosesFor(signal.Type, MenuType.Planet) && openPlanetId >= 0)
+		{
+			CloseView();
+		}
 	}
 
 	private void OnPlanetUpdated(PlanetUpdatedSignal signal)

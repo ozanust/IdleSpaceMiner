@@ -39,6 +39,13 @@ public class BoostsView : MonoBehaviour
 
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
+		// Opening another window closes this one
+		if (MenuTypes.ClosesFor(signal.Type, MenuType.Boosts))
+		{
+			panel.SetActive(false);
+			return;
+		}
+
 		if (signal.Type == MenuType.Boosts)
 		{
 			panel.SetActive(!panel.activeInHierarchy);
