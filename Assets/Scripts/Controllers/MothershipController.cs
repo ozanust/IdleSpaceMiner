@@ -137,7 +137,7 @@ public class MothershipController : IMothershipController, IInitializable, IDisp
 
 	public int GetSellReward()
 	{
-		return Mathf.FloorToInt(settings.RewardScale * Mathf.Sqrt(GetGalaxyValue() / settings.ValueDivider));
+		return Mathf.FloorToInt(settings.RewardScale * Mathf.Pow(GetGalaxyValue() / settings.ValueDivider, settings.RewardExponent));
 	}
 
 	public bool CanSellGalaxy()

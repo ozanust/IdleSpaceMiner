@@ -91,7 +91,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	private void RestoreFromSave(SaveData save)
 	{
 		// --- Space state ---
-		spaceModel.InitializePlanetData(AddMissingPlanets(save.Space.Planets));
+		spaceModel.InitializePlanetData(RefreshPlanetStats(AddMissingPlanets(save.Space.Planets)));
 
 		// --- Player money ---
 		playerModel.AddMoney(save.Player.Money);
@@ -207,6 +207,31 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Saves store each planet's stats and prices, so they are worked out again from the levels
+	/// and the current settings. Rebalanced settings then reach existing saves too.
+	/// </summary>
+	private PlanetData[] RefreshPlanetStats(PlanetData[] planets)
+	{
+		foreach (PlanetData planet in planets)
+		{
+			PlanetDataSetting setting;
+			if (!planet.IsUnlocked || !planetSettings.TryGetPlanetSetting(planet.PlanetIndex, out setting))
+			{
+				continue;
+			}
+
+			planet.CurrentTotalMiningRate = PlanetUpgradeFormula.GetMiningRate(setting, planet.MiningRateLevel);
+			planet.TotalMiningRateUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(setting, planet.MiningRateLevel);
+			planet.CurrentShipSpeed = PlanetUpgradeFormula.GetShipSpeed(setting, planet.ShipSpeedLevel);
+			planet.ShipSpeedUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(setting, planet.ShipSpeedLevel);
+			planet.CurrentShipCargo = PlanetUpgradeFormula.GetShipCargo(setting, planet.ShipCargoLevel);
+			planet.ShipCargoUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(setting, planet.ShipCargoLevel);
+		}
+
+		return planets;
 	}
 
 	private PlanetData[] GetSampleData()

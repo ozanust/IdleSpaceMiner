@@ -104,8 +104,16 @@ public class TutorialController : ITutorialController, IInitializable, ITickable
 			() => sold || IsUnlocked(1),
 			TutorialTargetId.SellButton, TutorialTargetId.CopperResource, TutorialTargetId.ResourcesNavButton);
 
-		Add($"Save up {secondPrice}, then tap {second} to buy your next planet.",
+		Step buySecond = Add($"You have {secondPrice}! Tap {second} to buy your next planet.",
 			() => IsUnlocked(1), TutorialTargetId.ResourcesCloseButton, TutorialTargetId.SecondPlanet);
+		// Until the planet is affordable the step points at selling, not at closing the window
+		TutorialStepInfo saveUp = new TutorialStepInfo
+		{
+			Text = $"Save up {secondPrice} for {second}: keep selling your ore in Resources.",
+			Targets = new[] { TutorialTargetId.SellButton, TutorialTargetId.CopperResource }
+		};
+		long secondPriceValue = planetSettings.Settings[1].PlanetPrice;
+		buySecond.GetInfo = () => playerModel.HasMoney(secondPriceValue) ? buySecond.Info : saveUp;
 
 		Add("Tasks give you rewards. Tap to see them.",
 			() => tasksOpened || taskController.GetClaimedTasks().Length > 0, TutorialTargetId.TasksButton);

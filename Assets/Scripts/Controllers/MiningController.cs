@@ -199,35 +199,58 @@ public class MiningController : IMiningController, ITickable, IDisposable
 		return total;
 	}
 
+	/// <summary>
+	/// Loads a ship. When there is more ore than fits, each ore takes its share of the hold,
+	/// so a planet's pricier ores don't pile up behind the cheapest one.
+	/// </summary>
 	public TransferResourcesData[] TransferResources(int planetId, int amount)
 	{
-		List<TransferResourcesData> transferData = new List<TransferResourcesData>();
-
-		for (int i = 0; i < mineData[planetId].MineDatas.Length; i++)
+		ResourceMiningData[] mined = mineData[planetId].MineDatas;
+		float total = 0f;
+		foreach (ResourceMiningData resource in mined)
 		{
-			if (amount <= 0)
-			{
-				break;
-			}
-			
-			if (amount > mineData[planetId].MineDatas[i].MinedAmount)
-			{
-				TransferResourcesData tempData = new TransferResourcesData(mineData[planetId].MineDatas[i].Type, Mathf.FloorToInt(mineData[planetId].MineDatas[i].MinedAmount));
-				transferData.Add(tempData);
+			total += Mathf.Floor(resource.MinedAmount);
+		}
 
-				// This can create errors if round amount is zero
-				amount -= Mathf.FloorToInt(mineData[planetId].MineDatas[i].MinedAmount);
-				mineData[planetId].MineDatas[i].MinedAmount = 0;
-			}
-			else if(amount > 0)
+		float share = total > amount ? amount / total : 1f;
+		List<TransferResourcesData> loaded = new List<TransferResourcesData>();
+		int space = amount;
+		for (int i = 0; i < mined.Length && space > 0; i++)
+		{
+			int take = Mathf.Min(space, Mathf.FloorToInt(Mathf.Floor(mined[i].MinedAmount) * share));
+			if (take <= 0)
 			{
-				TransferResourcesData tempData = new TransferResourcesData(mineData[planetId].MineDatas[i].Type, amount);
-				transferData.Add(tempData);
-				mineData[planetId].MineDatas[i].MinedAmount -= amount;
+				continue;
+			}
+
+			mined[i].MinedAmount -= take;
+			space -= take;
+			loaded.Add(new TransferResourcesData(mined[i].Type, take));
+		}
+
+		// Rounding down can leave a little room, filled from whatever is left
+		for (int i = 0; i < mined.Length && space > 0; i++)
+		{
+			int take = Mathf.Min(space, Mathf.FloorToInt(mined[i].MinedAmount));
+			if (take <= 0)
+			{
+				continue;
+			}
+
+			mined[i].MinedAmount -= take;
+			space -= take;
+			int index = loaded.FindIndex(t => t.Type == mined[i].Type);
+			if (index >= 0)
+			{
+				loaded[index].Amount += take;
+			}
+			else
+			{
+				loaded.Add(new TransferResourcesData(mined[i].Type, take));
 			}
 		}
 
-		return transferData.ToArray();
+		return loaded.ToArray();
 	}
 
 	public bool TryGetMiningData(int planetId, out MiningData data)

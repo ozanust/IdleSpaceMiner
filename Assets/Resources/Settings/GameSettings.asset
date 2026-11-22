@@ -507,7 +507,8 @@ MonoBehaviour:
     Music: {fileID: 0}
     Sounds: []
   prestigeSettings:
-    RewardScale: 5
+    RewardScale: 8
+    RewardExponent: 0.33333334
     ValueDivider: 10000
     MinimumReward: 10
     Rooms:

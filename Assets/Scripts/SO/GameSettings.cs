@@ -148,8 +148,10 @@ public class SoundClip
 [System.Serializable]
 public class PrestigeSettings
 {
-	// Dark Matter for a sale = RewardScale * sqrt(galaxy value / ValueDivider)
-	public float RewardScale = 5f;
+	// Dark Matter for a sale = RewardScale * (galaxy value / ValueDivider) ^ RewardExponent.
+	// A cube root keeps the late, pricey planets from flooding the rooms with Dark Matter
+	public float RewardScale = 8f;
+	public float RewardExponent = 1f / 3f;
 	public float ValueDivider = 10000f;
 	public int MinimumReward = 10;
 

@@ -77,7 +77,9 @@ public class TutorialView : MonoBehaviour
 			return;
 		}
 
-		PlaceHint(position.y < 0f);
+		// Open windows fill the middle and bottom of the screen, so the hint stays at the top
+		// unless the target itself is up there
+		PlaceHint(!ReachesTopHint(position, radius));
 		Animate(position, radius);
 	}
 
@@ -161,6 +163,12 @@ public class TutorialView : MonoBehaviour
 		float bob = 14f * Mathf.Sin(time * 6f);
 		pointer.anchoredPosition = position + away * (radius + pointerDistance + bob);
 		pointer.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(-away.y, -away.x) * Mathf.Rad2Deg);
+	}
+
+	private bool ReachesTopHint(Vector2 position, float radius)
+	{
+		float hintBottom = rect.rect.yMax - hintMarginTop - hintPanel.rect.height;
+		return position.y + radius + pointerDistance > hintBottom;
 	}
 
 	// Hint sits at the top or bottom of the screen, away from the target

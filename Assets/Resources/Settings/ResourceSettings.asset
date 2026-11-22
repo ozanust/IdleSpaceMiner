@@ -380,20 +380,20 @@ MonoBehaviour:
   - SmelterId: 0
     Price: 0
   - SmelterId: 1
-    Price: 50000
+    Price: 20000
   - SmelterId: 2
-    Price: 500000
+    Price: 200000
   - SmelterId: 3
-    Price: 10000000
+    Price: 2000000
   crafterSettings:
   - CrafterId: 0
     Price: 0
   - CrafterId: 1
-    Price: 1000000
+    Price: 300000
   - CrafterId: 2
-    Price: 100000000
+    Price: 3000000
   - CrafterId: 3
-    Price: 50000000000
+    Price: 30000000
   researchSettings:
   - Name: Telescope 1
     Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}
@@ -422,9 +422,9 @@ MonoBehaviour:
     RequiredResearch: 9
     NeededResources:
     - Type: 11
-      Amount: 10
+      Amount: 4
     - Type: 8
-      Amount: 15
+      Amount: 8
   - Name: Telescope 4
     Icon: {fileID: 21300000, guid: e1f4c70f099a94c45a8232dc60505220, type: 3}
     Description: Extends vision to 3 more planets
@@ -432,9 +432,9 @@ MonoBehaviour:
     RequiredResearch: 10
     NeededResources:
     - Type: 13
-      Amount: 5
+      Amount: 3
     - Type: 9
-      Amount: 20
+      Amount: 10
   - Name: Asteroid Miner
     Icon: {fileID: 21300000, guid: 0a0c3bbb3d055ed469b77a816a1bc225, type: 3}
     Description: Ability to mine asteroids for ore
@@ -482,9 +482,9 @@ MonoBehaviour:
     RequiredResearch: 3
     NeededResources:
     - Type: 13
-      Amount: 10
+      Amount: 5
     - Type: 9
-      Amount: 50
+      Amount: 20
   - Name: Advanced Furnace
     Icon: {fileID: 21300000, guid: cb02883e4c0f302439667234b26ab5b5, type: 3}
     Description: All smelters speed x1.20
@@ -492,9 +492,9 @@ MonoBehaviour:
     RequiredResearch: 2
     NeededResources:
     - Type: 14
-      Amount: 3
+      Amount: 2
     - Type: 9
-      Amount: 10
+      Amount: 5
   - Name: Smelting Efficiency
     Icon: {fileID: 21300000, guid: daff6177ca9108844a18e5d507ce4a2d, type: 3}
     Description: Decreases ingredients required by 20% for all smelters
@@ -510,6 +510,6 @@ MonoBehaviour:
     RequiredResearch: 7
     NeededResources:
     - Type: 14
-      Amount: 20
+      Amount: 8
     - Type: 9
-      Amount: 30
+      Amount: 15
