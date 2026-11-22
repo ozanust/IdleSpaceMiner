@@ -533,7 +533,69 @@ public static class OrbitalThemeApplier
 				Record(labelRect);
 				Record(label);
 			}
+
+			LinkNavTab(button, navBar.transform.parent, label);
 		}
+	}
+
+	private static readonly Dictionary<string, string> NavWindows = new Dictionary<string, string>
+	{
+		{ "resourcesButton", "ResourcesView/Panel" },
+		{ "productionButton", "ProductionView/Panel" },
+		{ "projectsButton", "ResearchView/Panel" },
+		{ "managersButton", "ManagersView/Panel" },
+		{ "boostsButton", "BoostsView/Panel" },
+		{ "mothershipButton", "MothershipRoomsView/Panel" }
+	};
+
+	/// <summary>The tab of the open window gets a glowing bar under its label.</summary>
+	private static void LinkNavTab(Button button, Transform canvas, TMP_Text label)
+	{
+		string field = null;
+		NavBarView navBar = button.GetComponentInParent<NavBarView>(true);
+		SerializedObject so = new SerializedObject(navBar);
+		foreach (string key in NavWindows.Keys)
+		{
+			if (so.FindProperty(key).objectReferenceValue == button)
+			{
+				field = key;
+			}
+		}
+
+		Transform window = field != null ? canvas.Find(NavWindows[field]) : null;
+		if (window == null)
+		{
+			return;
+		}
+
+		Image mark = EnsureChildImage(button.transform, "SelectedMark", S("Fill_Energy"));
+		mark.preserveAspect = false;
+		mark.type = Image.Type.Sliced;
+		RectTransform markRect = mark.rectTransform;
+		markRect.anchorMin = markRect.anchorMax = new Vector2(0.5f, 0f);
+		markRect.pivot = new Vector2(0.5f, 0f);
+		markRect.anchoredPosition = new Vector2(0f, 8f);
+		markRect.sizeDelta = new Vector2(96f, 10f);
+		LayoutElement markLayout = mark.GetComponent<LayoutElement>();
+		if (markLayout == null)
+		{
+			markLayout = mark.gameObject.AddComponent<LayoutElement>();
+		}
+
+		markLayout.ignoreLayout = true;
+		mark.gameObject.SetActive(false);
+		Record(markRect);
+		Record(markLayout);
+		Record(mark.gameObject);
+
+		NavTab tab = button.GetComponent<NavTab>();
+		if (tab == null)
+		{
+			tab = button.gameObject.AddComponent<NavTab>();
+		}
+
+		tab.Link(window.gameObject, mark.gameObject, label, LabelColor);
+		Record(tab);
 	}
 
 	// --- HUD ---
