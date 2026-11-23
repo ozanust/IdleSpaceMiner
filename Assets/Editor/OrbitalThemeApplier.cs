@@ -212,6 +212,19 @@ public static class OrbitalThemeApplier
 			rect.offsetMax = new Vector2(16f, 16f);
 			Record(rect);
 		}
+
+		// The hub the research tree grows from was still a plain grey circle
+		foreach (Image image in canvas.GetComponentsInChildren<Image>(true))
+		{
+			if (image.name != "CenterCircle")
+			{
+				continue;
+			}
+
+			Set(image, S("Nav_Research"), true);
+			image.rectTransform.sizeDelta = new Vector2(100f, 100f);
+			Record(image.rectTransform);
+		}
 	}
 
 	private static void Restyle(Transform root)
