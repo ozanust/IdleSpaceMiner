@@ -555,7 +555,7 @@ MonoBehaviour:
       BonusPerLevel: 0.2
       MaxLevel: 10
   adRewardSettings:
-    AndroidRewardedAdUnitId: ca-app-pub-3940256099942544/5224354917
+    AndroidRewardedAdUnitId: ca-app-pub-4494318679381284/1637017190
     IosRewardedAdUnitId: ca-app-pub-3940256099942544/1712485313
     MineBoostMultiplier: 1.2
     MineBoostMinutes: 60
