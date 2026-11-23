@@ -923,6 +923,8 @@ public static class OrbitalThemeApplier
 	/// <summary>Keeps texts off the kit frames' bevelled edges and corners.</summary>
 	private static void FitTexts(Transform root)
 	{
+		PutPricesOnUnlockButtons(root);
+		CenterButtonLabels(root);
 		foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
 		{
 			Image image = t.GetComponent<Image>();
@@ -959,6 +961,70 @@ public static class OrbitalThemeApplier
 	{
 		Image image = row != null ? row.GetComponent<Image>() : null;
 		return image != null && image.sprite != null && image.sprite.name == "Panel_UpgradeRow";
+	}
+
+	/// <summary>
+	/// Smelter and crafter unlock prices were drawn before the orange price plate, so the opaque kit
+	/// plate hid them. Inside the plate they sit on top of it, centred.
+	/// </summary>
+	private static void PutPricesOnUnlockButtons(Transform root)
+	{
+		foreach (MonoBehaviour machine in root.GetComponentsInChildren<MonoBehaviour>(true))
+		{
+			if (!(machine is SmelterItem) && !(machine is CrafterItem))
+			{
+				continue;
+			}
+
+			SerializedObject so = new SerializedObject(machine);
+			TMP_Text price = so.FindProperty("smelterUnlockPriceText").objectReferenceValue as TMP_Text;
+			GameObject lockedPanel = so.FindProperty("smelterLockedPanel").objectReferenceValue as GameObject;
+			Transform plate = lockedPanel != null ? lockedPanel.transform.Find("PriceBackground") : null;
+			// Prefab instances in the scene follow their prefab, which is changed when the prefabs are styled
+			if (price == null || plate == null || price.transform.parent == plate || PrefabUtility.IsPartOfPrefabInstance(price))
+			{
+				continue;
+			}
+
+			price.transform.SetParent(plate, false);
+			RectTransform rect = price.rectTransform;
+			rect.anchorMin = Vector2.zero;
+			rect.anchorMax = Vector2.one;
+			rect.offsetMin = Vector2.zero;
+			rect.offsetMax = Vector2.zero;
+			price.raycastTarget = false;
+			Record(rect);
+			Record(price);
+		}
+	}
+
+	/// <summary>Labels that fill their button sit in its middle; some were nudged up for the old art.</summary>
+	private static void CenterButtonLabels(Transform root)
+	{
+		foreach (TMP_Text label in root.GetComponentsInChildren<TMP_Text>(true))
+		{
+			Transform parent = label.transform.parent;
+			Image image = parent != null ? parent.GetComponent<Image>() : null;
+			if (image == null || image.sprite == null || !image.sprite.name.StartsWith("Button_") || image.sprite.name == "Button_Close")
+			{
+				continue;
+			}
+
+			RectTransform rect = label.rectTransform;
+			if (rect.anchorMin != Vector2.zero || rect.anchorMax != Vector2.one)
+			{
+				continue;
+			}
+
+			rect.offsetMin = Vector2.zero;
+			rect.offsetMax = Vector2.zero;
+			// Centre on the glyphs, Rajdhani's line box sits low for capitals and numbers
+			label.alignment = TextAlignmentOptions.CenterGeoAligned;
+			label.color = Color.white;
+			label.fontStyle |= FontStyles.Bold;
+			Record(rect);
+			Record(label);
+		}
 	}
 
 	private static void InsetRowText(TMP_Text text)

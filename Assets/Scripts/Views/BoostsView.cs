@@ -11,6 +11,7 @@ public class BoostsView : MonoBehaviour
 	[Inject] SignalBus signalBus;
 	[Inject] IBoostController boostController;
 	[Inject] GameSettings gameSettings;
+	[Inject] IConsentService consent;
 
 	[SerializeField] private GameObject panel;
 	[SerializeField] private Button closeButton;
@@ -73,7 +74,10 @@ public class BoostsView : MonoBehaviour
 			? "Active, " + NumberFormatter.FormatDuration((float)boostController.MineBoostRemaining.TotalSeconds, true) + " left"
 			: "Not active";
 		mineBoostButton.interactable = adReady;
-		SetLabel(mineBoostButton, !adReady ? "Loading ad..." : boostController.IsMineBoostActive ? "Watch ad to refresh" : "Watch ad");
+		// Without ad consent (or while the consent check can't finish) no ad will come, so don't promise one
+		bool adsBlocked = consent.IsResolved && !consent.CanRequestAds;
+		string waiting = adsBlocked ? "Ads unavailable" : "Loading ad...";
+		SetLabel(mineBoostButton, !adReady ? waiting : boostController.IsMineBoostActive ? "Watch ad to refresh" : "Watch ad");
 
 		bool arkReady = boostController.IsArkAvailable;
 		arkStatusText.text = arkReady ? "The Ark has arrived!" : "On its way, it arrives every few minutes";

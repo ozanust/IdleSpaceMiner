@@ -9,6 +9,7 @@ public class SettingsView : MonoBehaviour
 	[Inject] SignalBus signalBus;
 	[Inject] IAudioController audioController;
 	[Inject] SaveController saveController;
+	[Inject] IConsentService consent;
 
 	[SerializeField] private GameObject panel;
 	[SerializeField] private Button closeButton;
@@ -19,6 +20,8 @@ public class SettingsView : MonoBehaviour
 	[SerializeField] private Button confirmResetButton;
 	[SerializeField] private Button cancelResetButton;
 
+	private Button privacyButton;
+
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
@@ -27,12 +30,41 @@ public class SettingsView : MonoBehaviour
 		resetButton.onClick.AddListener(() => confirmPanel.SetActive(true));
 		cancelResetButton.onClick.AddListener(() => confirmPanel.SetActive(false));
 		confirmResetButton.onClick.AddListener(() => saveController.ResetProgress());
+		CreatePrivacyButton();
 		signalBus.Subscribe<MenuOpenSignal>(OnMenuOpen);
+		consent.OnConsent(RefreshPrivacyButton);
 	}
 
 	private void OnDestroy()
 	{
 		signalBus.Unsubscribe<MenuOpenSignal>(OnMenuOpen);
+		consent.RemoveOnConsent(RefreshPrivacyButton);
+	}
+
+	// A row like the others, above Reset progress; shown only where players must be able to change consent
+	private void CreatePrivacyButton()
+	{
+		privacyButton = Instantiate(resetButton, resetButton.transform.parent);
+		privacyButton.name = "PrivacyButton";
+		privacyButton.transform.SetSiblingIndex(resetButton.transform.GetSiblingIndex());
+		privacyButton.onClick.RemoveAllListeners();
+		privacyButton.onClick.AddListener(() => consent.ShowPrivacyOptions());
+		TMP_Text label = privacyButton.GetComponentInChildren<TMP_Text>(true);
+		if (label != null)
+		{
+			label.text = "Privacy settings";
+			label.color = Color.white;
+		}
+
+		RefreshPrivacyButton();
+	}
+
+	private void RefreshPrivacyButton()
+	{
+		if (privacyButton != null)
+		{
+			privacyButton.gameObject.SetActive(consent.PrivacyOptionsRequired);
+		}
 	}
 
 	private void OnMenuOpen(MenuOpenSignal signal)

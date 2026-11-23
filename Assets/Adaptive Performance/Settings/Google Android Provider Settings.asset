@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Logging: 1
   m_AutomaticPerformanceModeEnabled: 1
+  m_AutomaticGameModeEnabled: 0
   m_EnableBoostOnStartup: 1
   m_StatsLoggingFrequencyInFrames: 50
   m_IndexerSettings:
@@ -165,6 +166,10 @@ MonoBehaviour:
       m_MaxLevel: 40
       m_MinBound: 0.01
       m_MaxBound: 1
+  m_AddedScalerViaScan:
+  - {fileID: 4930310220102045077}
+  m_ActiveScalerProfile:
+    rid: -2
   m_scalerProfileList:
   - m_AdaptiveFramerate:
       m_Name: Adaptive Framerate
@@ -310,7 +315,35 @@ MonoBehaviour:
       m_MaxLevel: 40
       m_MinBound: 0.01
       m_MaxBound: 1
+    m_AddedScalers: []
     m_Name: Default Scaler Profile
   m_DefaultScalerProfilerIndex: 0
   k_AssetVersion: 2
   m_GoogleProviderLogging: 0
+  m_FrameStatsDialogDisplayed: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &4930310220102045077
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9bf5a1e61a341698660bf5642a37379, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AdaptivePerformance.Samsung.Android::UnityEngine.AdaptivePerformance.AdaptiveVariableRefreshRate
+  m_defaultSetting:
+    m_Name: Base Scaler
+    m_Enabled: 0
+    m_Scale: -1
+    m_VisualImpact: 0
+    m_Target: 1
+    m_MaxLevel: 1
+    m_MinBound: -1
+    m_MaxBound: -1

@@ -14,6 +14,8 @@ public class AdMobRewardedAdService : IRewardedAdService, IInitializable, ITicka
 	private const float RetryDelay = 30f;
 
 	private readonly AdRewardSettings settings;
+	private readonly IConsentService consent;
+	private static bool sdkStarted;
 
 	private RewardedAd ad;
 	private bool initialized;
@@ -28,14 +30,34 @@ public class AdMobRewardedAdService : IRewardedAdService, IInitializable, ITicka
 		? settings.IosRewardedAdUnitId
 		: settings.AndroidRewardedAdUnitId;
 
-	public AdMobRewardedAdService(GameSettings gameSettings)
+	public AdMobRewardedAdService(GameSettings gameSettings, IConsentService consent)
 	{
 		settings = gameSettings.AdRewardSettings;
+		this.consent = consent;
 	}
 
 	public void Initialize()
 	{
+		// Ads start only once the player answered the consent form, or wasn't asked
+		consent.OnConsent(OnConsent);
+	}
+
+	private void OnConsent()
+	{
+		if (initialized || !consent.CanRequestAds)
+		{
+			return;
+		}
+
+		if (sdkStarted)
+		{
+			initialized = true;
+			Load();
+			return;
+		}
+
 		// AdMob calls back on its own threads, so every callback hops to Unity's main thread first
+		sdkStarted = true;
 		MobileAds.Initialize(status => MobileAdsEventExecutor.ExecuteInUpdate(() =>
 		{
 			initialized = true;
@@ -54,6 +76,7 @@ public class AdMobRewardedAdService : IRewardedAdService, IInitializable, ITicka
 
 	public void Dispose()
 	{
+		consent.RemoveOnConsent(OnConsent);
 		ad?.Destroy();
 		ad = null;
 	}

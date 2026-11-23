@@ -66,8 +66,16 @@ Other: `screen_view` (screen_name = window), `progress_reset`.
 install_version, sessions, days_since_install, play_minutes, planets_owned, research_count, galaxies_sold.
 Use them as comparison filters, for example retention of players who sold a galaxy against those who didn't.
 
-## Privacy
+## Privacy and consent
 
-Firebase Analytics collects an app instance ID and device data. Before release, add the data use to the
-store privacy forms and, for EEA/UK players, a consent prompt (Google's UMP SDK, shared with AdMob) that calls
-`FirebaseAnalytics.SetConsent` before analytics is enabled.
+`ConsentService` (Google's User Messaging Platform, bundled with the AdMob plugin) runs at launch:
+- It checks where the player is and shows Google's consent form where the law requires it (EEA, UK, Switzerland).
+- Ads start only after that (`ConsentInformation.CanRequestAds`).
+- Firebase starts with every consent type denied (`Assets/Plugins/Android/ConsentDefaults.androidlib`) and gets
+  analytics, ad storage, ad user data and ad personalisation from the player's answers (Google consent mode).
+  Without analytics consent Firebase only sends cookieless pings.
+- Settings shows a "Privacy settings" button where players must be able to change their answer.
+
+For the form to appear, create a GDPR message in AdMob > Privacy & messaging for the app. Test it from the EEA,
+or with `ConsentDebugSettings.DebugGeography = DebugGeography.EEA` and your device's test ID.
+Also add the data use to the Google Play data safety form and the App Store privacy details.

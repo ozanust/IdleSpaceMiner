@@ -25,6 +25,7 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind(typeof(IOfflineProgressController), typeof(ITickable)).To<OfflineProgressController>().AsSingle();
 		Container.Bind(typeof(ISpaceController), typeof(ITickable)).To<SpaceController>().AsSingle().NonLazy();
 		Container.BindInterfacesTo<MothershipController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<ConsentService>().AsSingle().NonLazy();
 #if GOOGLE_MOBILE_ADS
 		Container.BindInterfacesTo<AdMobRewardedAdService>().AsSingle().NonLazy();
 #else

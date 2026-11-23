@@ -85,3 +85,9 @@ crashlytics-build.properties
 /[Aa]ssets/OrbitalUI.meta
 /[Aa]ssets/GFX/Sprites/UI/Orbital/
 /[Aa]ssets/GFX/Sprites/UI/Orbital.meta
+
+# Signing keys stay out of git
+*.keystore
+*.jks
+# Unity build temp
+/.utmp/
