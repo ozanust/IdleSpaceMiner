@@ -13,12 +13,26 @@ public class SaveData
     public MiningSaveData Mining = new MiningSaveData();
     public SmeltingSaveData Smelting = new SmeltingSaveData();
     public CraftingSaveData Crafting = new CraftingSaveData();
+    public long SavedAtUtcTicks;
+    public List<int> ClaimedTasks = new List<int>();
+    public List<int> ClaimedAchievements = new List<int>();
+    public List<ManagerData> Managers = new List<ManagerData>();
+    public int ManagerSlots;
+    public int ManagersHired;
+    public bool FreeManagerGranted;
+    public int TutorialStep;
+    public List<RoomSaveEntry> Rooms = new List<RoomSaveEntry>();
+    public int GalaxiesSold;
+    // Money spent on planets and their upgrades in the current galaxy
+    public long GalaxyValue;
+    // When the ad Mine Boost runs out, in UTC ticks
+    public long MineBoostEndUtcTicks;
 }
 
 [Serializable]
 public class PlayerSaveData
 {
-    public int Money;
+    public long Money;
     public List<ResourceSaveEntry> Resources = new List<ResourceSaveEntry>();
     public List<CurrencySaveEntry> Currencies = new List<CurrencySaveEntry>();
     public List<AlloyType> UnlockedAlloys = new List<AlloyType>();
@@ -28,6 +42,7 @@ public class PlayerSaveData
     public int[] UnlockedCrafters;
     public int LastUnlockedSmelterId;
     public int LastUnlockedCrafterId;
+    public int AsteroidsDestroyed;
 }
 
 [Serializable]
@@ -79,6 +94,9 @@ public class SmelterSaveData
 {
     public int Id;
     public AlloyType TargetAlloy;
+    // A batch that had already taken its ingredients, and how many seconds of it were done
+    public bool InProgress;
+    public float Progress;
 }
 
 [Serializable]
@@ -86,6 +104,8 @@ public class CrafterSaveData
 {
     public int Id;
     public ResourceType TargetResource;
+    public bool InProgress;
+    public float Progress;
 }
 
 [Serializable]
@@ -98,4 +118,11 @@ public class SmeltingSaveData
 public class CraftingSaveData
 {
     public List<CrafterSaveData> CraftEntries = new List<CrafterSaveData>();
+}
+
+[Serializable]
+public class RoomSaveEntry
+{
+    public RoomType Type;
+    public int Level;
 }

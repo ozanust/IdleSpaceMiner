@@ -13,6 +13,13 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 	public UnityEvent<int> OnClick;
 	private int index;
 
+	/// <summary>Planets stay hidden until a telescope reveals them.</summary>
+	public void Hide()
+	{
+		planetSpriteRenderer.enabled = false;
+		priceText.gameObject.SetActive(false);
+	}
+
     public void Unravel()
 	{
 		planetSpriteRenderer.enabled = true;
@@ -25,9 +32,9 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 		planetSpriteRenderer.color = Color.white;
 	}
 
-	public void SetPrice(int price)
+	public void SetPrice(long price)
 	{
-		priceText.text = string.Format("{0}{1}", "$", price.ToString());
+		priceText.text = NumberFormatter.FormatMoney(price);
 	}
 
 	public void SetPlanetIcon(Sprite icon)
@@ -42,6 +49,11 @@ public class PlanetSpaceView : MonoBehaviour, IPointerClickHandler
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
+		if (PointerUtility.IsDrag(eventData))
+		{
+			return;
+		}
+
 		OnClick?.Invoke(index);
 	}
 }

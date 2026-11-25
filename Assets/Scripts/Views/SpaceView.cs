@@ -10,6 +10,7 @@ public class SpaceView : MonoBehaviour
 	[Inject] SignalBus signalBus;
 	[Inject] IPlayerModel playerModel;
 	[Inject] PlanetSettings planetSettings;
+	[Inject] GameSettings gameSettings;
  
 	[SerializeField] private PlanetSpaceView[] planets;
 
@@ -19,22 +20,39 @@ public class SpaceView : MonoBehaviour
 	{
 		signalBus.Subscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		signalBus.Subscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+		signalBus.Subscribe<PlanetUnraveledSignal>(OnPlanetUnraveled);
 	}
 
 	private void OnDestroy()
 	{
 		signalBus.Unsubscribe<SpaceModelInitializedSignal>(OnSpaceModelInitialized);
 		signalBus.Unsubscribe<PlanetUnlockedSignal>(OnPlanetUnlocked);
+		signalBus.Unsubscribe<PlanetUnraveledSignal>(OnPlanetUnraveled);
 	}
 
 	private void Start()
 	{
 		Application.targetFrameRate = 60;
+		CreateBackdrop();
 
 		if (!isViewInitialized)
 		{
 			InitializePlanets(planetSettings);
 			spaceController.OnRegister();
+		}
+	}
+
+	// Animated stars and meteors, drawn by the camera that renders the background layer
+	private void CreateBackdrop()
+	{
+		int backgroundLayer = LayerMask.NameToLayer("BG");
+		foreach (Camera camera in Camera.allCameras)
+		{
+			if (camera != Camera.main && (camera.cullingMask & (1 << backgroundLayer)) != 0)
+			{
+				SpaceBackdropView.Create(camera);
+				return;
+			}
 		}
 	}
 
@@ -48,9 +66,21 @@ public class SpaceView : MonoBehaviour
 		InitializePlanetData(signal.Data);
 	}
 
+	private void OnPlanetUnraveled(PlanetUnraveledSignal signal)
+	{
+		planets[signal.PlanetId].Unravel();
+		// A scan ripple shows where a telescope found the planet
+		FxPlayer.Play(gameSettings.FxSettings.ScanFrames, planets[signal.PlanetId].transform.position, 10f, 0.14f, 0.35f);
+	}
+
 	private void OnPlanetUnlocked(PlanetUnlockedSignal signal)
 	{
 		planets[signal.PlanetId].Unlock();
+		if (gameSettings.FxSettings.LootGlint != null)
+		{
+			FxPlayer.Play(gameSettings.FxSettings.LootGlint, planets[signal.PlanetId].transform.position, 7f);
+		}
+
 		signalBus.Fire(new PlanetTransformSignal()
 		{
 			PlanetId = signal.PlanetId,
@@ -66,7 +96,11 @@ public class SpaceView : MonoBehaviour
 			planets[i].SetIndex(setting.PlanetId);
 			planets[i].SetPrice(setting.PlanetPrice);
 			planets[i].SetPlanetIcon(setting.Icon);
+			PlanetDecorView.Attach(planets[i].gameObject);
 		}
+
+		TutorialTarget.Mark(planets[0].gameObject, TutorialTargetId.FirstPlanet);
+		TutorialTarget.Mark(planets[1].gameObject, TutorialTargetId.SecondPlanet);
 	}
 
 	private void InitializePlanetData(PlanetData[] data)
@@ -77,6 +111,10 @@ public class SpaceView : MonoBehaviour
 			if (data[i].IsUnraveled)
 			{
 				planets[planetIndex].Unravel();
+			}
+			else
+			{
+				planets[planetIndex].Hide();
 			}
 
 			if (data[i].IsUnlocked)

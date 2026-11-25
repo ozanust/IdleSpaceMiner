@@ -10,6 +10,7 @@ public class ResourcesSellView : MonoBehaviour
     [Inject] ResourceSettings resourceSettings;
     [Inject] SignalBus signalBus;
     [Inject] IPlayerModel playerModel;
+    [Inject] IMothershipController mothershipController;
 
     [SerializeField] private GameObject selectResourceText;
     [SerializeField] private GameObject sellResourcePanel;
@@ -31,6 +32,7 @@ public class ResourcesSellView : MonoBehaviour
         signalBus.Subscribe<ResourceDeselectedToSellSignal>(OnResourceDeselectedToSell);
         sellResourceSlider.onValueChanged.AddListener(OnSellingSliderMoved);
         sellButton.onClick.AddListener(OnSellButtonClicked);
+        TutorialTarget.Mark(sellButton.gameObject, TutorialTargetId.SellButton);
 	}
 
 	private void OnDestroy()
@@ -53,15 +55,21 @@ public class ResourcesSellView : MonoBehaviour
 
         sellResourceSlider.maxValue = selectedTotalResourceAmount;
         sellResourceSlider.value = selectedTotalResourceAmount;
-        sellingAmountText.text = selectedTotalResourceAmount.ToString();
-        sellingAmountValueText.text = string.Format("{0}{1}", "$", selectedTotalResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
+        sellingAmountText.text = NumberFormatter.Format(selectedTotalResourceAmount);
+        sellingAmountValueText.text = NumberFormatter.FormatMoney(GetSellValue(selectedTotalResourceAmount));
     }
 
     private void OnSellingSliderMoved(float value)
 	{
         currentSelectedResourceAmount = Mathf.RoundToInt(value);
-        sellingAmountText.text = currentSelectedResourceAmount.ToString();
-        sellingAmountValueText.text = string.Format("{0}{1}", "$", currentSelectedResourceAmount * resourceSettings.GetResourceValue(sellingResourceType));
+        sellingAmountText.text = NumberFormatter.Format(currentSelectedResourceAmount);
+        sellingAmountValueText.text = NumberFormatter.FormatMoney(GetSellValue(currentSelectedResourceAmount));
+    }
+
+    // Same as the money selling gives, including the Sales room
+    private long GetSellValue(int amount)
+    {
+        return (long)System.Math.Round(amount * resourceSettings.GetResourceValue(sellingResourceType) * (double)mothershipController.GetMultiplier(RoomType.Sales));
     }
 
     private void OnResourceDeselected()

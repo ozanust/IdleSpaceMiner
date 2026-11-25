@@ -18,8 +18,8 @@ public class ResearchRequirementInfoItem : MonoBehaviour
     public void Initialize(Sprite icon, int holdingAmount, int neededAmount)
     {
         iconImage.sprite = icon;
-        holdingAmountText.text = holdingAmount.ToString();
-        neededAmountText.text = neededAmount.ToString();
+        holdingAmountText.text = NumberFormatter.Format(holdingAmount);
+        neededAmountText.text = NumberFormatter.Format(neededAmount);
         this.neededAmount = neededAmount;
 
         if (holdingAmount >= neededAmount)
@@ -36,7 +36,7 @@ public class ResearchRequirementInfoItem : MonoBehaviour
 
     public void SetHoldingAmount(int amount)
 	{
-        holdingAmountText.text = amount.ToString();
+        holdingAmountText.text = NumberFormatter.Format(amount);
 
         if (amount >= neededAmount)
         {

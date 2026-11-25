@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "639805188184",
+    "project_id": "idlespaceminer-58ae1",
+    "storage_bucket": "idlespaceminer-58ae1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639805188184:android:0d8cdf4bd89a9fd713c22d",
+        "android_client_info": {
+          "package_name": "com.xenium.idlespaceminer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBupMOBTQTWj6FdB9-uo5t8tsob7NWTybM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

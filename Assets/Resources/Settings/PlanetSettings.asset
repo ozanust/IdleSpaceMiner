@@ -18,18 +18,12 @@ MonoBehaviour:
     MiningYieldRatios:
     - Type: 0
       YieldRatio: 1
-    TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
-    StartingShipCargo: 5
-    StartingMiningRatePrice: 5
-    StartingShipSpeedPrice: 5
-    StartingShipCargoPrice: 5
-    PriceIncreaseMultiplier: 1.2
-    MiningRateIncreaseMultiplier: 1.2
-    ShipSpeedIncreaseMultiplier: 1.2
-    CargoIncreaseMultiplier: 1.2
-    Name: Balor
-    Icon: {fileID: 21300000, guid: d11d28313eb99944683c309595c47ab6, type: 3}
+    TotalStartingMiningRate: 0.5
+    StartingShipSpeed: 1
+    StartingShipCargo: 10
+    PriceIncreaseMultiplier: 1.3
+    Name: Cindral
+    Icon: {fileID: 21300000, guid: b47cb3c22b539494f9ed190d4653e990, type: 3}
   - PlanetId: 1
     PlanetPrice: 200
     MiningYieldRatios:
@@ -37,18 +31,12 @@ MonoBehaviour:
       YieldRatio: 0.8
     - Type: 1
       YieldRatio: 0.2
-    TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
-    StartingShipCargo: 5
-    StartingMiningRatePrice: 10
-    StartingShipSpeedPrice: 10
-    StartingShipCargoPrice: 10
+    TotalStartingMiningRate: 0.5
+    StartingShipSpeed: 1
+    StartingShipCargo: 10
     PriceIncreaseMultiplier: 1.3
-    MiningRateIncreaseMultiplier: 1.3
-    ShipSpeedIncreaseMultiplier: 1.3
-    CargoIncreaseMultiplier: 1.3
-    Name: Drasta
-    Icon: {fileID: 21300000, guid: 2ba978d2259eff04382dd9d2a3f71deb, type: 3}
+    Name: Duneva
+    Icon: {fileID: 21300000, guid: 494e65733ca358a48a58c6249e472c19, type: 3}
   - PlanetId: 2
     PlanetPrice: 500
     MiningYieldRatios:
@@ -56,18 +44,12 @@ MonoBehaviour:
       YieldRatio: 0.5
     - Type: 1
       YieldRatio: 0.5
-    TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
-    StartingShipCargo: 5
-    StartingMiningRatePrice: 10
-    StartingShipSpeedPrice: 10
-    StartingShipCargoPrice: 10
+    TotalStartingMiningRate: 0.5
+    StartingShipSpeed: 1
+    StartingShipCargo: 10
     PriceIncreaseMultiplier: 1.3
-    MiningRateIncreaseMultiplier: 1.3
-    ShipSpeedIncreaseMultiplier: 1.3
-    CargoIncreaseMultiplier: 1.3
-    Name: Anadius
-    Icon: {fileID: 21300000, guid: 86694bfd0c2890440b809c4ceabf229b, type: 3}
+    Name: Kogrin
+    Icon: {fileID: 21300000, guid: 182389edbef1e9040b972fe0b6df3de8, type: 3}
   - PlanetId: 3
     PlanetPrice: 1250
     MiningYieldRatios:
@@ -75,15 +57,169 @@ MonoBehaviour:
       YieldRatio: 0.8
     - Type: 2
       YieldRatio: 0.2
-    TotalStartingMiningRate: 0.25
-    StartingShipSpeed: 2
-    StartingShipCargo: 5
-    StartingMiningRatePrice: 10
-    StartingShipSpeedPrice: 10
-    StartingShipCargoPrice: 10
+    TotalStartingMiningRate: 0.5
+    StartingShipSpeed: 1
+    StartingShipCargo: 10
     PriceIncreaseMultiplier: 1.3
-    MiningRateIncreaseMultiplier: 1.3
-    ShipSpeedIncreaseMultiplier: 1.3
-    CargoIncreaseMultiplier: 1.3
-    Name: Dholen
-    Icon: {fileID: 21300000, guid: ac5a0d8962c26604caa3f997f130bc28, type: 3}
+    Name: Umbrax
+    Icon: {fileID: 21300000, guid: 168e8cf7f114b76419969d169090f3b9, type: 3}
+  - PlanetId: 4
+    PlanetPrice: 5000
+    MiningYieldRatios:
+    - Type: 2
+      YieldRatio: 0.5
+    - Type: 1
+      YieldRatio: 0.3
+    - Type: 0
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 0.61
+    StartingShipSpeed: 1
+    StartingShipCargo: 12
+    PriceIncreaseMultiplier: 1.3
+    Name: Virelle
+    Icon: {fileID: 21300000, guid: 2f62998cc48e3ff43a6d770910fad58d, type: 3}
+  - PlanetId: 5
+    PlanetPrice: 9000
+    MiningYieldRatios:
+    - Type: 2
+      YieldRatio: 1
+    TotalStartingMiningRate: 0.76
+    StartingShipSpeed: 1
+    StartingShipCargo: 15
+    PriceIncreaseMultiplier: 1.3
+    Name: Thalassa
+    Icon: {fileID: 21300000, guid: 75be41fc91a87ec4faa621bbbb9ecb83, type: 3}
+  - PlanetId: 6
+    PlanetPrice: 15000
+    MiningYieldRatios:
+    - Type: 1
+      YieldRatio: 0.4
+    - Type: 0
+      YieldRatio: 0.4
+    - Type: 3
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 0.95
+    StartingShipSpeed: 1.5
+    StartingShipCargo: 19
+    PriceIncreaseMultiplier: 1.3
+    Name: Glacia
+    Icon: {fileID: 21300000, guid: 37802406f0682cf468cf454462983965, type: 3}
+  - PlanetId: 7
+    PlanetPrice: 25000
+    MiningYieldRatios:
+    - Type: 3
+      YieldRatio: 0.6
+    - Type: 0
+      YieldRatio: 0.4
+    TotalStartingMiningRate: 1.19
+    StartingShipSpeed: 1.8
+    StartingShipCargo: 24
+    PriceIncreaseMultiplier: 1.3
+    Name: Nyxara
+    Icon: {fileID: 21300000, guid: 23e2235d38ae2b34794f54c8a0a70bf2, type: 3}
+  - PlanetId: 8
+    PlanetPrice: 40000
+    MiningYieldRatios:
+    - Type: 3
+      YieldRatio: 0.8
+    - Type: 4
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 1.49
+    StartingShipSpeed: 1.8
+    StartingShipCargo: 30
+    PriceIncreaseMultiplier: 1.3
+    Name: Opaline
+    Icon: {fileID: 21300000, guid: 991ece1380903b14eab87c9da182720e, type: 3}
+  - PlanetId: 9
+    PlanetPrice: 75000
+    MiningYieldRatios:
+    - Type: 4
+      YieldRatio: 0.5
+    - Type: 3
+      YieldRatio: 0.3
+    - Type: 2
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 1.86
+    StartingShipSpeed: 1.8
+    StartingShipCargo: 37
+    PriceIncreaseMultiplier: 1.3
+    Name: Mareth
+    Icon: {fileID: 21300000, guid: 75be41fc91a87ec4faa621bbbb9ecb83, type: 3}
+  - PlanetId: 10
+    PlanetPrice: 150000
+    MiningYieldRatios:
+    - Type: 4
+      YieldRatio: 1
+    TotalStartingMiningRate: 2.33
+    StartingShipSpeed: 2.2
+    StartingShipCargo: 47
+    PriceIncreaseMultiplier: 1.3
+    Name: Rimeholt
+    Icon: {fileID: 21300000, guid: 37802406f0682cf468cf454462983965, type: 3}
+  - PlanetId: 11
+    PlanetPrice: 250000
+    MiningYieldRatios:
+    - Type: 2
+      YieldRatio: 0.45
+    - Type: 3
+      YieldRatio: 0.35
+    - Type: 15
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 2.91
+    StartingShipSpeed: 2.2
+    StartingShipCargo: 58
+    PriceIncreaseMultiplier: 1.3
+    Name: Voidra
+    Icon: {fileID: 21300000, guid: 168e8cf7f114b76419969d169090f3b9, type: 3}
+  - PlanetId: 12
+    PlanetPrice: 400000
+    MiningYieldRatios:
+    - Type: 15
+      YieldRatio: 0.8
+    - Type: 4
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 3.64
+    StartingShipSpeed: 2.4
+    StartingShipCargo: 73
+    PriceIncreaseMultiplier: 1.3
+    Name: Lumen
+    Icon: {fileID: 21300000, guid: 991ece1380903b14eab87c9da182720e, type: 3}
+  - PlanetId: 13
+    PlanetPrice: 800000
+    MiningYieldRatios:
+    - Type: 0
+      YieldRatio: 0.4
+    - Type: 1
+      YieldRatio: 0.4
+    - Type: 16
+      YieldRatio: 0.2
+    TotalStartingMiningRate: 4.55
+    StartingShipSpeed: 2.9
+    StartingShipCargo: 91
+    PriceIncreaseMultiplier: 1.3
+    Name: Ferrox
+    Icon: {fileID: 21300000, guid: 182389edbef1e9040b972fe0b6df3de8, type: 3}
+  - PlanetId: 14
+    PlanetPrice: 1500000
+    MiningYieldRatios:
+    - Type: 16
+      YieldRatio: 0.5
+    - Type: 15
+      YieldRatio: 0.5
+    TotalStartingMiningRate: 5.68
+    StartingShipSpeed: 2.8
+    StartingShipCargo: 114
+    PriceIncreaseMultiplier: 1.3
+    Name: Siroc
+    Icon: {fileID: 21300000, guid: 494e65733ca358a48a58c6249e472c19, type: 3}
+  - PlanetId: 15
+    PlanetPrice: 3000000
+    MiningYieldRatios:
+    - Type: 16
+      YieldRatio: 1
+    TotalStartingMiningRate: 7.11
+    StartingShipSpeed: 2.9
+    StartingShipCargo: 142
+    PriceIncreaseMultiplier: 1.3
+    Name: Pyrrhos
+    Icon: {fileID: 21300000, guid: b47cb3c22b539494f9ed190d4653e990, type: 3}

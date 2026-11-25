@@ -22,10 +22,10 @@ public class ResourceInfoItem : MonoBehaviour
         resourceTotalValueText.text = "0";
 	}
 
-    public void UpdateAmount(int resourceAmount, int totalValue)
+    public void UpdateAmount(int resourceAmount, long totalValue)
 	{
-        resourceAmountText.text = resourceAmount.ToString();
-        resourceTotalValueText.text = totalValue.ToString();
+        resourceAmountText.text = NumberFormatter.Format(resourceAmount);
+        resourceTotalValueText.text = NumberFormatter.Format(totalValue);
 	}
 
     public void SetSelectionButtonAction(Action onClick)

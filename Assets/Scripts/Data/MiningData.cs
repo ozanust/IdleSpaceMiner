@@ -30,22 +30,10 @@ public class MiningData
 		Sort(MineDatas);
 	}
 
+	// Ores in type order. The old hand-written sort copied references, so planets listing
+	// their ores out of order ended up mining one ore several times and the others not at all
 	private void Sort(ResourceMiningData[] arr)
 	{
-		int n = arr.Length;
-		ResourceType temp;
-
-		for (int i = 0; i < n - 1; i++)
-		{
-			for (int j = 0; j < n - i - 1; j++)
-			{
-				if (arr[j].Type > arr[j + 1].Type)
-				{
-					temp = arr[j].Type;
-					arr[j] = arr[j + 1];
-					arr[j + 1].Type = temp;
-				}
-			}
-		}
+		System.Array.Sort(arr, (a, b) => a.Type.CompareTo(b.Type));
 	}
 }

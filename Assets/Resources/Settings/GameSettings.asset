@@ -13,7 +13,581 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   economySettings:
-    StartingMoney: 10000000
+    StartingMoney: 180
     StartingDarkMatter: 0
   globalSettings:
     AsteroidSpawnTimes: 780000002c010000
+    OfflineMiningMultiplier: 0.22
+    MaxOfflineSeconds: 7200
+    AsteroidRewardSeconds: 130
+  tasks:
+  - Type: 0
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 50
+  - Type: 1
+    TargetAmount: 50
+    Resource: 1
+    Research: 0
+    Reward: 150
+  - Type: 2
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 250
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 1
+    Reward: 300
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 0
+    Reward: 300
+  - Type: 6
+    TargetAmount: 1
+    Resource: 0
+    Research: 0
+    Reward: 300
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 2
+    Reward: 400
+  - Type: 1
+    TargetAmount: 1
+    Resource: 5
+    Research: 0
+    Reward: 400
+  - Type: 2
+    TargetAmount: 4
+    Resource: 0
+    Research: 0
+    Reward: 500
+  - Type: 1
+    TargetAmount: 100
+    Resource: 2
+    Research: 0
+    Reward: 500
+  - Type: 1
+    TargetAmount: 1
+    Resource: 6
+    Research: 0
+    Reward: 1000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 8
+    Reward: 1000
+  - Type: 0
+    TargetAmount: 40
+    Resource: 0
+    Research: 0
+    Reward: 1000
+  - Type: 2
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 2000
+  - Type: 6
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 2000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 3
+    Reward: 1500
+  - Type: 1
+    TargetAmount: 3
+    Resource: 10
+    Research: 0
+    Reward: 2000
+  - Type: 2
+    TargetAmount: 7
+    Resource: 0
+    Research: 0
+    Reward: 5000
+  - Type: 1
+    TargetAmount: 3
+    Resource: 7
+    Research: 0
+    Reward: 3000
+  - Type: 4
+    TargetAmount: 2
+    Resource: 0
+    Research: 0
+    Reward: 10000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 8
+    Research: 0
+    Reward: 8000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 12
+    Research: 0
+    Reward: 15000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 9
+    Reward: 10000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 14
+    Research: 0
+    Reward: 20000
+  - Type: 0
+    TargetAmount: 100
+    Resource: 0
+    Research: 0
+    Reward: 15000
+  - Type: 2
+    TargetAmount: 8
+    Resource: 0
+    Research: 0
+    Reward: 25000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 5
+    Reward: 25000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 13
+    Research: 0
+    Reward: 30000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 9
+    Research: 0
+    Reward: 30000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 7
+    Reward: 30000
+  - Type: 2
+    TargetAmount: 10
+    Resource: 0
+    Research: 0
+    Reward: 60000
+  - Type: 6
+    TargetAmount: 15
+    Resource: 0
+    Research: 0
+    Reward: 20000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 4
+    Reward: 50000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 6
+    Reward: 60000
+  - Type: 4
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 100000
+  - Type: 5
+    TargetAmount: 1000000
+    Resource: 0
+    Research: 0
+    Reward: 250000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 10
+    Reward: 100000
+  - Type: 2
+    TargetAmount: 11
+    Resource: 0
+    Research: 0
+    Reward: 150000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 21
+    Research: 0
+    Reward: 200000
+  - Type: 2
+    TargetAmount: 13
+    Resource: 0
+    Research: 0
+    Reward: 300000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 17
+    Research: 0
+    Reward: 250000
+  - Type: 3
+    TargetAmount: 1
+    Resource: 0
+    Research: 11
+    Reward: 400000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 22
+    Research: 0
+    Reward: 500000
+  - Type: 2
+    TargetAmount: 16
+    Resource: 0
+    Research: 0
+    Reward: 1000000
+  - Type: 1
+    TargetAmount: 5
+    Resource: 18
+    Research: 0
+    Reward: 800000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 19
+    Research: 0
+    Reward: 1000000
+  - Type: 1
+    TargetAmount: 1
+    Resource: 23
+    Research: 0
+    Reward: 2000000
+  - Type: 5
+    TargetAmount: 10000000
+    Resource: 0
+    Research: 0
+    Reward: 2500000
+  achievements:
+  - Type: 2
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 5
+  - Type: 2
+    TargetAmount: 7
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 2
+    TargetAmount: 10
+    Resource: 0
+    Research: 0
+    Reward: 15
+  - Type: 2
+    TargetAmount: 13
+    Resource: 0
+    Research: 0
+    Reward: 20
+  - Type: 2
+    TargetAmount: 16
+    Resource: 0
+    Research: 0
+    Reward: 30
+  - Type: 0
+    TargetAmount: 25
+    Resource: 0
+    Research: 0
+    Reward: 5
+  - Type: 0
+    TargetAmount: 100
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 0
+    TargetAmount: 250
+    Resource: 0
+    Research: 0
+    Reward: 15
+  - Type: 0
+    TargetAmount: 500
+    Resource: 0
+    Research: 0
+    Reward: 25
+  - Type: 6
+    TargetAmount: 1
+    Resource: 0
+    Research: 0
+    Reward: 5
+  - Type: 6
+    TargetAmount: 10
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 6
+    TargetAmount: 50
+    Resource: 0
+    Research: 0
+    Reward: 20
+  - Type: 6
+    TargetAmount: 100
+    Resource: 0
+    Research: 0
+    Reward: 30
+  - Type: 8
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 5
+  - Type: 8
+    TargetAmount: 6
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 8
+    TargetAmount: 9
+    Resource: 0
+    Research: 0
+    Reward: 20
+  - Type: 8
+    TargetAmount: 12
+    Resource: 0
+    Research: 0
+    Reward: 30
+  - Type: 4
+    TargetAmount: 2
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 4
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 20
+  - Type: 4
+    TargetAmount: 4
+    Resource: 0
+    Research: 0
+    Reward: 30
+  - Type: 7
+    TargetAmount: 2
+    Resource: 0
+    Research: 0
+    Reward: 15
+  - Type: 7
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 30
+  - Type: 9
+    TargetAmount: 1
+    Resource: 0
+    Research: 0
+    Reward: 5
+  - Type: 9
+    TargetAmount: 3
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 9
+    TargetAmount: 5
+    Resource: 0
+    Research: 0
+    Reward: 15
+  - Type: 9
+    TargetAmount: 10
+    Resource: 0
+    Research: 0
+    Reward: 25
+  - Type: 5
+    TargetAmount: 10000
+    Resource: 0
+    Research: 0
+    Reward: 5
+  - Type: 5
+    TargetAmount: 100000
+    Resource: 0
+    Research: 0
+    Reward: 10
+  - Type: 5
+    TargetAmount: 1000000
+    Resource: 0
+    Research: 0
+    Reward: 20
+  - Type: 5
+    TargetAmount: 10000000
+    Resource: 0
+    Research: 0
+    Reward: 30
+  - Type: 5
+    TargetAmount: 100000000
+    Resource: 0
+    Research: 0
+    Reward: 50
+  - Type: 1
+    TargetAmount: 100
+    Resource: 5
+    Research: 0
+    Reward: 10
+  - Type: 1
+    TargetAmount: 10
+    Resource: 21
+    Research: 0
+    Reward: 25
+  - Type: 1
+    TargetAmount: 5
+    Resource: 23
+    Research: 0
+    Reward: 40
+  managerSettings:
+    StartingSlots: 2
+    ThirdSlotCost: 50
+    SlotCostPerSlot: 50
+    MaxStars: 7
+    ManagersToPromote: 3
+    Schools:
+    - School: 0
+      Name: Public School
+      Cost: 50
+      Stars: 010000000200000003000000
+      Chances:
+      - 0.75
+      - 0.2
+      - 0.05
+    - School: 1
+      Name: Private School
+      Cost: 300
+      Stars: 0300000004000000
+      Chances:
+      - 0.75
+      - 0.25
+    - School: 2
+      Name: Brilliant Academy
+      Cost: 500
+      Stars: 0400000005000000
+      Chances:
+      - 0.75
+      - 0.25
+    MiningBonus:
+    - 1.25
+    - 1.5
+    - 1.75
+    - 2
+    - 2.25
+    - 2.5
+    - 2.95
+    ShipBonus:
+    - 1.5
+    - 2
+    - 2.5
+    - 3
+    - 3.5
+    - 4
+    - 4.9
+    AllMiningBonus:
+    - 1
+    - 1
+    - 1.05
+    - 1.1
+    - 1.2
+    - 1.3
+    - 1.5
+    AllShipBonus:
+    - 1
+    - 1
+    - 1.1
+    - 1.2
+    - 1.4
+    - 1.6
+    - 2
+    AllProductionBonus:
+    - 1
+    - 1
+    - 1.05
+    - 1.1
+    - 1.2
+    - 1.4
+    - 1.7
+  audioSettings:
+    MusicVolume: 0.35
+    SfxVolume: 0.7
+    Music: {fileID: 0}
+    Sounds: []
+  prestigeSettings:
+    RewardScale: 8
+    RewardExponent: 0.33333334
+    ValueDivider: 10000
+    MinimumReward: 10
+    Rooms:
+    - Type: 0
+      Name: Engineering
+      Effect: Mining rate
+      BaseCost: 5
+      CostMultiplier: 1.8
+      BonusPerLevel: 0.25
+      MaxLevel: 10
+    - Type: 1
+      Name: Aeronautical
+      Effect: Ship speed
+      BaseCost: 5
+      CostMultiplier: 1.8
+      BonusPerLevel: 0.25
+      MaxLevel: 10
+    - Type: 2
+      Name: Packaging
+      Effect: Ship cargo
+      BaseCost: 5
+      CostMultiplier: 1.8
+      BonusPerLevel: 0.25
+      MaxLevel: 10
+    - Type: 3
+      Name: Sales
+      Effect: Sell price
+      BaseCost: 10
+      CostMultiplier: 1.8
+      BonusPerLevel: 0.1
+      MaxLevel: 10
+    - Type: 4
+      Name: Forge
+      Effect: Smelting speed
+      BaseCost: 10
+      CostMultiplier: 1.8
+      BonusPerLevel: 0.2
+      MaxLevel: 10
+    - Type: 5
+      Name: Workshop
+      Effect: Crafting speed
+      BaseCost: 15
+      CostMultiplier: 1.8
+      BonusPerLevel: 0.2
+      MaxLevel: 10
+  adRewardSettings:
+    AndroidRewardedAdUnitId: ca-app-pub-4494318679381284/1637017190
+    IosRewardedAdUnitId: ca-app-pub-3940256099942544/1712485313
+    MineBoostMultiplier: 1.2
+    MineBoostMinutes: 60
+    ArkMinMinutes: 6
+    ArkMaxMinutes: 13
+    ArkDarkMatterChance: 0.3
+    ArkDarkMatter: 5
+    ArkCashShareOfGalaxyValue: 0.025
+    ArkMinIncomeSeconds: 120
+  fxSettings:
+    ImpactFrames:
+    - {fileID: 855100438377846689, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    - {fileID: -4017569868316738998, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    - {fileID: -2135553685900099073, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    - {fileID: -2249703403320133556, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    ScanFrames:
+    - {fileID: 6656517421449963162, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    - {fileID: 7897500058073832014, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    - {fileID: 6138769218692937065, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    - {fileID: -629014710556153759, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    LootGlint: {fileID: -4978450117855590208, guid: 03b2287b195558b3961cda1c9c54d3b0, type: 3}
+    AsteroidSprites:
+    - {fileID: -9045431023181696115, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: -7566774016247789531, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: -7247806937189074146, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: -6136308928966421921, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: -3621831259771742025, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: -2643897742903039799, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: -2239460534185521010, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: 513371962256456477, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: 3503396112739911849, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: 3872673351119693075, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: 7544790931609738634, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    - {fileID: 8156082637340889200, guid: 170ef91f043f59e19b98b9b89535fb87, type: 3}
+    AsteroidSize: 2.6

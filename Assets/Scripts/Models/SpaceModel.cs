@@ -39,14 +39,14 @@ public class SpaceModel : ISpaceModel
 		if (planetSettings.TryGetPlanetSetting(planetId, out pds))
 		{
 			pd.MiningRateLevel += 1;
-			pd.CurrentTotalMiningRate = pds.TotalStartingMiningRate;
-			pd.TotalMiningRateUpdatePrice = pds.StartingMiningRatePrice;
+			pd.CurrentTotalMiningRate = PlanetUpgradeFormula.GetMiningRate(pds, pd.MiningRateLevel);
+			pd.TotalMiningRateUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(pds, pd.MiningRateLevel);
 			pd.ShipSpeedLevel += 1;
-			pd.CurrentShipSpeed = pds.StartingShipSpeed;
-			pd.ShipSpeedUpdatePrice = pds.StartingShipSpeedPrice;
+			pd.CurrentShipSpeed = PlanetUpgradeFormula.GetShipSpeed(pds, pd.ShipSpeedLevel);
+			pd.ShipSpeedUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(pds, pd.ShipSpeedLevel);
 			pd.ShipCargoLevel += 1;
-			pd.CurrentShipCargo = pds.StartingShipCargo;
-			pd.ShipCargoUpdatePrice = pds.StartingShipCargoPrice;
+			pd.CurrentShipCargo = PlanetUpgradeFormula.GetShipCargo(pds, pd.ShipCargoLevel);
+			pd.ShipCargoUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(pds, pd.ShipCargoLevel);
 		}
 
 		signalBus.Fire(new PlanetUnlockedSignal() { PlanetId = planetId });
@@ -104,8 +104,8 @@ public class SpaceModel : ISpaceModel
 			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
 			{
 				pd.MiningRateLevel += 1;
-				pd.CurrentTotalMiningRate = pds.TotalStartingMiningRate * Mathf.Pow(pds.MiningRateIncreaseMultiplier, pd.MiningRateLevel);
-				pd.TotalMiningRateUpdatePrice = Mathf.RoundToInt(pds.StartingMiningRatePrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.MiningRateLevel));
+				pd.CurrentTotalMiningRate = PlanetUpgradeFormula.GetMiningRate(pds, pd.MiningRateLevel);
+				pd.TotalMiningRateUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(pds, pd.MiningRateLevel);
 				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
 			}
 		}
@@ -121,8 +121,8 @@ public class SpaceModel : ISpaceModel
 			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
 			{
 				pd.ShipSpeedLevel += 1;
-				pd.CurrentShipSpeed = pds.StartingShipSpeed * Mathf.Pow(pds.ShipSpeedIncreaseMultiplier, pd.ShipSpeedLevel);
-				pd.ShipSpeedUpdatePrice = Mathf.RoundToInt(pds.StartingShipSpeedPrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.ShipSpeedLevel));
+				pd.CurrentShipSpeed = PlanetUpgradeFormula.GetShipSpeed(pds, pd.ShipSpeedLevel);
+				pd.ShipSpeedUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(pds, pd.ShipSpeedLevel);
 				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
 			}
 		}
@@ -138,8 +138,8 @@ public class SpaceModel : ISpaceModel
 			if (planetSettings.TryGetPlanetSetting(planetId, out pds))
 			{
 				pd.ShipCargoLevel += 1;
-				pd.CurrentShipCargo = Mathf.RoundToInt(pds.StartingShipCargo * Mathf.Pow(pds.CargoIncreaseMultiplier, pd.ShipCargoLevel));
-				pd.ShipCargoUpdatePrice = Mathf.RoundToInt(pds.StartingShipCargoPrice * Mathf.Pow(pds.PriceIncreaseMultiplier, pd.ShipCargoLevel));
+				pd.CurrentShipCargo = PlanetUpgradeFormula.GetShipCargo(pds, pd.ShipCargoLevel);
+				pd.ShipCargoUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(pds, pd.ShipCargoLevel);
 				signalBus.Fire(new PlanetUpdatedSignal() { PlanetId = planetId });
 			}
 		}

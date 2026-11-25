@@ -14,15 +14,17 @@ public interface IPlayerModel
     bool HasResources(ResearchNeededResource[] data);
     int GetResource(ResourceType type);
     void AddResource(ResourceType type, int amount);
-    void AddMoney(int amount);
-    void UseMoney(int amount);
-    bool HasMoney(int amount);
-    int GetMoney();
+    void AddMoney(long amount);
+    void UseMoney(long amount);
+    bool HasMoney(long amount);
+    long GetMoney();
     Dictionary<ResourceType, int> GetResources();
     void UnlockSmelter(int smelterId);
     int GetLastUnlockedSmelterId();
     void UnlockCrafter(int smelterId);
     int GetLastUnlockedCrafterId();
+    int AsteroidsDestroyed { get; }
+    void AddDestroyedAsteroids(int count);
     void UnlockAlloy(AlloyType type);
     void UnlockItemRecipe(ResourceType type);
     ResourceType[] GetUnlockedItemRecipes();

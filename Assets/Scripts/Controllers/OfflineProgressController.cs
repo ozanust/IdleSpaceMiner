@@ -1,0 +1,118 @@
+using System;
+using UnityEngine;
+using Zenject;
+
+/// <summary>
+/// Grants progress for time the game was not running: after loading a save, and after
+/// the app is resumed from the background (detected as a long gap between ticks).
+/// Mining runs at a reduced rate and its ore goes straight to the mothership;
+/// smelters and crafters run at full speed.
+/// </summary>
+public class OfflineProgressController : IOfflineProgressController, ITickable
+{
+	// A gap between two frames longer than this means the app was suspended
+	private const double SuspendThresholdSeconds = 5;
+
+	private readonly IPlayerModel playerModel;
+	private readonly ISpaceModel spaceModel;
+	private readonly IProductionController productionController;
+	private readonly IMiningController miningController;
+	private readonly PlanetSettings planetSettings;
+	private readonly GameSettings gameSettings;
+	[Inject] private IAnalyticsService analytics;
+
+	// Null until the first tick, so slow scene loading isn't counted as offline time
+	private DateTime? lastTickUtc;
+
+	public OfflineProgressController(
+		IPlayerModel playerModel,
+		ISpaceModel spaceModel,
+		IProductionController productionController,
+		IMiningController miningController,
+		PlanetSettings planetSettings,
+		GameSettings gameSettings)
+	{
+		this.playerModel = playerModel;
+		this.spaceModel = spaceModel;
+		this.productionController = productionController;
+		this.miningController = miningController;
+		this.planetSettings = planetSettings;
+		this.gameSettings = gameSettings;
+	}
+
+	public void ApplySinceSave(SaveData save)
+	{
+		if (save.SavedAtUtcTicks <= 0)
+		{
+			return;
+		}
+
+		ApplyOfflineProgress((DateTime.UtcNow - new DateTime(save.SavedAtUtcTicks, DateTimeKind.Utc)).TotalSeconds);
+	}
+
+	public void Tick()
+	{
+		DateTime now = DateTime.UtcNow;
+		DateTime? previous = lastTickUtc;
+		lastTickUtc = now;
+
+		if (!previous.HasValue)
+		{
+			return;
+		}
+
+		double gap = (now - previous.Value).TotalSeconds;
+		if (gap > SuspendThresholdSeconds)
+		{
+			ApplyOfflineProgress(gap);
+		}
+	}
+
+	private void ApplyOfflineProgress(double elapsedSeconds)
+	{
+		float seconds = (float)Math.Min(elapsedSeconds, gameSettings.GlobalSettings.MaxOfflineSeconds);
+		if (seconds <= 0)
+		{
+			return;
+		}
+
+		MineOffline(seconds);
+		productionController.SimulateOffline(seconds);
+		// How long players stay away, and how often they hit the cap
+		analytics.LogEvent("offline_progress", new AnalyticsParams()
+			.Add("minutes_away", Math.Round(elapsedSeconds / 60.0, 1))
+			.Add("minutes_credited", Math.Round(seconds / 60.0, 1))
+			.Add("capped", elapsedSeconds > gameSettings.GlobalSettings.MaxOfflineSeconds));
+
+		Debug.Log($"[OfflineProgress] Applied {seconds:F0}s of offline progress (away {elapsedSeconds:F0}s)");
+	}
+
+	private void MineOffline(float seconds)
+	{
+		PlanetData[] planets = spaceModel.GetPlanetsData();
+		if (planets == null)
+		{
+			return;
+		}
+
+		float miningSeconds = seconds * gameSettings.GlobalSettings.OfflineMiningMultiplier;
+
+		foreach (PlanetData planet in planets)
+		{
+			PlanetDataSetting setting;
+			if (!planet.IsUnlocked || !planetSettings.TryGetPlanetSetting(planet.PlanetIndex, out setting))
+			{
+				continue;
+			}
+
+			foreach (PlanetMiningYield yield in setting.MiningYieldRatios)
+			{
+				int amount = Mathf.FloorToInt(planet.CurrentTotalMiningRate * miningController.GetMiningMultiplier(planet.PlanetIndex) * yield.YieldRatio * miningSeconds);
+				if (amount > 0)
+				{
+					playerModel.AddResource(yield.Type, amount);
+				}
+			}
+		}
+	}
+}

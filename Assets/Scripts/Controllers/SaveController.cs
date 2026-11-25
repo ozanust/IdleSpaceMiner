@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 /// <summary>
@@ -15,7 +16,16 @@ public class SaveController : ITickable, IDisposable
     private readonly IPlayerModel playerModel;
     private readonly ISpaceModel spaceModel;
     private readonly IMiningController miningController;
+    private readonly IProductionController productionController;
+    private readonly ITaskController taskController;
+    private readonly IAchievementController achievementController;
+    private readonly IManagerController managerController;
+    private readonly ITutorialController tutorialController;
+    private readonly IMothershipController mothershipController;
+    private readonly GameSettings gameSettings;
+    private readonly IBoostController boostController;
     private readonly SignalBus signalBus;
+    [Inject] private IAnalyticsService analytics;
 
     private float autoSaveTimer;
 
@@ -25,17 +35,36 @@ public class SaveController : ITickable, IDisposable
     /// </summary>
     private bool isRestoring;
 
+    // Set once progress is wiped, so nothing writes the old game back before the scene reloads
+    private bool isReset;
+
     public SaveController(
         ISaveService saveService,
         IPlayerModel playerModel,
         ISpaceModel spaceModel,
         IMiningController miningController,
+        IProductionController productionController,
+        ITaskController taskController,
+        IAchievementController achievementController,
+        IManagerController managerController,
+        ITutorialController tutorialController,
+        IMothershipController mothershipController,
+        GameSettings gameSettings,
+        IBoostController boostController,
         SignalBus signalBus)
     {
         this.saveService = saveService;
         this.playerModel = playerModel;
         this.spaceModel = spaceModel;
         this.miningController = miningController;
+        this.productionController = productionController;
+        this.taskController = taskController;
+        this.achievementController = achievementController;
+        this.managerController = managerController;
+        this.tutorialController = tutorialController;
+        this.mothershipController = mothershipController;
+        this.gameSettings = gameSettings;
+        this.boostController = boostController;
         this.signalBus = signalBus;
         
         //saveService.DeleteSave();
@@ -47,6 +76,8 @@ public class SaveController : ITickable, IDisposable
         signalBus.Subscribe<ResourcesSellSignal>(OnSaveTrigger);
         signalBus.Subscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Subscribe<OnApplicationQuitSignal>(OnApplicationQuit);
+        signalBus.Subscribe<OnApplicationFocusSignal>(OnApplicationFocus);
+        signalBus.Subscribe<GalaxySoldSignal>(OnGalaxySold);
     }
     
     public void Dispose()
@@ -58,6 +89,8 @@ public class SaveController : ITickable, IDisposable
         signalBus.Unsubscribe<ResourcesSellSignal>(OnSaveTrigger);
         signalBus.Unsubscribe<RecipeUnlockedSignal>(OnSaveTrigger);*/
         signalBus.Unsubscribe<OnApplicationQuitSignal>(OnApplicationQuit);
+        signalBus.Unsubscribe<OnApplicationFocusSignal>(OnApplicationFocus);
+        signalBus.Unsubscribe<GalaxySoldSignal>(OnGalaxySold);
     }
 
     /// <summary>Suppresses all saves until EndRestore is called.</summary>
@@ -78,10 +111,72 @@ public class SaveController : ITickable, IDisposable
         Save();
     }
 
+    // Mobile OSes often kill backgrounded apps without a quit callback
+    private void OnApplicationFocus(OnApplicationFocusSignal signal)
+    {
+        if (!signal.Focus)
+        {
+            Save();
+        }
+    }
+
+    /// <summary>Deletes the save and restarts the game scene as a new game.</summary>
+    public void ResetProgress()
+    {
+        analytics.LogEvent("progress_reset", AnalyticsParams.With("galaxies_sold", mothershipController.GalaxiesSold));
+        isReset = true;
+        saveService.DeleteSave();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    /// <summary>
+    /// Starts a new galaxy: writes a save that keeps only what survives a sale (Dark Matter plus the
+    /// reward, rooms, managers, achievements, the tutorial) and reloads the scene from it.
+    /// </summary>
+    private void OnGalaxySold(GalaxySoldSignal signal)
+    {
+        SaveData current = BuildSaveData();
+        SaveData next = new SaveData();
+
+        next.Player.Money = gameSettings.EconomySettings.StartingMoney;
+        next.Player.UnlockedSmelters = new int[0];
+        next.Player.UnlockedCrafters = new int[0];
+        next.Player.Currencies = current.Player.Currencies;
+        CurrencySaveEntry darkMatter = next.Player.Currencies.Find(c => c.Type == CurrencyType.DarkMatter);
+        if (darkMatter == null)
+        {
+            darkMatter = new CurrencySaveEntry { Type = CurrencyType.DarkMatter };
+            next.Player.Currencies.Add(darkMatter);
+        }
+
+        darkMatter.Amount += signal.Reward;
+
+        // Managers stay hired but have no planets to work on yet
+        next.Managers = current.Managers;
+        foreach (ManagerData manager in next.Managers)
+        {
+            manager.PlanetId = -1;
+        }
+
+        next.ManagerSlots = current.ManagerSlots;
+        next.ManagersHired = current.ManagersHired;
+        next.FreeManagerGranted = current.FreeManagerGranted;
+        next.ClaimedAchievements = current.ClaimedAchievements;
+        next.TutorialStep = current.TutorialStep;
+        next.Rooms = current.Rooms;
+        next.GalaxiesSold = current.GalaxiesSold;
+        next.MineBoostEndUtcTicks = current.MineBoostEndUtcTicks;
+        next.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
+
+        isReset = true;
+        saveService.Save(next);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     /// <summary>Builds and writes the full save snapshot to disk.</summary>
     public void Save()
     {
-        if (isRestoring)
+        if (isRestoring || isReset)
         {
             return;
         }
@@ -92,7 +187,7 @@ public class SaveController : ITickable, IDisposable
 
     public void Tick()
     {
-        if (isRestoring)
+        if (isRestoring || isReset)
         {
             return;
         }
@@ -119,6 +214,18 @@ public class SaveController : ITickable, IDisposable
         data.Mining = BuildMiningSaveData();
         data.Smelting = BuildSmeltingSaveData();
         data.Crafting = BuildCraftingSaveData();
+        data.SavedAtUtcTicks = DateTime.UtcNow.Ticks;
+        data.ClaimedTasks = new List<int>(taskController.GetClaimedTasks());
+        data.ClaimedAchievements = new List<int>(achievementController.GetClaimedAchievements());
+        data.Managers = new List<ManagerData>(managerController.Managers);
+        data.ManagerSlots = managerController.Slots;
+        data.ManagersHired = managerController.TotalHired;
+        data.FreeManagerGranted = managerController.FreeManagerGranted;
+        data.TutorialStep = tutorialController.StepIndex;
+        data.Rooms = mothershipController.GetRoomSaveEntries();
+        data.GalaxiesSold = mothershipController.GalaxiesSold;
+        data.GalaxyValue = mothershipController.GetGalaxyValue();
+        data.MineBoostEndUtcTicks = boostController.MineBoostEndUtcTicks;
 
         return data;
     }
@@ -130,6 +237,7 @@ public class SaveController : ITickable, IDisposable
         playerData.Money = playerModel.GetMoney();
         playerData.LastUnlockedSmelterId = playerModel.GetLastUnlockedSmelterId();
         playerData.LastUnlockedCrafterId = playerModel.GetLastUnlockedCrafterId();
+        playerData.AsteroidsDestroyed = playerModel.AsteroidsDestroyed;
         playerData.UnlockedCrafters = playerModel.GetUnlockedCrafters();
         playerData.UnlockedSmelters = playerModel.GetUnlockedSmelters();
 
@@ -241,6 +349,9 @@ public class SaveController : ITickable, IDisposable
             SmelterSaveData data = new SmelterSaveData();
             data.Id = smelter.Key;
             data.TargetAlloy = smelter.Value;
+            SmelterAlloyData progress = productionController.GetAlloyData(smelter.Key);
+            data.InProgress = progress != null && progress.IsSmelting;
+            data.Progress = progress != null ? progress.SmeltedTime : 0f;
             smeltingData.SmeltEntries.Add(data);
         }
         
@@ -256,6 +367,9 @@ public class SaveController : ITickable, IDisposable
             CrafterSaveData data = new CrafterSaveData();
             data.Id = crafter.Key;
             data.TargetResource = crafter.Value;
+            CrafterAlloyData progress = productionController.GetCraftingAlloyData(crafter.Key);
+            data.InProgress = progress != null && progress.IsSmelting;
+            data.Progress = progress != null ? progress.SmeltedTime : 0f;
             craftingSaveData.CraftEntries.Add(data);
         }
         

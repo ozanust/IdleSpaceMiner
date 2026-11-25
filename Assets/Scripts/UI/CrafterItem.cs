@@ -26,7 +26,12 @@ public class CrafterItem : MonoBehaviour
 
     [SerializeField] private bool isUnlocked = false;
     [SerializeField] private int smelterId;
-    
+
+    [Header("Optional")]
+    [SerializeField] private Image secondSourceResourceImage;
+    [SerializeField] private Image thirdSourceResourceImage;
+    [SerializeField] private RectTransform arrowImage;
+
     private CrafterAlloyData data;
 
 	private void Awake()
@@ -51,15 +56,17 @@ public class CrafterItem : MonoBehaviour
         {
 	        if (data != null)
 	        {
-		        recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString("N1");
+		        recipeRemainingTimeText.text = data.IsSmelting
+			        ? NumberFormatter.FormatDuration(productionController.GetCraftTime(data.Type) * (1f - data.SmeltedTime / data.SmeltTime), true)
+			        : "Waiting for materials";
 		        recipeProgressSlider.value = data.SmeltedTime;
 	        }
         }
 	}
 
-    public void SetSmelterUnlockPrice(int price)
+    public void SetSmelterUnlockPrice(long price)
     {
-        smelterUnlockPriceText.text = price.ToString() + "$";
+        smelterUnlockPriceText.text = NumberFormatter.FormatMoney(price);
     }
     
     private void OnClickUnlockButton()
@@ -99,13 +106,12 @@ public class CrafterItem : MonoBehaviour
 	{
 		if (isUnlocked && smelterId == signal.SmelterId && data == null)
 		{
-			AlloyDataSetting settings = resourceSettings.GetAlloyData(ResourceToAlloyConverter.Convert(signal.RecipeType));
-			ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.RecipeType);
+			ResearchNeededResource[] ingredients = resourceSettings.GetItemSmeltSetting(signal.RecipeType).NeededResources;
 
 			noRecipeSelectedText.gameObject.SetActive(false);
 			selectedRecipeImagesParent.SetActive(true);
-			sourceResourceImage.sprite = settings.Icon;
-			targetResourceImage.sprite = sourceSetting.Icon;
+			targetResourceImage.sprite = resourceSettings.GetResourceData(signal.RecipeType).Icon;
+			LayoutIngredients(ingredients);
 			data = productionController.GetCraftingAlloyData(signal.SmelterId);
 			recipeProgressSlider.maxValue = data.SmeltTime;
 			recipeProgressSlider.minValue = 0;
@@ -118,7 +124,7 @@ public class CrafterItem : MonoBehaviour
 		if (signal.SmelterId == smelterId)
 		{
 			recipeProgressSlider.value = 0;
-			recipeRemainingTimeText.text = "OFF";
+			recipeRemainingTimeText.text = "Idle";
 			noRecipeSelectedText.gameObject.SetActive(true);
 			selectedRecipeImagesParent.SetActive(false);
 			data = null;
@@ -127,6 +133,20 @@ public class CrafterItem : MonoBehaviour
 			playerModel.RemoveWorkingCrafter(signal.SmelterId);
 		}
 	}
+
+    /// <summary>Shows up to three ingredients with all icons in one centred line.</summary>
+    private void LayoutIngredients(ResearchNeededResource[] ingredients)
+    {
+        Image[] images = { sourceResourceImage, secondSourceResourceImage, thirdSourceResourceImage };
+        int count = 0;
+        for (int i = 0; i < ingredients.Length && i < images.Length && images[i] != null; i++)
+        {
+            images[i].sprite = resourceSettings.GetResourceData(ingredients[i].Type).Icon;
+            count++;
+        }
+
+        RecipeLineLayout.Layout(images, count, arrowImage, targetResourceImage.rectTransform);
+    }
 
     public void SetInjections(SignalBus signalBus, ResourceSettings resourceSettings, IProductionController productionController, IPlayerModel playerModel)
 	{

@@ -22,8 +22,25 @@ public class BindingsInstaller : MonoInstaller
 		Container.Bind<IResourcesSellViewController>().To<ResourcesSellViewController>().AsSingle().NonLazy();
 		Container.Bind<IPlanetInfoController>().To<PlanetInfoController>().AsSingle();
 		Container.Bind(typeof(IProductionController), typeof(ITickable)).To<ProductionController>().AsSingle().NonLazy();
+		Container.Bind(typeof(IOfflineProgressController), typeof(ITickable)).To<OfflineProgressController>().AsSingle();
 		Container.Bind(typeof(ISpaceController), typeof(ITickable)).To<SpaceController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<MothershipController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<ConsentService>().AsSingle().NonLazy();
+#if GOOGLE_MOBILE_ADS
+		Container.BindInterfacesTo<AdMobRewardedAdService>().AsSingle().NonLazy();
+#else
+		Container.Bind<IRewardedAdService>().To<SimulatedRewardedAdService>().AsSingle();
+#endif
+		Container.BindInterfacesTo<BoostController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<ManagerController>().AsSingle().NonLazy();
+		Container.Bind<IGoalProgressService>().To<GoalProgressService>().AsSingle();
+		Container.BindInterfacesTo<TaskController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<AchievementController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<TutorialController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<AudioController>().AsSingle().NonLazy();
 		Container.BindInterfacesAndSelfTo<SaveController>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<FirebaseAnalyticsService>().AsSingle().NonLazy();
+		Container.BindInterfacesTo<AnalyticsController>().AsSingle().NonLazy();
 	}
 
 	void InstallSignals()
@@ -69,5 +86,17 @@ public class BindingsInstaller : MonoInstaller
 		Container.DeclareSignal<MenuOpenSignal>();
 
 		Container.DeclareSignal<AsteroidDestroyedSignal>();
+
+		Container.DeclareSignal<TaskUpdatedSignal>();
+
+		Container.DeclareSignal<ManagersUpdatedSignal>();
+		Container.DeclareSignal<ManagerAssignRequestSignal>();
+
+		Container.DeclareSignal<PurchaseSignal>();
+		Container.DeclareSignal<RewardClaimedSignal>();
+		Container.DeclareSignal<GalaxySoldSignal>();
+		Container.DeclareSignal<MothershipUpdatedSignal>();
+		Container.DeclareSignal<BoostsUpdatedSignal>();
+		Container.DeclareSignal<RewardGrantedSignal>();
 	}
 }

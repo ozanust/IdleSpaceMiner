@@ -21,6 +21,14 @@ public class ResearchItem : MonoBehaviour
 	private void Awake()
 	{
 		button.onClick.AddListener(OnClickButton);
+		if (type == ResearchType.Smelter)
+		{
+			TutorialTarget.Mark(button.gameObject, TutorialTargetId.SmelterResearch);
+		}
+		else if (type == ResearchType.AsteroidMiner)
+		{
+			TutorialTarget.Mark(button.gameObject, TutorialTargetId.AsteroidMinerResearch);
+		}
 	}
 
 	private void Start()

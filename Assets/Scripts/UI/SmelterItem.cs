@@ -26,7 +26,11 @@ public class SmelterItem : MonoBehaviour
 
     [SerializeField] private bool isUnlocked = false;
     [SerializeField] private int smelterId;
-    
+
+    [Header("Optional")]
+    [SerializeField] private Image secondSourceResourceImage;
+    [SerializeField] private RectTransform arrowImage;
+
     private SmelterAlloyData data;
 
 	private void Awake()
@@ -34,6 +38,8 @@ public class SmelterItem : MonoBehaviour
         setRecipeButton.onClick.AddListener(OnClickSetRecipe);
         cancelRecipeButton.onClick.AddListener(OnClickRemoveRecipe);
         unlockButton.onClick.AddListener(OnClickUnlockButton);
+        TutorialTarget.Mark(setRecipeButton.gameObject, TutorialTargetId.SmelterRecipeButton);
+        TutorialTarget.Mark(unlockButton.gameObject, TutorialTargetId.SmelterUnlockButton);
     }
 
 	private void Update()
@@ -42,7 +48,9 @@ public class SmelterItem : MonoBehaviour
         {
 	        if (data != null)
 	        {
-		        recipeRemainingTimeText.text = (data.SmeltTime - data.SmeltedTime).ToString("N1");
+		        recipeRemainingTimeText.text = data.IsSmelting
+			        ? NumberFormatter.FormatDuration(productionController.GetSmeltTime(data.Type) * (1f - data.SmeltedTime / data.SmeltTime), true)
+			        : "Waiting for ore";
 		        recipeProgressSlider.value = data.SmeltedTime;
 	        }
         }
@@ -57,9 +65,9 @@ public class SmelterItem : MonoBehaviour
 		signalBus.Subscribe<SmelterUnlockedSignal>(OnSmelterUnlocked);
 	}
 
-    public void SetSmelterUnlockPrice(int price)
+    public void SetSmelterUnlockPrice(long price)
     {
-        smelterUnlockPriceText.text = price.ToString() + "$";
+        smelterUnlockPriceText.text = NumberFormatter.FormatMoney(price);
     }
     
     private void OnClickUnlockButton()
@@ -100,7 +108,7 @@ public class SmelterItem : MonoBehaviour
         if (signal.SmelterId == smelterId)
         {
             recipeProgressSlider.value = 0;
-            recipeRemainingTimeText.text = "OFF";
+            recipeRemainingTimeText.text = "Idle";
             noRecipeSelectedText.gameObject.SetActive(true);
             selectedRecipeImagesParent.SetActive(false);
             data = null;
@@ -114,13 +122,21 @@ public class SmelterItem : MonoBehaviour
 	{
         if (isUnlocked && smelterId == signal.SmelterId && data == null)
         {
-            AlloyDataSetting settings = resourceSettings.GetAlloyData(signal.RecipeType);
-            ResourceDataSetting sourceSetting = resourceSettings.GetResourceData(signal.ItemRecipeType);
-
             noRecipeSelectedText.gameObject.SetActive(false);
             selectedRecipeImagesParent.SetActive(true);
-            sourceResourceImage.sprite = settings.Icon;
-            targetResourceImage.sprite = sourceSetting.Icon;
+            targetResourceImage.sprite = resourceSettings.GetResourceData(AlloyToResourceConverter.Convert(signal.RecipeType)).Icon;
+
+            // Bars from ore have one ingredient, bars like Bronze and Steel have two
+            ResearchNeededResource[] ingredients = productionController.GetSmeltIngredients(signal.RecipeType);
+            Image[] images = { sourceResourceImage, secondSourceResourceImage };
+            int count = 0;
+            for (int i = 0; i < ingredients.Length && i < images.Length && images[i] != null; i++)
+            {
+                images[i].sprite = resourceSettings.GetResourceData(ingredients[i].Type).Icon;
+                count++;
+            }
+
+            RecipeLineLayout.Layout(images, count, arrowImage, targetResourceImage.rectTransform);
             data = productionController.GetAlloyData(signal.SmelterId);
             recipeProgressSlider.maxValue = data.SmeltTime;
             recipeProgressSlider.minValue = 0;

@@ -8,6 +8,9 @@ using Object = UnityEngine.Object;
 
 public class SpaceController : ISpaceController, ITickable, IDisposable
 {
+	public const int DefaultVisiblePlanets = 4;
+	public const int PlanetsPerTelescope = 3;
+
 	PlanetSettings planetSettings;
 	ISpaceModel spaceModel;
 	IPlayerModel playerModel;
@@ -16,6 +19,8 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	ISaveService saveService;
 	IMiningController miningController;
 	SaveController saveController;
+	IOfflineProgressController offlineProgressController;
+	ResourceSettings resourceSettings;
 	AsteroidView asteroidPrototype;
 	MissileView missilePrototype;
 
@@ -23,9 +28,12 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 	int nextAsteroidSpawnTime;
 	float asteroidSpawnTimer;
 	int asteroidNumber = -1;
+	// Only one asteroid at a time, the next one waits until this one is mined
+	int activeAsteroidId = -1;
 
 	public SpaceController(
 		PlanetSettings planetSettings,
+		ResourceSettings resourceSettings,
 		ISpaceModel spaceModel,
 		IPlayerModel playerModel,
 		GameSettings gameSettings,
@@ -33,10 +41,12 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		ISaveService saveService,
 		IMiningController miningController,
 		SaveController saveController,
+		IOfflineProgressController offlineProgressController,
 		AsteroidView asteroidView,
 		MissileView missileView)
 	{
 		this.planetSettings = planetSettings;
+		this.resourceSettings = resourceSettings;
 		this.spaceModel = spaceModel;
 		this.playerModel = playerModel;
 		this.gameSettings = gameSettings;
@@ -44,6 +54,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		this.saveService = saveService;
 		this.miningController = miningController;
 		this.saveController = saveController;
+		this.offlineProgressController = offlineProgressController;
 		asteroidPrototype = asteroidView;
 		missilePrototype = missileView;
 
@@ -62,25 +73,29 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		{
 			spaceModel.InitializePlanetData(GetSampleData());
 			playerModel.AddMoney(gameSettings.EconomySettings.StartingMoney);
+			playerModel.AddCurrency(CurrencyType.DarkMatter, gameSettings.EconomySettings.StartingDarkMatter);
 		}
 		else
 		{
 			saveController.BeginRestore();
 			RestoreFromSave(save);
 			saveController.EndRestore();
+			offlineProgressController.ApplySinceSave(save);
 		}
 
 		signalBus.Subscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
+		signalBus.Subscribe<ResearchCompletedSignal>(OnTelescopeResearchUnlocked);
 		signalBus.Subscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 	}
 
 	private void RestoreFromSave(SaveData save)
 	{
 		// --- Space state ---
-		spaceModel.InitializePlanetData(save.Space.Planets);
+		spaceModel.InitializePlanetData(RefreshPlanetStats(AddMissingPlanets(save.Space.Planets)));
 
 		// --- Player money ---
 		playerModel.AddMoney(save.Player.Money);
+		playerModel.AddDestroyedAsteroids(save.Player.AsteroidsDestroyed);
 
 		// --- Resources ---
 		foreach (ResourceSaveEntry entry in save.Player.Resources)
@@ -120,6 +135,8 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		foreach (ResearchType research in save.Player.UnlockedResearches)
 		{
 			playerModel.UnlockResearch(research);
+			// Saves from before a planet was added don't have it revealed yet
+			RevealTelescopePlanets(research);
 		}
 
 		// --- Smelter / crafter slot progression ---
@@ -153,7 +170,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 			foreach (var data in save.Smelting.SmeltEntries)
 			{
 				//playerModel.AddWorkingSmelter(data.Id, data.TargetAlloy);
-				signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = data.TargetAlloy, SmelterId = data.Id });
+				signalBus.Fire(new SmeltRecipeAddSignal() { RecipeType = data.TargetAlloy, SmelterId = data.Id, InProgress = data.InProgress, Progress = data.Progress });
 			}
 		}
 		
@@ -163,7 +180,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 			foreach (var data in save.Crafting.CraftEntries)
 			{
 				//playerModel.AddWorkingCrafter(data.Id, data.TargetResource);
-				signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = data.TargetResource, SmelterId = data.Id });
+				signalBus.Fire(new CraftRecipeAddSignal() { RecipeType = data.TargetResource, SmelterId = data.Id, InProgress = data.InProgress, Progress = data.Progress });
 			}
 		}
 	}
@@ -192,41 +209,56 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Saves store each planet's stats and prices, so they are worked out again from the levels
+	/// and the current settings. Rebalanced settings then reach existing saves too.
+	/// </summary>
+	private PlanetData[] RefreshPlanetStats(PlanetData[] planets)
+	{
+		foreach (PlanetData planet in planets)
+		{
+			PlanetDataSetting setting;
+			if (!planet.IsUnlocked || !planetSettings.TryGetPlanetSetting(planet.PlanetIndex, out setting))
+			{
+				continue;
+			}
+
+			planet.CurrentTotalMiningRate = PlanetUpgradeFormula.GetMiningRate(setting, planet.MiningRateLevel);
+			planet.TotalMiningRateUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(setting, planet.MiningRateLevel);
+			planet.CurrentShipSpeed = PlanetUpgradeFormula.GetShipSpeed(setting, planet.ShipSpeedLevel);
+			planet.ShipSpeedUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(setting, planet.ShipSpeedLevel);
+			planet.CurrentShipCargo = PlanetUpgradeFormula.GetShipCargo(setting, planet.ShipCargoLevel);
+			planet.ShipCargoUpdatePrice = PlanetUpgradeFormula.GetUpgradePrice(setting, planet.ShipCargoLevel);
+		}
+
+		return planets;
+	}
+
 	private PlanetData[] GetSampleData()
 	{
-		PlanetData data = new PlanetData();
+		return AddMissingPlanets(new PlanetData[0]);
+	}
 
-		data.IsUnraveled = true;
-		data.PlanetIndex = 0;
-		data.MiningRateLevel = 0;
-		data.ShipCargoLevel = 0;
-		data.ShipSpeedLevel = 0;
+	/// <summary>Appends data for planets in the settings that the given data doesn't have yet.</summary>
+	private PlanetData[] AddMissingPlanets(PlanetData[] planets)
+	{
+		int planetCount = planetSettings.Settings.Length;
+		if (planets.Length >= planetCount)
+		{
+			return planets;
+		}
 
-		PlanetData data2 = new PlanetData();
+		PlanetData[] result = new PlanetData[planetCount];
+		System.Array.Copy(planets, result, planets.Length);
 
-		data2.IsUnraveled = true;
-		data2.PlanetIndex = 1;
-		data2.MiningRateLevel = 0;
-		data2.ShipCargoLevel = 0;
-		data2.ShipSpeedLevel = 0;
-		
-		PlanetData data3 = new PlanetData();
+		for (int i = planets.Length; i < planetCount; i++)
+		{
+			result[i] = new PlanetData();
+			result[i].PlanetIndex = i;
+			result[i].IsUnraveled = i < DefaultVisiblePlanets;
+		}
 
-		data3.IsUnraveled = true;
-		data3.PlanetIndex = 2;
-		data3.MiningRateLevel = 0;
-		data3.ShipCargoLevel = 0;
-		data3.ShipSpeedLevel = 0;
-		
-		PlanetData data4 = new PlanetData();
-
-		data4.IsUnraveled = true;
-		data4.PlanetIndex = 3;
-		data4.MiningRateLevel = 0;
-		data4.ShipCargoLevel = 0;
-		data4.ShipSpeedLevel = 0;
-
-		return new PlanetData[] { data, data2, data3, data4 };
+		return result;
 	}
 
 	private void OnAsteroidResearchUnlocked(ResearchCompletedSignal signal)
@@ -238,21 +270,92 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 		}
 	}
 
+	private void OnTelescopeResearchUnlocked(ResearchCompletedSignal signal)
+	{
+		RevealTelescopePlanets(signal.ResearchType);
+	}
+
+	/// <summary>
+	/// The first planets are visible from the start, then each telescope reveals the next few
+	/// (Telescope 1 reveals planets 5-7, Telescope 2 planets 8-10, like Idle Planet Miner).
+	/// </summary>
+	private void RevealTelescopePlanets(ResearchType research)
+	{
+		if (research < ResearchType.Telescope1 || research > ResearchType.Telescope5)
+		{
+			return;
+		}
+
+		int firstPlanet = DefaultVisiblePlanets + (research - ResearchType.Telescope1) * PlanetsPerTelescope;
+		PlanetData[] planetData = spaceModel.GetPlanetsData();
+
+		for (int i = firstPlanet; i < firstPlanet + PlanetsPerTelescope && i < planetData.Length; i++)
+		{
+			if (!planetData[i].IsUnraveled)
+			{
+				spaceModel.UnravelPlanet(i);
+			}
+		}
+	}
+
 	private void OnAsteroidDestroyed(AsteroidDestroyedSignal signal)
 	{
+		FxPlayer.Play(gameSettings.FxSettings.ImpactFrames, signal.Position, gameSettings.FxSettings.AsteroidSize * 2f);
+
 		ResourceData[] rewards = spaceModel.GetAsteroidRewards(signal.AsteroidId).Rewards;
 		foreach (ResourceData rd in rewards)
 		{
 			playerModel.AddResource(rd.Type, rd.Amount);
+
+			ResourceDataSetting resource = resourceSettings.GetResourceData(rd.Type);
+			string name = resource != null ? resource.Name : rd.Type.ToString();
+			FloatingTextView.Spawn($"+{NumberFormatter.Format(rd.Amount)} {name}", signal.Position, new Color(0.6f, 1f, 0.6f));
 		}
 
 		spaceModel.RemoveAsteroidData(signal.AsteroidId);
+		playerModel.AddDestroyedAsteroids(1);
+
+		if (signal.AsteroidId == activeAsteroidId)
+		{
+			activeAsteroidId = -1;
+		}
+	}
+
+	/// <summary>
+	/// Like Idle Planet Miner, an asteroid is worth a fixed number of seconds of all planets'
+	/// mining, paid out in one random ore that the bought planets produce.
+	/// </summary>
+	private ResourceData CreateAsteroidReward()
+	{
+		List<ResourceType> ores = new List<ResourceType>();
+		foreach (PlanetData planet in spaceModel.GetPlanetsData())
+		{
+			PlanetDataSetting setting;
+			if (!planet.IsUnlocked || !planetSettings.TryGetPlanetSetting(planet.PlanetIndex, out setting))
+			{
+				continue;
+			}
+
+			foreach (PlanetMiningYield yield in setting.MiningYieldRatios)
+			{
+				if (!ores.Contains(yield.Type))
+				{
+					ores.Add(yield.Type);
+				}
+			}
+		}
+
+		ResourceType ore = ores.Count > 0 ? ores[Random.Range(0, ores.Count)] : ResourceType.Copper;
+		float value = gameSettings.GlobalSettings.AsteroidRewardSeconds * miningController.GetValuePerSecond();
+		int amount = Mathf.Max(1, Mathf.RoundToInt(value / Mathf.Max(1, resourceSettings.GetResourceValue(ore))));
+		return new ResourceData(ore, amount);
 	}
 
 	/// <summary>Unsubscribes from all signals.</summary>
 	public void Dispose()
 	{
 		signalBus.Unsubscribe<ResearchCompletedSignal>(OnAsteroidResearchUnlocked);
+		signalBus.Unsubscribe<ResearchCompletedSignal>(OnTelescopeResearchUnlocked);
 		signalBus.Unsubscribe<AsteroidDestroyedSignal>(OnAsteroidDestroyed);
 	}
 
@@ -282,15 +385,21 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 		if (!planetData[planetIndex].IsUnlocked)
 		{
-			if (playerModel.HasMoney(planetSettings.Settings[planetIndex].PlanetPrice))
+			PlanetDataSetting setting = planetSettings.Settings[planetIndex];
+			bool canBuy = playerModel.HasMoney(setting.PlanetPrice);
+			if (canBuy)
 			{
 				spaceModel.UnlockPlanet(planetIndex);
-				playerModel.UseMoney(planetSettings.Settings[planetIndex].PlanetPrice);
+				playerModel.UseMoney(setting.PlanetPrice);
 			}
-			else
+
+			signalBus.Fire(new PurchaseSignal()
 			{
-				Debug.LogWarning("Insufficient funds!");
-			}
+				Kind = PurchaseKind.Planet,
+				Success = canBuy,
+				Price = setting.PlanetPrice,
+				FailMessage = $"You need {NumberFormatter.FormatMoney(setting.PlanetPrice)} to buy {setting.Name}"
+			});
 		}
 		else
 		{
@@ -300,7 +409,7 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 
 	public void Tick()
 	{
-		if (isAsteroidMinerUnlocked)
+		if (isAsteroidMinerUnlocked && activeAsteroidId < 0)
 		{
 			asteroidSpawnTimer += Time.deltaTime;
 			if (asteroidSpawnTimer >= nextAsteroidSpawnTime)
@@ -314,11 +423,19 @@ public class SpaceController : ISpaceController, ITickable, IDisposable
 				asteroidNumber += 1;
 				int id = asteroidNumber;
 				asteroid.Init(signalBus, id);
+				FxSettings fx = gameSettings.FxSettings;
+				if (fx.AsteroidSprites.Length > 0)
+				{
+					asteroid.SetArt(fx.AsteroidSprites[Random.Range(0, fx.AsteroidSprites.Length)], fx.AsteroidSize);
+				}
+
 				asteroid.OnClick.AddListener(OnClickAsteroid);
 				asteroid.gameObject.SetActive(true);
 
-				AsteroidData data = new AsteroidData(new ResourceData[] { new ResourceData(ResourceType.Copper, Mathf.RoundToInt(playerModel.GetResource(ResourceType.Copper) * 0.2f)), new ResourceData(ResourceType.Iron, Mathf.RoundToInt(playerModel.GetResource(ResourceType.Iron) * 0.2f)) });
+				// The reward is fixed when the asteroid appears, so hoarding ore doesn't change it
+				AsteroidData data = new AsteroidData(new ResourceData[] { CreateAsteroidReward() });
 				spaceModel.AddAsteroidData(data, id);
+				activeAsteroidId = id;
 				
 				nextAsteroidSpawnTime = Random.Range(gameSettings.GlobalSettings.AsteroidSpawnTimes[0], gameSettings.GlobalSettings.AsteroidSpawnTimes[1]);
 				asteroidSpawnTimer = 0;

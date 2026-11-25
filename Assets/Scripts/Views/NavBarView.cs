@@ -7,6 +7,8 @@ using Zenject;
 public class NavBarView : MonoBehaviour
 {
     [Inject] SignalBus signalBus;
+    [Inject] IPlayerModel playerModel;
+    [Inject] IManagerController managerController;
 
     // TODO: Make those custom button and use their menu type property
     [SerializeField] private Button resourcesButton;
@@ -25,6 +27,18 @@ public class NavBarView : MonoBehaviour
         managersButton.onClick.AddListener(OnClickManagers);
         boostsButton.onClick.AddListener(OnClickBoosts);
         mothershipButton.onClick.AddListener(OnClickMothership);
+        TutorialTarget.Mark(resourcesButton.gameObject, TutorialTargetId.ResourcesNavButton);
+        TutorialTarget.Mark(productionButton.gameObject, TutorialTargetId.ProductionNavButton);
+        TutorialTarget.Mark(projectsButton.gameObject, TutorialTargetId.ProjectsNavButton);
+
+        // Managers open after the Management research, and stay open in later galaxies once hired
+        managersButton.interactable = playerModel.IsResearchUnlocked(ResearchType.Management) || managerController.Managers.Count > 0;
+
+        // The scene keeps it locked like the other upcoming menus, selling the galaxy is always available
+        mothershipButton.interactable = true;
+
+        // Locked in the scene like the other upcoming menus, ad boosts are always available
+        boostsButton.interactable = true;
 
         signalBus.Subscribe<ResearchCompletedSignal>(OnResearchUnlocked);
     }

@@ -10,6 +10,11 @@ public class MothershipView : MonoBehaviour, IPointerClickHandler
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
+		if (PointerUtility.IsDrag(eventData))
+		{
+			return;
+		}
+
 		signalBus.Fire(new MenuOpenSignal() { Type = MenuType.Resources });
 	}
 }

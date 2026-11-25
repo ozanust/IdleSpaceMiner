@@ -32,9 +32,14 @@ public class ResourcesView : MonoBehaviour
 	private void Awake()
 	{
 		closeButton.onClick.AddListener(CloseView);
+		TutorialTarget.Mark(closeButton.gameObject, TutorialTargetId.ResourcesCloseButton);
 		oreButton.onClick.AddListener(OnOreSelected);
 		alloyButton.onClick.AddListener(OnAlloySelected);
 		itemButton.onClick.AddListener(OnItemSelected);
+
+		// Show which list the window starts on
+		int startTab = oreResourcesLayout.gameObject.activeSelf ? 0 : alloyResourcesLayout.gameObject.activeSelf ? 1 : 2;
+		TabButton.Select(startTab, oreButton, alloyButton, itemButton);
 	}
 
 	private void Start()
@@ -53,6 +58,13 @@ public class ResourcesView : MonoBehaviour
 
 	private void OnMenuOpen(MenuOpenSignal signal)
 	{
+		// Opening another window closes this one
+		if (MenuTypes.ClosesFor(signal.Type, type))
+		{
+			panel.SetActive(false);
+			return;
+		}
+
 		if (signal.Type == type)
 		{
 			panel.SetActive(!panel.activeInHierarchy);
@@ -61,17 +73,9 @@ public class ResourcesView : MonoBehaviour
 
 	private void OnResourcesInitialized(ResourcesViewInitializedSignal signal)
 	{
-		foreach(ResourceType rt in signal.ResourcesToInitialize.Keys)
+		foreach (ResourceType rt in signal.ResourcesToInitialize.Keys)
 		{
-			if (!infoItems.ContainsKey(rt))
-			{
-				MainResourceType mainType = resourceSettings.GetResourceParentType(rt);
-				ResourceInfoItem infoItem = Instantiate(infoItemPrototype, GetResourceParent(mainType));
-				ResourceDataSetting resourceData = resourceSettings.GetResourceData(rt);
-				infoItem.InitializeResource(resourceData.Icon, resourceData.Name);
-
-				infoItems.Add(rt, infoItem);
-			}
+			UpdateItem(rt);
 		}
 	}
 
@@ -79,22 +83,29 @@ public class ResourcesView : MonoBehaviour
 	{
 		foreach (ResourceType rt in signal.ResourcesToUpdate.Keys)
 		{
-			if (!infoItems.ContainsKey(rt))
-			{
-				MainResourceType mainType = resourceSettings.GetResourceParentType(rt);
-				ResourceInfoItem infoItem = Instantiate(infoItemPrototype, GetResourceParent(mainType));
-				ResourceDataSetting resourceData = resourceSettings.GetResourceData(rt);
-				infoItem.InitializeResource(resourceData.Icon, resourceData.Name);
-				infoItem.UpdateAmount(playerModel.GetResource(rt), playerModel.GetResource(rt) * resourceSettings.GetResourceValue(rt));
-				infoItem.SetSelectionButtonAction(() => OnSelectResourceItem(rt));
-
-				infoItems.Add(rt, infoItem);
-			}
-			else
-			{
-				infoItems[rt].UpdateAmount(playerModel.GetResource(rt), playerModel.GetResource(rt) * resourceSettings.GetResourceValue(rt));
-			}
+			UpdateItem(rt);
 		}
+	}
+
+	// Rows made for loaded resources need the sell selection too, or they can't be sold
+	private void UpdateItem(ResourceType rt)
+	{
+		if (!infoItems.ContainsKey(rt))
+		{
+			MainResourceType mainType = resourceSettings.GetResourceParentType(rt);
+			ResourceInfoItem infoItem = Instantiate(infoItemPrototype, GetResourceParent(mainType));
+			ResourceDataSetting resourceData = resourceSettings.GetResourceData(rt);
+			infoItem.InitializeResource(resourceData.Icon, resourceData.Name);
+			infoItem.SetSelectionButtonAction(() => OnSelectResourceItem(rt));
+			if (rt == ResourceType.Copper)
+			{
+				TutorialTarget.Mark(infoItem.gameObject, TutorialTargetId.CopperResource);
+			}
+
+			infoItems.Add(rt, infoItem);
+		}
+
+		infoItems[rt].UpdateAmount(playerModel.GetResource(rt), playerModel.GetResource(rt) * resourceSettings.GetResourceValue(rt));
 	}
 
 	private void OnSelectResourceItem(ResourceType type)
@@ -136,6 +147,7 @@ public class ResourcesView : MonoBehaviour
 		alloyResourcesLayout.gameObject.SetActive(isAlloy);
 		itemResourcesLayout.gameObject.SetActive(isItem);
 		panelTitle.text = isOre ? "Ores" : isAlloy ? "Alloys" : isItem ? "Items" : "";
+		TabButton.Select(isOre ? 0 : isAlloy ? 1 : 2, oreButton, alloyButton, itemButton);
 		signalBus.Fire(new ResourceDeselectedToSellSignal() { Type = currentResourceSelection });
 	}
 

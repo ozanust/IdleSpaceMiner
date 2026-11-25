@@ -18,6 +18,14 @@ public static class AlloyToResourceConverter
 				return ResourceType.SilicaBar;
 			case AlloyType.AluminumBar:
 				return ResourceType.AluminumBar;
+			case AlloyType.SilverBar:
+				return ResourceType.SilverBar;
+			case AlloyType.GoldBar:
+				return ResourceType.GoldBar;
+			case AlloyType.BronzeBar:
+				return ResourceType.BronzeBar;
+			case AlloyType.SteelBar:
+				return ResourceType.SteelBar;
 			default:
 				return ResourceType.CopperBar;
 		}
@@ -37,6 +45,10 @@ public static class AlloyToResourceConverter
 				return ResourceType.Silica;
 			case AlloyType.AluminumBar:
 				return ResourceType.Aluminum;
+			case AlloyType.SilverBar:
+				return ResourceType.Silver;
+			case AlloyType.GoldBar:
+				return ResourceType.Gold;
 			default:
 				return ResourceType.Copper;
 		}
